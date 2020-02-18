@@ -1,0 +1,37 @@
+version: '3.2'
+
+services:
+  backend:
+    image: node:12
+    container_name: kookkook-backend-dev
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - ./src:/app/src
+      - ./node_modules:/app/node_modules
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.build.json:/app/tsconfig.build.json
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      JWT_SECRET: jwtsecret
+    working_dir: /app
+    command: ['npm', 'run', 'start:dev']
+
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
