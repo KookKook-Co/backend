@@ -44,6 +44,8 @@ $ bash scripts/setup-dev.sh
     $ bash scripts/run-dev.sh
     ```
 
+    > **Note:** Backend server is listening on [localhost:3000](localhost:3000) / Adminer is listening on [localhost:8080](localhost:8080)
+
 ## Test
 
 ```bash
