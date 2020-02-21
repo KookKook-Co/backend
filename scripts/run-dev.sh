@@ -1,5 +1,15 @@
-docker-compose down --remove-orphans
-sleep 5
-echo '# start everything'
-docker-compose -f docker-compose.dev.yml up -d
+if [ -e .env ]; then
+    set -a # automatically export all variables
+    source .env
+    set +a
+else 
+    echo "Please set up your .env file before starting your environment."
+    exit 1
+fi
+export PORT=3000
+export NODE_ENV=development
+if [ ! "$(docker ps -q -f name=$POSTGRES_CONTAINER_NAME)" ]; then
+    bash scripts/setup-dev.sh
+fi
+echo '# Running dev'
 npm run start:dev

@@ -3,6 +3,7 @@ version: '3.2'
 services:
   db:
     image: postgres
+    container_name: kookkook-postgres-dev
     restart: always
     volumes:
       - ./db:/var/lib/postgresql/data

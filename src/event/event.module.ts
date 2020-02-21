@@ -1,4 +1,4 @@
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from '../../src/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { EventController } from './event.controller';
 import { EventGateway } from './event.gateway';

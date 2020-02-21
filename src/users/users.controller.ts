@@ -1,9 +1,9 @@
 import { Controller, Post, Body, Res, Get, UseGuards } from '@nestjs/common';
 import { User, CreateUserDto, Role } from './users.interfaces';
 import { Response } from 'express';
-import { RolesGuard } from 'src/guard/roles.guard';
+import { RolesGuard } from '../../src/guard/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
-import { Roles } from 'src/decorator/roles.decotator';
+import { Roles } from '../../src/decorator/roles.decotator';
 
 @Controller('users')
 export class UsersController {

@@ -1,15 +1,18 @@
+if [ -e .env ]; then
+    set -a # automatically export all variables
+    source .env
+    set +a
+else 
+    echo "Please set up your .env file before starting your environment."
+    exit 1
+fi
 # clear containers
-if [ "$(docker ps -q)" ]; then
-    echo '# stop running container'
-    docker stop $(docker ps -q)
+bash scripts/clear-container.sh
+if [ ! "$(docker ps -q -f name=$PRISMA_CONTAINER_NAME)" ]; then
+    echo "# Setting up environment"
+    # run postgres & adminer containers
+    docker-compose -f docker-compose.dev.yml up -d
+    echo "# Wating for database"
+    sleep 5
 fi
-if [ "$(docker ps -aq)" ]; then
-    echo '# remove exited container'
-    docker rm $(docker ps -aq)
-fi
-
-echo "# Setting up environment"
-# run postgres & adminer containers
-docker-compose -f docker-compose.dev.yml up -d
-
 echo "# Everything is already up"
