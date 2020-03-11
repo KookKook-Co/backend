@@ -2,17 +2,10 @@ version: '3.2'
 
 services:
   backend:
-    image: node:12
+    build: .
+    image: patsk135/kookkook-backend-dev:latest
     container_name: kookkook-backend-dev
-    depends_on:
-      - db
     restart: always
-    volumes:
-      - ./src:/app/src
-      - ./node_modules:/app/node_modules
-      - ./package.json:/app/package.json
-      - ./tsconfig.json:/app/tsconfig.json
-      - ./tsconfig.build.json:/app/tsconfig.build.json
     ports:
       - 3000:3000
     environment:
@@ -21,8 +14,6 @@ services:
       JWT_SECRET: jwtsecret
       LINE_USERID: U26da3150bd8eb08e92189daf9ca82e3d
       LINE_BOT_TOKEN: hbuF2G3ORyb6xZsK4ajeUiqPTmFIjNGZqIJr6L9ftCp7gc+dYe0RatFuouYrIi5zGt8uBJX5L6jexP1lLoAtP7Ooa6H/rqtVbOJJaT0vm6JSq0AQ/OHlRMUiV504KApB0tIAVLKxag/4ki5Cmy1gJQdB04t89/1O/w1cDnyilFU=
-    working_dir: /app
-    command: ['npm', 'run', 'start:dev']
 
   db:
     image: postgres

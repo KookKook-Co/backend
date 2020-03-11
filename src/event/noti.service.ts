@@ -12,10 +12,11 @@ export class NotiService {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.configService.get<string>(
                 'LINE_BOT_TOKEN',
-            )}`,
+            ) || process.env.LINE_BOT_TOKEN}`,
         };
         const body = JSON.stringify({
-            to: `${this.configService.get<string>('LINE_USERID')}`,
+            to: `${this.configService.get<string>('LINE_USERID') ||
+                process.env.LINE_USERID}`,
             messages: [
                 {
                     type: 'text',

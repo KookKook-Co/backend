@@ -7,7 +7,8 @@ export class SeederService {
     constructor(private readonly configService: ConfigService) {}
 
     private pool = new Pool({
-        connectionString: this.configService.get<string>('DB_URI'),
+        connectionString:
+            process.env.DB_URI || this.configService.get<string>('DB_URI'),
     });
 
     seedUsers() {

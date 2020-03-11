@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
-import { NotiService } from '../../src/event/noti.service';
+import { NotiService } from '../event/noti.service';
 
 @Controller('event')
 export class EventController {
