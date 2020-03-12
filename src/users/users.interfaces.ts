@@ -11,7 +11,7 @@ export enum Role {
     WORKER = 'WORKER',
 }
 
-export interface CreateUserDto {
+export interface CreateUserDTO {
     user: User;
     profile: Profile;
 }

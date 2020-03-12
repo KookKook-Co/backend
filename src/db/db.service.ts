@@ -14,4 +14,8 @@ export class DbService {
     createUser() {
         return true;
     }
+
+    getUserResponsibleHouse() {
+        return true;
+    }
 }

@@ -27,8 +27,12 @@ export class AuthService {
             sub: user.userId,
             role: user.role,
         };
+        const access_token = this.jwtService.sign(payload);
+        const dbGetResponsibleHouse = async () => true as any;
+        const responsible_house: number = await dbGetResponsibleHouse();
         return {
-            access_token: this.jwtService.sign(payload),
+            access_token,
+            responsible_house,
         };
     }
 }

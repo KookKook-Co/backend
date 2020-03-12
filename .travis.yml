@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - 'node'
+
+cache: npm
+
+services:
+  - docker
+
+stages:
+  - name: run test
+    if: type = push
+
+  - name: docker build to docker hub
+    if: type = push
+
+jobs:
+  include:
+    - stage: run test
+      script:
+        - npm run test
+
+    - stage: docker build to docker hub
+      script:
+        - bash ./scripts/push-backend-image.sh
