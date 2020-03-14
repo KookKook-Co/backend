@@ -9,7 +9,6 @@ import { ConfigService } from '@nestjs/config';
 import { DbService } from '../db/db.service';
 import { Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
-import { async } from 'rxjs/internal/scheduler/async';
 
 @Injectable()
 export class SeederService {
@@ -28,7 +27,10 @@ export class SeederService {
         query_list.push(
             createTable(
                 'House',
-                '"hid" INT, "length" DOUBLE PRECISION, "width" DOUBLE PRECISION, "scale" DOUBLE PRECISION, PRIMARY KEY (hid)',
+                '"hid" INT, "length" DOUBLE PRECISION, \
+                "width" DOUBLE PRECISION, \
+                "scale" DOUBLE PRECISION, \
+                PRIMARY KEY (hid)',
             ),
         );
 
@@ -37,6 +39,7 @@ export class SeederService {
                 '_User',
                 '"uid" SERIAL, \
                 "pwd" VARCHAR, \
+                "currentuser" BOOLEAN, \
                 "fname" VARCHAR(50), \
                 "lname" VARCHAR(50), \
                 "position" VARCHAR(50), \
@@ -58,6 +61,7 @@ export class SeederService {
                 'Chicken',
                 '"date_in" DATE, \
                 "hid" INT NOT NULL, \
+                "gen" VARCHAR(50), \
                 "amount_in" INT, \
                 "type" VARCHAR(20), \
                 "gender" VARCHAR(1), \
@@ -172,10 +176,24 @@ export class SeederService {
         );
 
         query_list.push(
-            addConstraint('HasUser', 'uid', '_User', 'uid', 'uid_constraint'),
+            addConstraint(
+                'HasUser',
+                'uid',
+                '_User',
+                'uid',
+                'uid_constraint',
+                'ON DELETE CASCADE',
+            ),
         );
         query_list.push(
-            addConstraint('HasUser', 'hid', 'House', 'hid', 'hid_constraint'),
+            addConstraint(
+                'HasUser',
+                'hid',
+                'House',
+                'hid',
+                'hid_constraint',
+                'ON DELETE CASCADE',
+            ),
         );
         query_list.push(
             addConstraint('Chicken', 'hid', 'House', 'hid', 'hid_constraint'),
@@ -261,7 +279,6 @@ export class SeederService {
     };
 
     seedAddSampleData = async () => {
-    
         await this.dbService.createHouse(1, 10, 10, 10);
         // await temp;
         await this.dbService.createHouse(2, 10, 10, 10);
@@ -269,6 +286,7 @@ export class SeederService {
         await this.dbService.createUser(
             'worker1',
             'kookkook',
+            1,
             '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
             'worker',
         );
@@ -276,6 +294,7 @@ export class SeederService {
         await this.dbService.createUser(
             'worker2',
             'kookkook',
+            1,
             '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
             'worker',
         );
@@ -295,6 +314,7 @@ export class SeederService {
         await this.dbService.createChicken(
             '12-03-2020',
             1,
+            '1/2020',
             36000,
             'Sally',
             'm',
@@ -303,6 +323,7 @@ export class SeederService {
         await this.dbService.createChicken(
             '12-03-2020',
             2,
+            '1/2020',
             40000,
             'Sally',
             'f',
