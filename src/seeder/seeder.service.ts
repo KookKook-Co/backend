@@ -23,7 +23,7 @@ export class SeederService {
     });
 
     seedTableConstraint = async () => {
-        var query_list = [];
+        const query_list = [];
         query_list.push(
             createTable(
                 'House',
