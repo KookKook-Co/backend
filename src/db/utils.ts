@@ -1,9 +1,5 @@
 import { Pool } from 'pg';
 
-export const pool = new Pool({
-    connectionString: "postgres://postgres:password@localhost:5432/postgres"
-  });
-  
-export async function poolQuery(query_list) {
+export async function poolQuery(pool: Pool, query_list) {
     return pool.query(query_list);
-  }
+}

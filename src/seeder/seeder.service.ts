@@ -1,14 +1,10 @@
-import {
-    addConstraint,
-    addMultiConstraint,
-    createTable,
-    poolQuery,
-} from './utils';
+import { addConstraint, addMultiConstraint, createTable } from './utils';
 
 import { ConfigService } from '@nestjs/config';
 import { DbService } from '../db/db.service';
 import { Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
+import { poolQuery } from '../db/utils';
 
 @Injectable()
 export class SeederService {
@@ -23,7 +19,7 @@ export class SeederService {
     });
 
     seedTableConstraint = async () => {
-        var query_list = [];
+        const query_list = [];
         query_list.push(
             createTable(
                 'House',

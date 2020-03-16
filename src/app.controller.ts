@@ -7,7 +7,6 @@ export class AppController {
     constructor(private readonly appService: AppService) {}
     @Get()
     getHello() {
-        console.log('test travis-ciii');
         return this.appService.getHello();
     }
 }
