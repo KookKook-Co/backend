@@ -1,4 +1,9 @@
-import { addConstraint, addMultiConstraint, createTable } from './utils';
+import {
+    addConstraint,
+    addMultiConstraint,
+    createTable,
+    dropTable,
+} from './utils';
 
 import { ConfigService } from '@nestjs/config';
 import { DbService } from '../db/db.service';
@@ -35,7 +40,7 @@ export class SeederService {
                 '_User',
                 '"uid" SERIAL, \
                 "pwd" VARCHAR, \
-                "currentuser" BOOLEAN, \
+                "is_current_user" BOOLEAN, \
                 "fname" VARCHAR(50), \
                 "lname" VARCHAR(50), \
                 "position" VARCHAR(50), \
@@ -94,6 +99,7 @@ export class SeederService {
                 "date" DATE, \
                 "hid" INT NOT NULL, \
                 "death_real" INT, \
+                "death_cam" INT, \
                 PRIMARY KEY (chic_time, date, hid)',
             ),
         );
@@ -113,23 +119,23 @@ export class SeederService {
         query_list.push(
             createTable(
                 'VacRecord',
-                '"vactime" TIMESTAMP, \
+                '"vac_time" TIMESTAMP, \
                 "date" DATE, \
                 "hid" INT NOT NULL, \
                 "vac_type" VARCHAR(50), \
                 "vac_conc" DOUBLE PRECISION, \
-                PRIMARY KEY (vactime, date, hid)',
+                PRIMARY KEY (vac_time, date, hid)',
             ),
         );
 
         query_list.push(
             createTable(
                 'Camera',
-                '"cam_no" INT, \
+                '"cid" INT, \
                 "hid" INT NOT NULL, \
                 "cam_x" INT, \
                 "cam_y" INT, \
-                PRIMARY KEY (cam_no, hid)',
+                PRIMARY KEY (cid, hid)',
             ),
         );
 
@@ -137,23 +143,21 @@ export class SeederService {
             createTable(
                 'Image',
                 '"timestamp" TIMESTAMP, \
-                "cam_no" INT NOT NULL, \
+                "cid" INT NOT NULL, \
                 "hid" INT NOT NULL, \
                 "url" VARCHAR, \
-                "clicked" BOOLEAN, \
-                "startdead" BOOLEAN, \
-                PRIMARY KEY (timestamp, cam_no, hid)',
+                PRIMARY KEY (timestamp, cid, hid)',
             ),
         );
 
         query_list.push(
             createTable(
                 'Sensor',
-                '"sen_no" INT, \
+                '"sid" INT, \
                 "hid" INT NOT NULL, \
                 "sen_x" INT, \
                 "sen_y" INT, \
-                PRIMARY KEY (sen_no, hid)',
+                PRIMARY KEY (sid, hid)',
             ),
         );
 
@@ -161,13 +165,13 @@ export class SeederService {
             createTable(
                 'Environment',
                 '"timestamp" TIMESTAMP, \
-                "sen_no" INT NOT NULL, \
+                "sid" INT NOT NULL, \
                 "hid" INT NOT NULL, \
                 "windspeed" DOUBLE PRECISION, \
                 "humid" DOUBLE PRECISION, \
                 "temp" DOUBLE PRECISION, \
                 "ammonia" DOUBLE PRECISION, \
-                PRIMARY KEY (timestamp, sen_no, hid)',
+                PRIMARY KEY (timestamp, sid, hid)',
             ),
         );
 
@@ -251,10 +255,10 @@ export class SeederService {
         query_list.push(
             addMultiConstraint(
                 'Image',
-                'cam_no, hid',
+                'cid, hid',
                 'Camera',
-                'cam_no, hid',
-                'camno_hid_constraint',
+                'cid, hid',
+                'cid_hid_constraint',
             ),
         );
         query_list.push(
@@ -263,10 +267,10 @@ export class SeederService {
         query_list.push(
             addMultiConstraint(
                 'Environment',
-                'sen_no, hid',
+                'sid, hid',
                 'Sensor',
-                'sen_no, hid',
-                'senno_hid_constraint',
+                'sid, hid',
+                'sid_hid_constraint',
             ),
         );
 
@@ -329,23 +333,24 @@ export class SeederService {
         // await temp;
         await this.dbService.createSensor(2, 1, 20, 40);
         // await temp;
-        await this.dbService.createSensor(1, 2, 10, 20);
+        await this.dbService.createSensor(3, 2, 10, 20);
         // await temp;
-        await this.dbService.createSensor(2, 2, 20, 40);
+        await this.dbService.createSensor(4, 2, 20, 40);
         // await temp;
         await this.dbService.createCamera(1, 1, 10, 20);
         // await temp;
         await this.dbService.createCamera(2, 1, 20, 40);
         // await temp;
-        await this.dbService.createCamera(1, 2, 10, 20);
+        await this.dbService.createCamera(3, 2, 10, 20);
         // await temp;
-        await this.dbService.createCamera(2, 2, 20, 40);
+        await this.dbService.createCamera(4, 2, 20, 40);
         // await temp;
         await this.dbService.createChickenRecord(
             1584011605,
             '12-03-2020',
             1,
             13,
+            14,
         );
         // await temp;
         await this.dbService.createChickenRecord(
@@ -353,6 +358,7 @@ export class SeederService {
             '12-03-2020',
             2,
             33,
+            34,
         );
         // await temp;
         await this.dbService.createChickenRecord(
@@ -360,6 +366,7 @@ export class SeederService {
             '13-03-2020',
             1,
             43,
+            45,
         );
         // await temp;
         await this.dbService.createChickenRecord(
@@ -367,6 +374,7 @@ export class SeederService {
             '13-03-2020',
             2,
             24,
+            20,
         );
         // await temp;
         await this.dbService.createFoodRecord(
@@ -475,7 +483,7 @@ export class SeederService {
         // await temp;
         await this.dbService.createEnvData(
             1584090805,
-            1,
+            3,
             2,
             125,
             45.6,
@@ -485,7 +493,7 @@ export class SeederService {
         // await temp;
         await this.dbService.createEnvData(
             1584090805,
-            2,
+            4,
             2,
             123,
             46.6,
@@ -498,8 +506,6 @@ export class SeederService {
             1,
             1,
             'http://www.kookkook.com/img/1_1',
-            0,
-            0,
         );
         // await temp;
         await this.dbService.createImage(
@@ -507,27 +513,38 @@ export class SeederService {
             2,
             1,
             'http://www.kookkook.com/img/1_2',
-            0,
-            0,
         );
         // await temp;
         await this.dbService.createImage(
             1584090805,
-            1,
+            3,
             2,
             'http://www.kookkook.com/img/2_1',
-            0,
-            0,
         );
         // await temp;
         await this.dbService.createImage(
             1584090805,
-            2,
+            4,
             2,
             'http://www.kookkook.com/img/2_2',
-            0,
-            0,
         );
         // await temp;
+    };
+    seedDropAllTable = async () => {
+        var query_list = [];
+        query_list.push(dropTable('ChickenRecord'));
+        query_list.push(dropTable('Environment'));
+        query_list.push(dropTable('FoodRecord'));
+        query_list.push(dropTable('Image'));
+        query_list.push(dropTable('VacRecord'));
+        query_list.push(dropTable('WaterRecord'));
+        query_list.push(dropTable('Camera'));
+        query_list.push(dropTable('Sensor'));
+        query_list.push(dropTable('Chicken'));
+        query_list.push(dropTable('HasUser'));
+        query_list.push(dropTable('DailyRecord'));
+        query_list.push(dropTable('House'));
+        query_list.push(dropTable('_User'));
+        await poolQuery(this.pool, query_list.join(''));
     };
 }

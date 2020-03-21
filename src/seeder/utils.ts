@@ -10,7 +10,7 @@ export const createTable = (table_name: string, column_data: string) =>
     `CREATE TABLE "${table_name}"(${column_data});`;
 
 export const dropTable = table_name => {
-    return `DROP TABLE ${table_name};`;
+    return `DROP TABLE "${table_name}";`;
 };
 
 export const addOneColumn = (
