@@ -1,11 +1,11 @@
 import {
-    ChickenObj,
-    ChickenRecordObj,
+    ChickenInput,
+    ChickenRecordInput,
     DailyDataRecordInput,
     EnvironmentInput,
-    FoodRecordObj,
+    FoodRecordInput,
     ImageInput,
-    UserData,
+    UserDataInput,
     VacRecordInput,
     WaterRecordInput,
 } from './db.interfaces';
@@ -26,12 +26,12 @@ export class DbService {
 
     private dbPoolQuery = query_list => poolQuery(this.pool, query_list);
 
-    createUser = (userData: UserData) =>
+    createUser = (userDataInput: UserDataInput) =>
         this
             .dbPoolQuery(`INSERT INTO "User" ("username", "hashedPwd", "isCurrentUser", "firstName", "lastName", "role", "imgUrl", "hid") \
-                VALUES ('${userData.username}', '${userData.hashedPwd}', '${userData.isCurrentUser}',
-                '${userData.firstName}', '${userData.lastName}', '${userData.role}',
-                 '${userData.imgUrl}', '${userData.hid}');`);
+                VALUES ('${userDataInput.username}', '${userDataInput.hashedPwd}', '${userDataInput.isCurrentUser}',
+                '${userDataInput.firstName}', '${userDataInput.lastName}', '${userDataInput.role}',
+                 '${userDataInput.imgUrl}', '${userDataInput.hid}');`);
     getUserUid = (fname, lname) =>
         this.dbPoolQuery(`SELECT uid FROM "_User" \
                 WHERE fname = '${fname}' AND lname = '${lname}';`);
@@ -69,11 +69,11 @@ export class DbService {
         this.dbPoolQuery(`DELETE FROM "DailyRecord" \
                 WHERE hid = '${hid}' AND date = TO_DATE('${date}', 'DD-MM-YYYY');`);
 
-    createChicken = (chicObj: ChickenObj) =>
+    createChicken = (chickenInput: ChickenInput) =>
         this.dbPoolQuery(`INSERT INTO "Chicken" \
                 ("dateIn", "dateOut", "generation", "type", "amountIn", "gender", "hid") \
-                VALUES (TO_DATE('${chicObj.dateIn}', 'DD-MM-YYYY'), TO_DATE('${chicObj.dateOut}', 'DD-MM-YYYY'),
-                  '${chicObj.generation}', '${chicObj.type}', ${chicObj.amountIn}, '${chicObj.gender}','${chicObj.hid}');`);
+                VALUES (TO_DATE('${chickenInput.dateIn}', 'DD-MM-YYYY'), TO_DATE('${chickenInput.dateOut}', 'DD-MM-YYYY'),
+                  '${chickenInput.generation}', '${chickenInput.type}', ${chickenInput.amountIn}, '${chickenInput.gender}','${chickenInput.hid}');`);
 
     getChickenInfo = (hid, gen) =>
         this
@@ -128,24 +128,24 @@ export class DbService {
                             VALUES (TO_TIMESTAMP(${imageInput.timestamp}), '${imageInput.url}',
                             '${imageInput.cid}', '${imageInput.hid}');`);
 
-    createChickenRecord = (chickenRecordObj: ChickenRecordObj) =>
+    createChickenRecord = (chickenRecordInput: ChickenRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "ChickenRecord" ("chicTime","amountDead", "amountZleg", "amountDwaft", "amountSick", "date", "hid") \
-                        VALUES (TO_TIMESTAMP(${chickenRecordObj.chicTime}), '${chickenRecordObj.amountDead}',
-                        '${chickenRecordObj.amountZleg}', '${chickenRecordObj.amountDwaft}', '${chickenRecordObj.amountSick}',
-                        TO_DATE('${chickenRecordObj.date}', 'DD-MM-YYYY'), '${chickenRecordObj.hid}');`);
+                        VALUES (TO_TIMESTAMP(${chickenRecordInput.chicTime}), '${chickenRecordInput.amountDead}',
+                        '${chickenRecordInput.amountZleg}', '${chickenRecordInput.amountDwaft}', '${chickenRecordInput.amountSick}',
+                        TO_DATE('${chickenRecordInput.date}', 'DD-MM-YYYY'), '${chickenRecordInput.hid}');`);
 
     createDailyDataRecord = (dailyRecordInput: DailyDataRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "DailyDataRecord" ("timestamp", "date", "hid") \
             VALUES (TO_TIMESTAMP(${dailyRecordInput.timestamp}), TO_DATE('${dailyRecordInput.date}', 'DD-MM-YYYY'), '${dailyRecordInput.hid}');`);
 
-    createFoodRecord = (foodRecordObj: FoodRecordObj) =>
+    createFoodRecord = (foodRecordInput: FoodRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "FoodRecord" ("foodSilo", "foodIn", "foodRemain", "foodConsumed", "timestamp", "date", "hid") \
-                        VALUES ('${foodRecordObj.foodSilo}','${foodRecordObj.foodIn}', '${foodRecordObj.foodRemain}',
-                        '${foodRecordObj.foodConsumed}', TO_TIMESTAMP(${foodRecordObj.timestamp}),
-                        TO_DATE('${foodRecordObj.date}', 'DD-MM-YYYY'), '${foodRecordObj.hid}');`);
+                        VALUES ('${foodRecordInput.foodSilo}','${foodRecordInput.foodIn}', '${foodRecordInput.foodRemain}',
+                        '${foodRecordInput.foodConsumed}', TO_TIMESTAMP(${foodRecordInput.timestamp}),
+                        TO_DATE('${foodRecordInput.date}', 'DD-MM-YYYY'), '${foodRecordInput.hid}');`);
 
     createVacRecord = (vacRecordInput: VacRecordInput) =>
         this

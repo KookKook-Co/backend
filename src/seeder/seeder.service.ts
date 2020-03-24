@@ -1,12 +1,12 @@
 import {
-    ChickenObj,
-    ChickenRecordObj,
+    ChickenInput,
+    ChickenRecordInput,
     DailyDataRecordInput,
     EnvironmentInput,
-    FoodRecordObj,
+    FoodRecordInput,
     ImageInput,
-    SensorObj,
-    UserData,
+    SensorInput,
+    UserDataInput,
     VacRecordInput,
     WaterRecordInput,
 } from '../db/db.interfaces';
@@ -289,15 +289,13 @@ export class SeederService {
                 'sid_hid_constraint',
             ),
         );
-
-        // console.log(query_list.join(''));
         await poolQuery(this.pool, query_list.join(''));
     };
 
     seedAddSampleData = async () => {
         await this.dbService.createHouse(1, 10, 10, 10);
         await this.dbService.createHouse(2, 10, 10, 10);
-        let userObj: UserData = {
+        let UserDataInput: UserDataInput = {
             username: 'username1',
             hashedPwd:
                 '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
@@ -308,7 +306,7 @@ export class SeederService {
             imgUrl: 'http://www.kk.com/img/1',
             hid: 1,
         };
-        let userObj2: UserData = {
+        let UserDataInput2: UserDataInput = {
             username: 'username2',
             hashedPwd:
                 '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
@@ -319,13 +317,13 @@ export class SeederService {
             imgUrl: 'http://www.kk.com/img/2',
             hid: 2,
         };
-        await this.dbService.createUser(userObj);
-        await this.dbService.createUser(userObj2);
+        await this.dbService.createUser(UserDataInput);
+        await this.dbService.createUser(UserDataInput2);
         await this.dbService.createDailyRecord('12-03-2020', 1);
         await this.dbService.createDailyRecord('12-03-2020', 2);
         await this.dbService.createDailyRecord('13-03-2020', 1);
         await this.dbService.createDailyRecord('13-03-2020', 2);
-        let chicObj: ChickenObj = {
+        let chickenInput: ChickenInput = {
             dateIn: '12-03-2020',
             dateOut: '12-04-2020',
             generation: '1/2020',
@@ -334,7 +332,7 @@ export class SeederService {
             gender: 'm',
             hid: 1,
         };
-        let chicObj2: ChickenObj = {
+        let chickenInput2: ChickenInput = {
             dateIn: '12-03-2020',
             dateOut: '12-04-2020',
             generation: '1/2020',
@@ -343,8 +341,8 @@ export class SeederService {
             gender: 'f',
             hid: 2,
         };
-        await this.dbService.createChicken(chicObj);
-        await this.dbService.createChicken(chicObj2);
+        await this.dbService.createChicken(chickenInput);
+        await this.dbService.createChicken(chickenInput2);
         await this.dbService.createSensor(1, 10, 20, 1);
         await this.dbService.createSensor(2, 20, 40, 1);
         await this.dbService.createSensor(3, 10, 20, 2);
@@ -353,7 +351,7 @@ export class SeederService {
         await this.dbService.createCamera(2, 20, 40, 1);
         await this.dbService.createCamera(3, 10, 20, 2);
         await this.dbService.createCamera(4, 20, 40, 2);
-        let chickenRecordObj: ChickenRecordObj = {
+        let chickenRecordInput: ChickenRecordInput = {
             chicTime: '1584011015',
             amountDead: 10,
             amountZleg: 5,
@@ -362,9 +360,9 @@ export class SeederService {
             date: '12-03-2020',
             hid: 1,
         };
-        await this.dbService.createChickenRecord(chickenRecordObj);
+        await this.dbService.createChickenRecord(chickenRecordInput);
 
-        let chickenRecordObj2: ChickenRecordObj = {
+        let chickenRecordInput2: ChickenRecordInput = {
             chicTime: '1584011015',
             amountDead: 40,
             amountZleg: 4,
@@ -373,9 +371,9 @@ export class SeederService {
             date: '12-03-2020',
             hid: 2,
         };
-        await this.dbService.createChickenRecord(chickenRecordObj2);
+        await this.dbService.createChickenRecord(chickenRecordInput2);
 
-        let chickenRecordObj3: ChickenRecordObj = {
+        let chickenRecordInput3: ChickenRecordInput = {
             chicTime: '1584023974',
             amountDead: 13,
             amountZleg: 4,
@@ -384,9 +382,9 @@ export class SeederService {
             date: '12-03-2020',
             hid: 1,
         };
-        await this.dbService.createChickenRecord(chickenRecordObj3);
+        await this.dbService.createChickenRecord(chickenRecordInput3);
 
-        let chickenRecordObj4: ChickenRecordObj = {
+        let chickenRecordInput4: ChickenRecordInput = {
             chicTime: '1584023974',
             amountDead: 4,
             amountZleg: 7,
@@ -395,7 +393,7 @@ export class SeederService {
             date: '12-03-2020',
             hid: 2,
         };
-        await this.dbService.createChickenRecord(chickenRecordObj4);
+        await this.dbService.createChickenRecord(chickenRecordInput4);
 
         let dailyDataRecordInput: DailyDataRecordInput = {
             timestamp: '1584014660',
@@ -410,8 +408,7 @@ export class SeederService {
             hid: 2,
         };
         await this.dbService.createDailyDataRecord(dailyDataRecordInput2);
-
-        let foodRecordObj: FoodRecordObj = {
+        let foodRecordInput: FoodRecordInput = {
             foodSilo: 1,
             foodIn: 8970,
             foodRemain: 4879,
@@ -420,9 +417,9 @@ export class SeederService {
             date: '12-03-2020',
             hid: 1,
         };
-        await this.dbService.createFoodRecord(foodRecordObj);
+        await this.dbService.createFoodRecord(foodRecordInput);
 
-        let foodRecordObj2: FoodRecordObj = {
+        let foodRecordInput2: FoodRecordInput = {
             foodSilo: 2,
             foodIn: 970,
             foodRemain: 79,
@@ -431,9 +428,9 @@ export class SeederService {
             date: '12-03-2020',
             hid: 1,
         };
-        await this.dbService.createFoodRecord(foodRecordObj2);
+        await this.dbService.createFoodRecord(foodRecordInput2);
 
-        let foodRecordObj3: FoodRecordObj = {
+        let foodRecordInput3: FoodRecordInput = {
             foodSilo: 1,
             foodIn: 9450,
             foodRemain: 7925,
@@ -442,9 +439,9 @@ export class SeederService {
             date: '12-03-2020',
             hid: 2,
         };
-        await this.dbService.createFoodRecord(foodRecordObj3);
+        await this.dbService.createFoodRecord(foodRecordInput3);
 
-        let foodRecordObj4: FoodRecordObj = {
+        let foodRecordInput4: FoodRecordInput = {
             foodSilo: 2,
             foodIn: 2350,
             foodRemain: 2421,
@@ -453,7 +450,7 @@ export class SeederService {
             date: '12-03-2020',
             hid: 2,
         };
-        await this.dbService.createFoodRecord(foodRecordObj4);
+        await this.dbService.createFoodRecord(foodRecordInput4);
 
         let dailyDataRecordInput3: DailyDataRecordInput = {
             timestamp: '1584018805',
@@ -562,9 +559,8 @@ export class SeederService {
             humidity: 48.6,
             sid: 1,
             hid: 1,
-        }
+        };
         await this.dbService.createEnvData(environmentInput);
-        // await temp;
 
         let environmentInput2: EnvironmentInput = {
             timestamp: '1584011605',
@@ -574,7 +570,7 @@ export class SeederService {
             humidity: 48.5,
             sid: 2,
             hid: 1,
-        }
+        };
         await this.dbService.createEnvData(environmentInput2);
 
         let environmentInput3: EnvironmentInput = {
@@ -585,7 +581,7 @@ export class SeederService {
             humidity: 40.5,
             sid: 3,
             hid: 2,
-        }
+        };
         await this.dbService.createEnvData(environmentInput3);
 
         let environmentInput4: EnvironmentInput = {
@@ -596,7 +592,7 @@ export class SeederService {
             humidity: 41.5,
             sid: 4,
             hid: 2,
-        }
+        };
         await this.dbService.createEnvData(environmentInput4);
         let imageInput: ImageInput = {
             timestamp: '1584011605',

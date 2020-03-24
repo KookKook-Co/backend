@@ -1,4 +1,4 @@
-export interface UserData {
+export interface UserDataInput {
     username: string;
     hashedPwd: string;
     isCurrentUser: number;
@@ -9,7 +9,7 @@ export interface UserData {
     hid: number;
 }
 
-export interface ChickenObj {
+export interface ChickenInput {
     dateIn: string;
     dateOut: string;
     generation: string;
@@ -19,14 +19,14 @@ export interface ChickenObj {
     hid: number;
 }
 
-export interface SensorObj {
+export interface SensorInput {
     sid: number;
     hid: number;
     sen_x: number;
     sen_y: number;
 }
 
-export interface ChickenRecordObj {
+export interface ChickenRecordInput {
     chicTime: string;
     amountDead: number;
     amountZleg: number;
@@ -36,7 +36,7 @@ export interface ChickenRecordObj {
     hid: number;
 }
 
-export interface FoodRecordObj {
+export interface FoodRecordInput {
     foodSilo: number;
     foodIn: number;
     foodRemain: number;
