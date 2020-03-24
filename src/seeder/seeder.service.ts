@@ -1,4 +1,16 @@
 import {
+    ChickenObj,
+    ChickenRecordObj,
+    DailyDataRecordInput,
+    EnvironmentInput,
+    FoodRecordObj,
+    ImageInput,
+    SensorObj,
+    UserData,
+    VacRecordInput,
+    WaterRecordInput,
+} from '../db/db.interfaces';
+import {
     addConstraint,
     addMultiConstraint,
     createTable,
@@ -28,7 +40,9 @@ export class SeederService {
         query_list.push(
             createTable(
                 'House',
-                '"hid" INT, "length" DOUBLE PRECISION, \
+                '"hid" SERIAL, \
+                "hno" INT, \
+                "length" DOUBLE PRECISION, \
                 "width" DOUBLE PRECISION, \
                 "scale" DOUBLE PRECISION, \
                 PRIMARY KEY (hid)',
@@ -37,36 +51,31 @@ export class SeederService {
 
         query_list.push(
             createTable(
-                '_User',
+                'User',
                 '"uid" SERIAL, \
-                "pwd" VARCHAR, \
-                "is_current_user" BOOLEAN, \
-                "fname" VARCHAR(50), \
-                "lname" VARCHAR(50), \
-                "position" VARCHAR(50), \
+                "username" VARCHAR(50), \
+                "hashedPwd" VARCHAR, \
+                "isCurrentUser" BOOLEAN, \
+                "firstName" VARCHAR(50), \
+                "lastName" VARCHAR(50), \
+                "role" VARCHAR(50), \
+                "imgUrl" VARCHAR, \
+                "hid" INT, \
                 PRIMARY KEY (uid)',
             ),
         );
 
         query_list.push(
             createTable(
-                'HasUser',
-                '"hid" INT, \
-                "uid" INT NOT NULL, \
-                PRIMARY KEY (hid, uid)',
-            ),
-        );
-
-        query_list.push(
-            createTable(
                 'Chicken',
-                '"date_in" DATE, \
-                "hid" INT NOT NULL, \
-                "gen" VARCHAR(50), \
-                "amount_in" INT, \
+                '"dateIn" DATE, \
+                "dateOut" DATE, \
+                "generation" VARCHAR(50), \
                 "type" VARCHAR(20), \
+                "amountIn" INT, \
                 "gender" VARCHAR(1), \
-                PRIMARY KEY (date_in, hid)',
+                "hid" INT NOT NULL, \
+                PRIMARY KEY ("dateIn", "hid")',
             ),
         );
 
@@ -81,50 +90,64 @@ export class SeederService {
 
         query_list.push(
             createTable(
-                'FoodRecord',
-                '"food_no" INT, \
+                'ChickenRecord',
+                '"chicTime" TIMESTAMP, \
+                "amountDead" INT, \
+                "amountZleg" INT, \
+                "amountDwaft" INT, \
+                "amountSick" INT, \
                 "date" DATE, \
                 "hid" INT NOT NULL, \
-                "food_in" DOUBLE PRECISION, \
-                "food_remain" DOUBLE PRECISION, \
-                "food_consume" DOUBLE PRECISION, \
-                PRIMARY KEY (food_no, date, hid)',
+                PRIMARY KEY ("chicTime", date, hid)',
             ),
         );
 
         query_list.push(
             createTable(
-                'ChickenRecord',
-                '"chic_time" TIMESTAMP, \
+                'DailyDataRecord',
+                '"timestamp" TIMESTAMP, \
                 "date" DATE, \
                 "hid" INT NOT NULL, \
-                "death_real" INT, \
-                "death_cam" INT, \
-                PRIMARY KEY (chic_time, date, hid)',
+                PRIMARY KEY (timestamp, date, hid)',
+            ),
+        );
+
+        query_list.push(
+            createTable(
+                'FoodRecord',
+                '"foodSilo" INT, \
+                "foodIn" DOUBLE PRECISION, \
+                "foodRemain" DOUBLE PRECISION, \
+                "foodConsumed" DOUBLE PRECISION, \
+                "timestamp" TIMESTAMP, \
+                "date" DATE, \
+                "hid" INT NOT NULL, \
+                PRIMARY KEY ("foodSilo", timestamp, date, hid)',
             ),
         );
 
         query_list.push(
             createTable(
                 'WaterRecord',
-                '"meter_1" INT, \
-                "meter_2" INT, \
+                '"waterMeter1" INT, \
+                "waterMeter2" INT, \
+                "waterConsumed" INT, \
+                "timestamp" TIMESTAMP, \
                 "date" DATE, \
                 "hid" INT NOT NULL, \
-                "water_consume" DOUBLE PRECISION, \
-                PRIMARY KEY (meter_1, meter_2, date, hid)',
+                PRIMARY KEY ("waterMeter1", "waterMeter2", timestamp, date, hid)',
             ),
         );
 
         query_list.push(
             createTable(
                 'VacRecord',
-                '"vac_time" TIMESTAMP, \
+                '"vacType" VARCHAR(50), \
+                "vacConc" DOUBLE PRECISION, \
+                "timestamp" TIMESTAMP, \
                 "date" DATE, \
                 "hid" INT NOT NULL, \
-                "vac_type" VARCHAR(50), \
-                "vac_conc" DOUBLE PRECISION, \
-                PRIMARY KEY (vac_time, date, hid)',
+                PRIMARY KEY ("vacType", "timestamp", "date", "hid")',
             ),
         );
 
@@ -132,9 +155,9 @@ export class SeederService {
             createTable(
                 'Camera',
                 '"cid" INT, \
+                "xPosCam" INT, \
+                "yPosCam" INT, \
                 "hid" INT NOT NULL, \
-                "cam_x" INT, \
-                "cam_y" INT, \
                 PRIMARY KEY (cid, hid)',
             ),
         );
@@ -143,9 +166,9 @@ export class SeederService {
             createTable(
                 'Image',
                 '"timestamp" TIMESTAMP, \
+                "url" VARCHAR, \
                 "cid" INT NOT NULL, \
                 "hid" INT NOT NULL, \
-                "url" VARCHAR, \
                 PRIMARY KEY (timestamp, cid, hid)',
             ),
         );
@@ -154,9 +177,9 @@ export class SeederService {
             createTable(
                 'Sensor',
                 '"sid" INT, \
+                "xPosSen" INT, \
+                "yPosSen" INT, \
                 "hid" INT NOT NULL, \
-                "sen_x" INT, \
-                "sen_y" INT, \
                 PRIMARY KEY (sid, hid)',
             ),
         );
@@ -165,39 +188,20 @@ export class SeederService {
             createTable(
                 'Environment',
                 '"timestamp" TIMESTAMP, \
+                "windspeed" DOUBLE PRECISION, \
+                "ammonia" DOUBLE PRECISION, \
+                "temperature" DOUBLE PRECISION, \
+                "humidity" DOUBLE PRECISION, \
                 "sid" INT NOT NULL, \
                 "hid" INT NOT NULL, \
-                "windspeed" DOUBLE PRECISION, \
-                "humid" DOUBLE PRECISION, \
-                "temp" DOUBLE PRECISION, \
-                "ammonia" DOUBLE PRECISION, \
                 PRIMARY KEY (timestamp, sid, hid)',
             ),
         );
 
         query_list.push(
-            addConstraint(
-                'HasUser',
-                'uid',
-                '_User',
-                'uid',
-                'uid_constraint',
-                'ON DELETE CASCADE',
-            ),
-        );
-        query_list.push(
-            addConstraint(
-                'HasUser',
-                'hid',
-                'House',
-                'hid',
-                'hid_constraint',
-                'ON DELETE CASCADE',
-            ),
-        );
-        query_list.push(
             addConstraint('Chicken', 'hid', 'House', 'hid', 'hid_constraint'),
         );
+
         query_list.push(
             addConstraint(
                 'DailyRecord',
@@ -207,15 +211,27 @@ export class SeederService {
                 'hid_constraint',
             ),
         );
+
+        query_list.push(
+            addMultiConstraint(
+                'DailyDataRecord',
+                'hid, date',
+                'DailyRecord',
+                'hid, date',
+                'hid_timestamp_constraint',
+            ),
+        );
+
         query_list.push(
             addMultiConstraint(
                 'FoodRecord',
-                'date, hid',
-                'DailyRecord',
-                'date, hid',
-                'date_hid_constraint',
+                'timestamp, date, hid',
+                'DailyDataRecord',
+                'timestamp, date, hid',
+                'ts_date_hid_constraint',
             ),
         );
+
         query_list.push(
             addMultiConstraint(
                 'ChickenRecord',
@@ -228,19 +244,19 @@ export class SeederService {
         query_list.push(
             addMultiConstraint(
                 'WaterRecord',
-                'date, hid',
-                'DailyRecord',
-                'date, hid',
-                'date_hid_constraint',
+                'timestamp, date, hid',
+                'DailyDataRecord',
+                'timestamp, date, hid',
+                'ts_date_hid_constraint',
             ),
         );
         query_list.push(
             addMultiConstraint(
                 'VacRecord',
-                'date, hid',
-                'DailyRecord',
-                'date, hid',
-                'date_hid_constraint',
+                'timestamp, date, hid',
+                'DailyDataRecord',
+                'timestamp, date, hid',
+                'ts_date_hid_constraint',
             ),
         );
         query_list.push(
@@ -280,255 +296,339 @@ export class SeederService {
 
     seedAddSampleData = async () => {
         await this.dbService.createHouse(1, 10, 10, 10);
-        // await temp;
         await this.dbService.createHouse(2, 10, 10, 10);
-        // await temp;
-        await this.dbService.createUser(
-            'worker1',
-            'kookkook',
-            1,
-            '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
-            'worker',
-        );
-        // await temp;
-        await this.dbService.createUser(
-            'worker2',
-            'kookkook',
-            1,
-            '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
-            'worker',
-        );
-        // await temp;
-        await this.dbService.createResponsibleWithID(1, 1);
-        // await temp;
-        await this.dbService.createResponsibleWithID(2, 2);
-        // await temp;
+        let userObj: UserData = {
+            username: 'username1',
+            hashedPwd:
+                '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
+            isCurrentUser: 1,
+            firstName: 'worker1',
+            lastName: 'lastname1',
+            role: 'worker',
+            imgUrl: 'http://www.kk.com/img/1',
+            hid: 1,
+        };
+        let userObj2: UserData = {
+            username: 'username2',
+            hashedPwd:
+                '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
+            isCurrentUser: 1,
+            firstName: 'worker2',
+            lastName: 'lastname2',
+            role: 'worker',
+            imgUrl: 'http://www.kk.com/img/2',
+            hid: 2,
+        };
+        await this.dbService.createUser(userObj);
+        await this.dbService.createUser(userObj2);
         await this.dbService.createDailyRecord('12-03-2020', 1);
-        // await temp;
         await this.dbService.createDailyRecord('12-03-2020', 2);
-        // await temp;
         await this.dbService.createDailyRecord('13-03-2020', 1);
-        // await temp;
         await this.dbService.createDailyRecord('13-03-2020', 2);
+        let chicObj: ChickenObj = {
+            dateIn: '12-03-2020',
+            dateOut: '12-04-2020',
+            generation: '1/2020',
+            type: 'Sally',
+            amountIn: 40000,
+            gender: 'm',
+            hid: 1,
+        };
+        let chicObj2: ChickenObj = {
+            dateIn: '12-03-2020',
+            dateOut: '12-04-2020',
+            generation: '1/2020',
+            type: 'Sally',
+            amountIn: 40000,
+            gender: 'f',
+            hid: 2,
+        };
+        await this.dbService.createChicken(chicObj);
+        await this.dbService.createChicken(chicObj2);
+        await this.dbService.createSensor(1, 10, 20, 1);
+        await this.dbService.createSensor(2, 20, 40, 1);
+        await this.dbService.createSensor(3, 10, 20, 2);
+        await this.dbService.createSensor(4, 20, 40, 2);
+        await this.dbService.createCamera(1, 10, 20, 1);
+        await this.dbService.createCamera(2, 20, 40, 1);
+        await this.dbService.createCamera(3, 10, 20, 2);
+        await this.dbService.createCamera(4, 20, 40, 2);
+        let chickenRecordObj: ChickenRecordObj = {
+            chicTime: '1584011015',
+            amountDead: 10,
+            amountZleg: 5,
+            amountDwaft: 2,
+            amountSick: 9,
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createChickenRecord(chickenRecordObj);
+
+        let chickenRecordObj2: ChickenRecordObj = {
+            chicTime: '1584011015',
+            amountDead: 40,
+            amountZleg: 4,
+            amountDwaft: 3,
+            amountSick: 2,
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createChickenRecord(chickenRecordObj2);
+
+        let chickenRecordObj3: ChickenRecordObj = {
+            chicTime: '1584023974',
+            amountDead: 13,
+            amountZleg: 4,
+            amountDwaft: 4,
+            amountSick: 2,
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createChickenRecord(chickenRecordObj3);
+
+        let chickenRecordObj4: ChickenRecordObj = {
+            chicTime: '1584023974',
+            amountDead: 4,
+            amountZleg: 7,
+            amountDwaft: 3,
+            amountSick: 6,
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createChickenRecord(chickenRecordObj4);
+
+        let dailyDataRecordInput: DailyDataRecordInput = {
+            timestamp: '1584014660',
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createDailyDataRecord(dailyDataRecordInput);
+
+        let dailyDataRecordInput2: DailyDataRecordInput = {
+            timestamp: '1584014660',
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createDailyDataRecord(dailyDataRecordInput2);
+
+        let foodRecordObj: FoodRecordObj = {
+            foodSilo: 1,
+            foodIn: 8970,
+            foodRemain: 4879,
+            foodConsumed: 2421,
+            timestamp: '1584014660',
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createFoodRecord(foodRecordObj);
+
+        let foodRecordObj2: FoodRecordObj = {
+            foodSilo: 2,
+            foodIn: 970,
+            foodRemain: 79,
+            foodConsumed: 134,
+            timestamp: '1584014660',
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createFoodRecord(foodRecordObj2);
+
+        let foodRecordObj3: FoodRecordObj = {
+            foodSilo: 1,
+            foodIn: 9450,
+            foodRemain: 7925,
+            foodConsumed: 3454,
+            timestamp: '1584014660',
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createFoodRecord(foodRecordObj3);
+
+        let foodRecordObj4: FoodRecordObj = {
+            foodSilo: 2,
+            foodIn: 2350,
+            foodRemain: 2421,
+            foodConsumed: 344,
+            timestamp: '1584014660',
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createFoodRecord(foodRecordObj4);
+
+        let dailyDataRecordInput3: DailyDataRecordInput = {
+            timestamp: '1584018805',
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createDailyDataRecord(dailyDataRecordInput3);
+
+        let dailyDataRecordInput4: DailyDataRecordInput = {
+            timestamp: '1584018905',
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createDailyDataRecord(dailyDataRecordInput4);
+
+        let vacRecordInput: VacRecordInput = {
+            vacType: 'NDIB',
+            vacConc: 35000,
+            timestamp: '1584018805',
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createVacRecord(vacRecordInput);
+
+        let vacRecordInput2: VacRecordInput = {
+            vacType: 'NDIB',
+            vacConc: 40000,
+            timestamp: '1584018905',
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createVacRecord(vacRecordInput2);
+
+        let dailyDataRecordInput5: DailyDataRecordInput = {
+            timestamp: '1584019202',
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createDailyDataRecord(dailyDataRecordInput5);
+        let dailyDataRecordInput6: DailyDataRecordInput = {
+            timestamp: '1584019202',
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createDailyDataRecord(dailyDataRecordInput6);
+
+        let waterRecordInput: WaterRecordInput = {
+            waterMeter1: 2508392,
+            waterMeter2: 2530116,
+            waterConsumed: 663,
+            timestamp: '1584019202',
+            date: '12-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createWaterRecord(waterRecordInput);
+
+        let waterRecordInput2: WaterRecordInput = {
+            waterMeter1: 2608392,
+            waterMeter2: 2530116,
+            waterConsumed: 546,
+            timestamp: '1584019202',
+            date: '12-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createWaterRecord(waterRecordInput2);
+
+        let dailyDataRecordInput7: DailyDataRecordInput = {
+            timestamp: '1584019202',
+            date: '13-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createDailyDataRecord(dailyDataRecordInput7);
+
+        let dailyDataRecordInput8: DailyDataRecordInput = {
+            timestamp: '1584019202',
+            date: '13-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createDailyDataRecord(dailyDataRecordInput8);
+
+        let waterRecordInput3: WaterRecordInput = {
+            waterMeter1: 2508508,
+            waterMeter2: 2530735,
+            waterConsumed: 763,
+            timestamp: '1584019202',
+            date: '13-03-2020',
+            hid: 1,
+        };
+        await this.dbService.createWaterRecord(waterRecordInput3);
+
+        let waterRecordInput4: WaterRecordInput = {
+            waterMeter1: 2508508,
+            waterMeter2: 2530735,
+            waterConsumed: 346,
+            timestamp: '1584019202',
+            date: '13-03-2020',
+            hid: 2,
+        };
+        await this.dbService.createWaterRecord(waterRecordInput4);
+
+        let environmentInput: EnvironmentInput = {
+            timestamp: '1584011605',
+            windspeed: 120,
+            ammonia: 23,
+            temperature: 27.8,
+            humidity: 48.6,
+            sid: 1,
+            hid: 1,
+        }
+        await this.dbService.createEnvData(environmentInput);
         // await temp;
-        await this.dbService.createChicken(
-            '12-03-2020',
-            1,
-            '1/2020',
-            36000,
-            'Sally',
-            'm',
-        );
-        // await temp;
-        await this.dbService.createChicken(
-            '12-03-2020',
-            2,
-            '1/2020',
-            40000,
-            'Sally',
-            'f',
-        );
-        // await temp;
-        await this.dbService.createSensor(1, 1, 10, 20);
-        // await temp;
-        await this.dbService.createSensor(2, 1, 20, 40);
-        // await temp;
-        await this.dbService.createSensor(3, 2, 10, 20);
-        // await temp;
-        await this.dbService.createSensor(4, 2, 20, 40);
-        // await temp;
-        await this.dbService.createCamera(1, 1, 10, 20);
-        // await temp;
-        await this.dbService.createCamera(2, 1, 20, 40);
-        // await temp;
-        await this.dbService.createCamera(3, 2, 10, 20);
-        // await temp;
-        await this.dbService.createCamera(4, 2, 20, 40);
-        // await temp;
-        await this.dbService.createChickenRecord(
-            1584011605,
-            '12-03-2020',
-            1,
-            13,
-            14,
-        );
-        // await temp;
-        await this.dbService.createChickenRecord(
-            1584011605,
-            '12-03-2020',
-            2,
-            33,
-            34,
-        );
-        // await temp;
-        await this.dbService.createChickenRecord(
-            1584090805,
-            '13-03-2020',
-            1,
-            43,
-            45,
-        );
-        // await temp;
-        await this.dbService.createChickenRecord(
-            1584090805,
-            '13-03-2020',
-            2,
-            24,
-            20,
-        );
-        // await temp;
-        await this.dbService.createFoodRecord(
-            1,
-            '12-03-2020',
-            1,
-            8430,
-            8130,
-            300,
-        );
-        // await temp;
-        await this.dbService.createFoodRecord(
-            2,
-            '12-03-2020',
-            1,
-            7800,
-            7200,
-            600,
-        );
-        // await temp;
-        await this.dbService.createFoodRecord(
-            1,
-            '12-03-2020',
-            2,
-            8530,
-            8130,
-            400,
-        );
-        // await temp;
-        await this.dbService.createFoodRecord(
-            2,
-            '12-03-2020',
-            2,
-            7800,
-            7200,
-            600,
-        );
-        // await temp;
-        await this.dbService.createVacRecord(
-            1584018805,
-            'Calcium',
-            '12-03-2020',
-            1,
-            10.3,
-        );
-        // await temp;
-        await this.dbService.createVacRecord(
-            1584018905,
-            'Calcium',
-            '12-03-2020',
-            2,
-            20.4,
-        );
-        // await temp;
-        await this.dbService.createWaterRecord(
-            2508392,
-            2530116,
-            '12-03-2020',
-            1,
-            663,
-        );
-        // await temp;
-        await this.dbService.createWaterRecord(
-            2608392,
-            2630116,
-            '12-03-2020',
-            2,
-            546,
-        );
-        // await temp;
-        await this.dbService.createWaterRecord(
-            2508508,
-            2530735,
-            '13-03-2020',
-            1,
-            763,
-        );
-        // await temp;
-        await this.dbService.createWaterRecord(
-            2608508,
-            2630735,
-            '13-03-2020',
-            2,
-            346,
-        );
-        // await temp;
-        await this.dbService.createEnvData(
-            1584011605,
-            1,
-            1,
-            120,
-            48.6,
-            28.2,
-            23,
-        );
-        // await temp;
-        await this.dbService.createEnvData(
-            1584011605,
-            2,
-            1,
-            140,
-            46.4,
-            24.2,
-            29,
-        );
-        // await temp;
-        await this.dbService.createEnvData(
-            1584090805,
-            3,
-            2,
-            125,
-            45.6,
-            25.3,
-            25,
-        );
-        // await temp;
-        await this.dbService.createEnvData(
-            1584090805,
-            4,
-            2,
-            123,
-            46.6,
-            27.4,
-            24,
-        );
-        // await temp;
-        await this.dbService.createImage(
-            1584011605,
-            1,
-            1,
-            'http://www.kookkook.com/img/1_1',
-        );
-        // await temp;
-        await this.dbService.createImage(
-            1584011605,
-            2,
-            1,
-            'http://www.kookkook.com/img/1_2',
-        );
-        // await temp;
-        await this.dbService.createImage(
-            1584090805,
-            3,
-            2,
-            'http://www.kookkook.com/img/2_1',
-        );
-        // await temp;
-        await this.dbService.createImage(
-            1584090805,
-            4,
-            2,
-            'http://www.kookkook.com/img/2_2',
-        );
-        // await temp;
+
+        let environmentInput2: EnvironmentInput = {
+            timestamp: '1584011605',
+            windspeed: 123,
+            ammonia: 24,
+            temperature: 28.8,
+            humidity: 48.5,
+            sid: 2,
+            hid: 1,
+        }
+        await this.dbService.createEnvData(environmentInput2);
+
+        let environmentInput3: EnvironmentInput = {
+            timestamp: '1584090805',
+            windspeed: 143,
+            ammonia: 22,
+            temperature: 26.4,
+            humidity: 40.5,
+            sid: 3,
+            hid: 2,
+        }
+        await this.dbService.createEnvData(environmentInput3);
+
+        let environmentInput4: EnvironmentInput = {
+            timestamp: '1584090805',
+            windspeed: 139,
+            ammonia: 20,
+            temperature: 27.4,
+            humidity: 41.5,
+            sid: 4,
+            hid: 2,
+        }
+        await this.dbService.createEnvData(environmentInput4);
+        let imageInput: ImageInput = {
+            timestamp: '1584011605',
+            url: 'http://www.kookkook.com/img/1_1',
+            cid: 1,
+            hid: 1,
+        };
+
+        await this.dbService.createImage(imageInput);
+        let imageInput2: ImageInput = {
+            timestamp: '1584011605',
+            url: 'http://www.kookkook.com/img/1_2',
+            cid: 2,
+            hid: 1,
+        };
+        await this.dbService.createImage(imageInput2);
+
+        let imageInput3: ImageInput = {
+            timestamp: '1584090805',
+            url: 'http://www.kookkook.com/img/2_3',
+            cid: 3,
+            hid: 2,
+        };
+        await this.dbService.createImage(imageInput3);
+
+        let imageInput4: ImageInput = {
+            timestamp: '1584090805',
+            url: 'http://www.kookkook.com/img/2_4',
+            cid: 4,
+            hid: 2,
+        };
+        await this.dbService.createImage(imageInput4);
     };
     seedDropAllTable = async () => {
         var query_list = [];
@@ -541,10 +641,10 @@ export class SeederService {
         query_list.push(dropTable('Camera'));
         query_list.push(dropTable('Sensor'));
         query_list.push(dropTable('Chicken'));
-        query_list.push(dropTable('HasUser'));
+        query_list.push(dropTable('DailyDataRecord'));
         query_list.push(dropTable('DailyRecord'));
         query_list.push(dropTable('House'));
-        query_list.push(dropTable('_User'));
+        query_list.push(dropTable('User'));
         await poolQuery(this.pool, query_list.join(''));
     };
 }
