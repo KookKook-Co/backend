@@ -5,7 +5,11 @@ import {
     EnvironmentInput,
     FoodRecordInput,
     ImageInput,
+    LatestEnvironmentOutput,
+    LatestUrl,
     UserDataInput,
+    UserDataOutput,
+    UserLoginOutput,
     VacRecordInput,
     WaterRecordInput,
 } from './db.interfaces';
@@ -33,12 +37,70 @@ export class DbService {
                 '${userDataInput.firstName}', '${userDataInput.lastName}', '${userDataInput.role}',
                  '${userDataInput.imgUrl}', '${userDataInput.hid}');`);
     getUserUid = (fname, lname) =>
-        this.dbPoolQuery(`SELECT uid FROM "_User" \
+        this.dbPoolQuery(`SELECT uid FROM "User" \
                 WHERE fname = '${fname}' AND lname = '${lname}';`);
 
     getUserPwd = (fname, lname) =>
-        this.dbPoolQuery(`SELECT pwd FROM "_User" \
+        this.dbPoolQuery(`SELECT pwd FROM "User" \
                 WHERE fname = '${fname}' AND lname = '${lname}';`);
+
+    getUser = async (uid: number): Promise<UserDataOutput> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT * FROM "User" WHERE uid = '${uid}'`,
+        );
+        return queryArr.rows[0];
+    };
+
+    getUserLogin = async (uid: number): Promise<UserLoginOutput> => {
+        const queryArr = await this
+            .dbPoolQuery(`SELECT "H"."hno", "U"."imgUrl", "U"."role" FROM "User" "U" \
+            LEFT JOIN "House" "H" \
+            ON "U"."hid" = "H"."hid" \
+            WHERE "U"."uid" = ${uid}`);
+        return queryArr.rows[0];
+    };
+
+    getHid = async (hno: number) => { //this function return Dictionary containing hid
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "H"."hno" \
+            FROM "House" "H" \
+            WHERE "H"."hid" = '${hno}';`,
+        );
+        const queryObj = queryArr.rows[0];
+        return queryObj;
+    };
+
+    getLatestEnvironment = async (
+        hid: number,
+        sid: number,
+    ): Promise<LatestEnvironmentOutput> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity" \
+            FROM "Environment" "E" \
+            WHERE "E"."hid" = '${hid}' \
+                AND "E"."sid" = '${sid}' \
+                AND "E"."timestamp" = \
+                    (SELECT MAX(timestamp) \
+                    FROM "Environment" "E2"  \
+                    WHERE "E2"."hid" = '${hid}' AND "E2"."sid" = '${sid}')`,
+        );
+        const queryObj = queryArr.rows[0];
+        return queryObj;
+    };
+
+    getLastestUrl = async (hid: number, cid: number): Promise<LatestUrl> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "I"."url" \
+            FROM "Image" "I" \
+            WHERE "I"."hid" = '${hid}' AND "I"."cid" = '${cid}' \
+                AND "I"."timestamp" = \
+                    (SELECT MAX(timestamp) \
+                    FROM "Image" "I2"  \
+                    WHERE "I2"."hid" = '${hid}' AND "I2"."cid" = '${cid}');`,
+        );
+        const queryObj = queryArr.rows[0];
+        return queryObj;
+    };
 
     deleteUser = (fname, lname) =>
         this.dbPoolQuery(`DELETE FROM "_User" \
@@ -49,10 +111,10 @@ export class DbService {
                 SET pwd = '${newPwd}' \
                 WHERE fname = '${fname}' AND lname = '${lname}';`);
 
-    createHouse = (house_id, length, width, scale) =>
+    createHouse = (hno, length, width, scale) =>
         this.dbPoolQuery(`INSERT INTO "House" \
-        (hid, length, width, scale) \
-        VALUES (${house_id}, ${length}, ${width}, ${scale});`);
+        (hno, length, width, scale) \
+        VALUES (${hno}, ${length}, ${width}, ${scale});`);
     getHouseInfo = house_id =>
         this.dbPoolQuery(`SELECT length, width, scale FROM "House" \
         WHERE hid = '${house_id}';`);

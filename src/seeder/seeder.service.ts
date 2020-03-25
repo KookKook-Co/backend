@@ -351,6 +351,7 @@ export class SeederService {
         await this.dbService.createCamera(2, 20, 40, 1);
         await this.dbService.createCamera(3, 10, 20, 2);
         await this.dbService.createCamera(4, 20, 40, 2);
+        
         let chickenRecordInput: ChickenRecordInput = {
             chicTime: '1584011015',
             amountDead: 10,
@@ -361,7 +362,7 @@ export class SeederService {
             hid: 1,
         };
         await this.dbService.createChickenRecord(chickenRecordInput);
-
+        
         let chickenRecordInput2: ChickenRecordInput = {
             chicTime: '1584011015',
             amountDead: 40,
@@ -408,6 +409,7 @@ export class SeederService {
             hid: 2,
         };
         await this.dbService.createDailyDataRecord(dailyDataRecordInput2);
+        
         let foodRecordInput: FoodRecordInput = {
             foodSilo: 1,
             foodIn: 8970,
@@ -490,6 +492,7 @@ export class SeederService {
             hid: 1,
         };
         await this.dbService.createDailyDataRecord(dailyDataRecordInput5);
+        
         let dailyDataRecordInput6: DailyDataRecordInput = {
             timestamp: '1584019202',
             date: '12-03-2020',

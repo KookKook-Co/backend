@@ -9,6 +9,24 @@ export interface UserDataInput {
     hid: number;
 }
 
+export interface UserDataOutput {
+    uid: number;
+    username: string;
+    hashedPwd: string;
+    isCurrentUser: number;
+    firstName: string;
+    lastName: string;
+    role: string;
+    imgUrl: string;
+    hid: number;
+}
+
+export interface UserLoginOutput {
+    hno: number;
+    imgUrl: string;
+    role: string;
+}
+
 export interface ChickenInput {
     dateIn: string;
     dateOut: string;
@@ -84,4 +102,16 @@ export interface ImageInput {
     url: string;
     cid: number;
     hid: number;
+}
+
+export interface LatestEnvironmentOutput {
+    windspeed: number;
+    ammonia: number;
+    temperature: number;
+    humidity: number;
+}
+
+
+export interface LatestUrl {
+    url: string;
 }
