@@ -8,11 +8,8 @@ async function bootstrap() {
     console.log('Please run this file in development environment only');
     const app = await NestFactory.create(SeederModule);
     const seeder = app.get(SeederService);
-    // await seeder.seedTableConstraint();
-    // await seeder.seedAddSampleData();
-    // await seeder.seedDropAllTable();
-    const testDbService = app.get(DbService);
-    console.log(await testDbService.getLastestUrl(1, 1));
+    await seeder.seedTableConstraint();
+    await seeder.seedAddSampleData();
     app.close();
 }
 
