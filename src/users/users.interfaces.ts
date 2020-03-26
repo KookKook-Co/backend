@@ -1,5 +1,5 @@
 export interface User {
-    userId?: any;
+    uid?: any;
     username: string;
     password?: string;
     role: Role;

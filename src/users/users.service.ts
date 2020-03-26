@@ -9,13 +9,13 @@ export class UsersService {
     constructor() {
         this.users = [
             {
-                userId: 1,
+                uid: 1,
                 username: 'owner',
                 password: 'owner',
                 role: Role.OWNER,
             },
             {
-                userId: 2,
+                uid: 2,
                 username: 'worker',
                 password: 'worker',
                 role: Role.WORKER,

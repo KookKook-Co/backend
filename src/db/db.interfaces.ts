@@ -1,4 +1,4 @@
-export interface UserDataInput {
+export interface CreateUserInput {
     username: string;
     hashedPwd: string;
     isCurrentUser: number;
@@ -27,7 +27,7 @@ export interface UserLoginOutput {
     role: string;
 }
 
-export interface ChickenInput {
+export interface CreateChickenFlockInput {
     dateIn: string;
     dateOut: string;
     generation: string;
@@ -37,14 +37,21 @@ export interface ChickenInput {
     hid: number;
 }
 
-export interface SensorInput {
-    sid: number;
+export interface CreateCameraInput {
+    cid: number;
     hid: number;
-    sen_x: number;
-    sen_y: number;
+    xPosCam: number;
+    yPosCam: number;
 }
 
-export interface ChickenRecordInput {
+export interface CreateSensorInput {
+    sid: number;
+    hid: number;
+    xPosSen: number;
+    yPosSen: number;
+}
+
+export interface CreateChickenRecordInput {
     chicTime: string;
     amountDead: number;
     amountZleg: number;
@@ -54,7 +61,7 @@ export interface ChickenRecordInput {
     hid: number;
 }
 
-export interface FoodRecordInput {
+export interface CreateFoodRecordInput {
     foodSilo: number;
     foodIn: number;
     foodRemain: number;
@@ -64,13 +71,13 @@ export interface FoodRecordInput {
     hid: number;
 }
 
-export interface DailyDataRecordInput {
+export interface CreateDailyDataRecordInput {
     timestamp: string;
     date: string;
     hid: number;
 }
 
-export interface VacRecordInput {
+export interface CreateVacRecordInput {
     vacType: string;
     vacConc: number;
     timestamp: string;
@@ -78,7 +85,7 @@ export interface VacRecordInput {
     hid: number;
 }
 
-export interface WaterRecordInput {
+export interface CreateWaterRecordInput {
     waterMeter1: number;
     waterMeter2: number;
     waterConsumed: number;
@@ -87,7 +94,7 @@ export interface WaterRecordInput {
     hid: number;
 }
 
-export interface EnvironmentInput {
+export interface CreateEnvDataInput {
     timestamp: string;
     windspeed: number;
     ammonia: number;
@@ -97,7 +104,7 @@ export interface EnvironmentInput {
     hid: number;
 }
 
-export interface ImageInput {
+export interface CreateCamImgInput {
     timestamp: string;
     url: string;
     cid: number;
@@ -110,7 +117,6 @@ export interface LatestEnvironmentOutput {
     temperature: number;
     humidity: number;
 }
-
 
 export interface LatestUrl {
     url: string;

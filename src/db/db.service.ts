@@ -1,17 +1,19 @@
 import {
-    ChickenInput,
-    ChickenRecordInput,
-    DailyDataRecordInput,
-    EnvironmentInput,
-    FoodRecordInput,
-    ImageInput,
+    CreateCamImgInput,
+    CreateCameraInput,
+    CreateChickenFlockInput,
+    CreateChickenRecordInput,
+    CreateDailyDataRecordInput,
+    CreateEnvDataInput,
+    CreateFoodRecordInput,
+    CreateSensorInput,
+    CreateUserInput,
+    CreateVacRecordInput,
+    CreateWaterRecordInput,
     LatestEnvironmentOutput,
     LatestUrl,
-    UserDataInput,
     UserDataOutput,
     UserLoginOutput,
-    VacRecordInput,
-    WaterRecordInput,
 } from './db.interfaces';
 
 import { ConfigService } from '@nestjs/config';
@@ -30,12 +32,13 @@ export class DbService {
 
     private dbPoolQuery = query_list => poolQuery(this.pool, query_list);
 
-    createUser = (userDataInput: UserDataInput) =>
+    createUser = (createUserInput: CreateUserInput) =>
         this
             .dbPoolQuery(`INSERT INTO "User" ("username", "hashedPwd", "isCurrentUser", "firstName", "lastName", "role", "imgUrl", "hid") \
-                VALUES ('${userDataInput.username}', '${userDataInput.hashedPwd}', '${userDataInput.isCurrentUser}',
-                '${userDataInput.firstName}', '${userDataInput.lastName}', '${userDataInput.role}',
-                 '${userDataInput.imgUrl}', '${userDataInput.hid}');`);
+                VALUES ('${createUserInput.username}', '${createUserInput.hashedPwd}', '${createUserInput.isCurrentUser}',
+                '${createUserInput.firstName}', '${createUserInput.lastName}', '${createUserInput.role}',
+                 '${createUserInput.imgUrl}', '${createUserInput.hid}');`);
+
     getUserUid = (fname, lname) =>
         this.dbPoolQuery(`SELECT uid FROM "User" \
                 WHERE fname = '${fname}' AND lname = '${lname}';`);
@@ -60,7 +63,8 @@ export class DbService {
         return queryArr.rows[0];
     };
 
-    getHid = async (hno: number) => { //this function return Dictionary containing hid
+    getHid = async (hno: number) => {
+        //this function return Dictionary containing hid
         const queryArr = await this.dbPoolQuery(
             `SELECT "H"."hno" \
             FROM "House" "H" \
@@ -115,6 +119,7 @@ export class DbService {
         this.dbPoolQuery(`INSERT INTO "House" \
         (hno, length, width, scale) \
         VALUES (${hno}, ${length}, ${width}, ${scale});`);
+
     getHouseInfo = house_id =>
         this.dbPoolQuery(`SELECT length, width, scale FROM "House" \
         WHERE hid = '${house_id}';`);
@@ -131,11 +136,11 @@ export class DbService {
         this.dbPoolQuery(`DELETE FROM "DailyRecord" \
                 WHERE hid = '${hid}' AND date = TO_DATE('${date}', 'DD-MM-YYYY');`);
 
-    createChicken = (chickenInput: ChickenInput) =>
+    createChickenFlock = (createChickenInput: CreateChickenFlockInput) =>
         this.dbPoolQuery(`INSERT INTO "Chicken" \
                 ("dateIn", "dateOut", "generation", "type", "amountIn", "gender", "hid") \
-                VALUES (TO_DATE('${chickenInput.dateIn}', 'DD-MM-YYYY'), TO_DATE('${chickenInput.dateOut}', 'DD-MM-YYYY'),
-                  '${chickenInput.generation}', '${chickenInput.type}', ${chickenInput.amountIn}, '${chickenInput.gender}','${chickenInput.hid}');`);
+                VALUES (TO_DATE('${createChickenInput.dateIn}', 'DD-MM-YYYY'), TO_DATE('${createChickenInput.dateOut}', 'DD-MM-YYYY'),
+                  '${createChickenInput.generation}', '${createChickenInput.type}', ${createChickenInput.amountIn}, '${createChickenInput.gender}','${createChickenInput.hid}');`);
 
     getChickenInfo = (hid, gen) =>
         this
@@ -146,20 +151,16 @@ export class DbService {
         this.dbPoolQuery(`INSERT INTO "HasUser" (hid, uid) \
                     VALUES ('${hid}', '${uid}');`);
 
-    createSensor = (
-        sid: number,
-        xPosSen: number,
-        yPosSen: number,
-        hid: number,
-    ) =>
+    createSensor = (input: CreateSensorInput) =>
         this
             .dbPoolQuery(`INSERT INTO "Sensor" ("sid", "xPosSen", "yPosSen", "hid") \
-                        VALUES ('${sid}','${xPosSen}', '${yPosSen}', '${hid}');`);
+                        VALUES ('${input.sid}','${input.xPosSen}', '${input.yPosSen}', '${input.hid}');`);
+
     getSensorInfo = sid =>
         this.dbPoolQuery(`SELECT hid, sen_x, sen_y FROM "Sensor" \
         WHERE sid = '${sid}';`);
 
-    createEnvData = (environmentInput: EnvironmentInput) =>
+    createEnvData = (environmentInput: CreateEnvDataInput) =>
         this
             .dbPoolQuery(`INSERT INTO "Environment" (timestamp, windspeed, ammonia, temperature, humidity, sid, hid) \
                             VALUES (TO_TIMESTAMP(${environmentInput.timestamp}), ${environmentInput.windspeed},
@@ -168,54 +169,50 @@ export class DbService {
     getLatestEnvData = hid =>
         this.dbPoolQuery(`SELECT * FROM "Environment"
                         WHERE hid = ${hid} ORDER BY timestamp DESC LIMIT 1;`);
+
     getEnvDataByDate = (hid, date) =>
         this.dbPoolQuery(`SELECT * FROM "Environment" WHERE hid = ${hid}
         AND timestamp BETWEEN TO_TIMESTAMP('${date} 00:00:00','DD-MM-YYYY HH24:MI:SS') 
         AND TO_TIMESTAMP('${date} 23:59:59','DD-MM-YYYY HH24:MI:SS')`);
 
-    createCamera = (
-        cid: number,
-        xPosCam: number,
-        yPosCam: number,
-        hid: number,
-    ) =>
+    createCamera = (input: CreateCameraInput) =>
         this
             .dbPoolQuery(`INSERT INTO "Camera" ("cid", "xPosCam", "yPosCam", "hid") \
-                          VALUES ('${cid}', '${xPosCam}', '${yPosCam}', '${hid}');`);
+                          VALUES ('${input.cid}', '${input.xPosCam}', '${input.yPosCam}', '${input.hid}');`);
     getCameraInfo = cid =>
         this.dbPoolQuery(`SELECT * FROM "Camera" WHERE cid = ${cid};`);
-    createImage = (imageInput: ImageInput) =>
+    createImage = (imageInput: CreateCamImgInput) =>
         this
             .dbPoolQuery(`INSERT INTO "Image" ("timestamp", "url", "cid", "hid")  \
                             VALUES (TO_TIMESTAMP(${imageInput.timestamp}), '${imageInput.url}',
                             '${imageInput.cid}', '${imageInput.hid}');`);
 
-    createChickenRecord = (chickenRecordInput: ChickenRecordInput) =>
+    createChickenRecord = (chickenRecordInput: CreateChickenRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "ChickenRecord" ("chicTime","amountDead", "amountZleg", "amountDwaft", "amountSick", "date", "hid") \
                         VALUES (TO_TIMESTAMP(${chickenRecordInput.chicTime}), '${chickenRecordInput.amountDead}',
                         '${chickenRecordInput.amountZleg}', '${chickenRecordInput.amountDwaft}', '${chickenRecordInput.amountSick}',
                         TO_DATE('${chickenRecordInput.date}', 'DD-MM-YYYY'), '${chickenRecordInput.hid}');`);
 
-    createDailyDataRecord = (dailyRecordInput: DailyDataRecordInput) =>
+    createDailyDataRecord = (dailyRecordInput: CreateDailyDataRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "DailyDataRecord" ("timestamp", "date", "hid") \
             VALUES (TO_TIMESTAMP(${dailyRecordInput.timestamp}), TO_DATE('${dailyRecordInput.date}', 'DD-MM-YYYY'), '${dailyRecordInput.hid}');`);
 
-    createFoodRecord = (foodRecordInput: FoodRecordInput) =>
+    createFoodRecord = (foodRecordInput: CreateFoodRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "FoodRecord" ("foodSilo", "foodIn", "foodRemain", "foodConsumed", "timestamp", "date", "hid") \
                         VALUES ('${foodRecordInput.foodSilo}','${foodRecordInput.foodIn}', '${foodRecordInput.foodRemain}',
                         '${foodRecordInput.foodConsumed}', TO_TIMESTAMP(${foodRecordInput.timestamp}),
                         TO_DATE('${foodRecordInput.date}', 'DD-MM-YYYY'), '${foodRecordInput.hid}');`);
 
-    createVacRecord = (vacRecordInput: VacRecordInput) =>
+    createVacRecord = (vacRecordInput: CreateVacRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "VacRecord" ("vacType", "vacConc", "timestamp", "date", "hid") \
                         VALUES ('${vacRecordInput.vacType}', '${vacRecordInput.vacConc}',
                         TO_TIMESTAMP('${vacRecordInput.timestamp}'), TO_DATE('${vacRecordInput.date}', 'DD-MM-YYYY'), '${vacRecordInput.hid}');`);
 
-    createWaterRecord = (waterRecordInput: WaterRecordInput) =>
+    createWaterRecord = (waterRecordInput: CreateWaterRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "WaterRecord" ("waterMeter1", "waterMeter2", "waterConsumed", "timestamp", "date", "hid") \
                         VALUES ('${waterRecordInput.waterMeter1}', '${waterRecordInput.waterMeter2}', '${waterRecordInput.waterConsumed}',

@@ -1,38 +1,49 @@
-/* eslint-disable @typescript-eslint/camelcase */
+import * as bcrypt from 'bcrypt';
+
+import { DbService } from '../db/db.service';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/users.interfaces';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly usersService: UsersService,
+        private readonly dbService: DbService,
         private readonly jwtService: JwtService,
     ) {}
 
-    async validateUser(username: string, pass: string): Promise<any> {
-        const user: User = await this.usersService.findOne(username);
+    async validateUser(username: string, password: string): Promise<any> {
+        const dbGetUser = async data => true as any;
 
-        if (user && user.password === pass) {
-            const { password, ...result } = user;
+        const user = await dbGetUser(username);
+        if (await bcrypt.compare(password, user.pwd)) {
+            const { pwd, ...result } = user;
             return result;
         }
         return null;
     }
 
-    async login(user: any) {
-        const payload = {
-            username: user.username,
-            sub: user.userId,
-            role: user.role,
-        };
-        const access_token = this.jwtService.sign(payload);
-        const dbGetResponsibleHouse = async () => true as any;
-        const responsible_house: number = await dbGetResponsibleHouse();
-        return {
-            access_token,
-            responsible_house,
-        };
+    async login(user: User) {
+        try {
+            const dbGetUser = async uid => true as any;
+
+            const { uid, imageUrl, responsible_house, role } = await dbGetUser(
+                user.uid,
+            );
+            const payload = {
+                uid,
+                responsible_house,
+                role,
+            };
+            const access_token = this.jwtService.sign(payload);
+            return {
+                access_token,
+                imageUrl,
+                responsible_house,
+                role,
+            };
+        } catch (err) {
+            console.log(err);
+        }
     }
 }

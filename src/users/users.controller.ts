@@ -4,45 +4,43 @@ import { Response } from 'express';
 import { RolesGuard } from '../guard/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../decorator/roles.decorator';
+import { DbService } from '../db/db.service';
 
 @Controller('users')
 export class UsersController {
-    @Roles(Role.ADMIN, Role.OWNER)
+    constructor(private readonly dbService: DbService) {}
+
+    @Roles(Role.OWNER)
     @UseGuards(AuthGuard(), RolesGuard)
-    @Post('create')
+    @Post()
     async createAccount(
         @Body() createUserDTO: CreateUserDTO,
         @Res() res: Response,
     ) {
-        const createUser = (data: CreateUserDTO): Promise<any> => {
-            return new Promise(res => {
-                const user = { ...data };
-                res(user);
-            });
-        };
         try {
-            const payload = await createUser(createUserDTO);
+            const createAccount = (data: any) => true as any;
+
+            const payload = await createAccount(createUserDTO);
             res.status(200).send(payload);
         } catch (err) {
             res.status(400).send(err);
         }
     }
 
-    @Roles(Role.ADMIN, Role.OWNER)
+    @Roles(Role.OWNER)
     @UseGuards(AuthGuard(), RolesGuard)
-    @Get('all')
+    @Get('')
     async fetchAllAccounts() {
         return true;
     }
 
-    @Roles(Role.ADMIN, Role.OWNER)
+    @Roles(Role.OWNER)
     @UseGuards(AuthGuard(), RolesGuard)
     @Post('update')
     async updateUser() {
         return true;
     }
 
-    @Roles(Role.ADMIN)
     @UseGuards(AuthGuard(), RolesGuard)
     @Post('delete')
     async deleteUser() {
