@@ -293,7 +293,7 @@ export class SeederService {
         await poolQuery(this.pool, query_list.join(''));
     };
 
-    seedAddSampleData = async () => {
+    seedSampleData = async () => {
         await this.dbService.createHouse(1, 10, 10, 10);
         await this.dbService.createHouse(2, 10, 10, 10);
         let UserDataInput: CreateUserInput = {
@@ -675,7 +675,8 @@ export class SeederService {
         };
         await this.dbService.createImage(imageInput4);
     };
-    seedDropAllTable = async () => {
+
+    dropAllTable = async () => {
         var query_list = [];
         query_list.push(dropTable('ChickenRecord'));
         query_list.push(dropTable('Environment'));
@@ -691,23 +692,5 @@ export class SeederService {
         query_list.push(dropTable('House'));
         query_list.push(dropTable('User'));
         await poolQuery(this.pool, query_list.join(''));
-    };
-
-    dropAllTable = async () => {
-        var query_list = [];
-        query_list.push(dropTable('ChickenRecord'));
-        query_list.push(dropTable('Environment'));
-        query_list.push(dropTable('FoodRecord'));
-        query_list.push(dropTable('Image'));
-        query_list.push(dropTable('VacRecord'));
-        query_list.push(dropTable('WaterRecord'));
-        query_list.push(dropTable('Camera'));
-        query_list.push(dropTable('Sensor'));
-        query_list.push(dropTable('Chicken'));
-        query_list.push(dropTable('HasUser'));
-        query_list.push(dropTable('DailyRecord'));
-        query_list.push(dropTable('House'));
-        query_list.push(dropTable('_User'));
-        return poolQuery(this.pool, query_list.join(''));
     };
 }
