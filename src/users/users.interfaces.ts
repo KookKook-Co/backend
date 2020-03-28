@@ -1,7 +1,17 @@
 export interface User {
-    uid?: any;
-    username: string;
-    password?: string;
+    uid: string;
+    username?: string;
+    hashedPwd?: string;
+    isCurrentUser?: boolean;
+    firstName?: string;
+    lastName?: string;
+    role?: Role;
+    imageUrl?: string;
+}
+
+export interface UserPayload {
+    uid: string;
+    hno: number;
     role: Role;
 }
 
@@ -12,11 +22,15 @@ export enum Role {
 }
 
 export interface CreateUserDTO {
-    user: User;
-    profile: Profile;
+    user: UserDTO;
+    hno: number;
 }
 
-interface Profile {
-    address: string;
-    contactNumber: number;
+interface UserDTO {
+    username: string;
+    hashedPwd: string;
+    firstName: string;
+    lastName: string;
+    role: Role;
+    imageUrl: string;
 }

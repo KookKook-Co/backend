@@ -60,7 +60,7 @@ export class SeederService {
                 "firstName" VARCHAR(50), \
                 "lastName" VARCHAR(50), \
                 "role" VARCHAR(50), \
-                "imgUrl" VARCHAR, \
+                "imageUrl" VARCHAR, \
                 "hid" INT, \
                 PRIMARY KEY (uid)',
             ),
@@ -300,22 +300,22 @@ export class SeederService {
             username: 'username1',
             hashedPwd:
                 '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
-            isCurrentUser: 1,
+            isCurrentUser: true,
             firstName: 'worker1',
             lastName: 'lastname1',
             role: 'worker',
-            imgUrl: 'http://www.kk.com/img/1',
+            imageUrl: 'http://www.kk.com/img/1',
             hid: 1,
         };
         let UserDataInput2: CreateUserInput = {
             username: 'username2',
             hashedPwd:
                 '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
-            isCurrentUser: 1,
+            isCurrentUser: true,
             firstName: 'worker2',
             lastName: 'lastname2',
             role: 'worker',
-            imgUrl: 'http://www.kk.com/img/2',
+            imageUrl: 'http://www.kk.com/img/2',
             hid: 2,
         };
         await this.dbService.createUser(UserDataInput);

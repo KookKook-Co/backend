@@ -1,30 +1,32 @@
+import { Role } from '../users/users.interfaces';
+
 export interface CreateUserInput {
     username: string;
     hashedPwd: string;
-    isCurrentUser: number;
+    isCurrentUser: boolean;
     firstName: string;
     lastName: string;
     role: string;
-    imgUrl: string;
+    imageUrl: string;
     hid: number;
 }
 
 export interface UserDataOutput {
-    uid: number;
+    uid: string;
     username: string;
     hashedPwd: string;
-    isCurrentUser: number;
+    isCurrentUser: boolean;
     firstName: string;
     lastName: string;
     role: string;
-    imgUrl: string;
+    imageUrl: string;
     hid: number;
 }
 
-export interface UserLoginOutput {
+export interface LoginUserInfo {
     hno: number;
-    imgUrl: string;
-    role: string;
+    imageUrl: string;
+    role: Role;
 }
 
 export interface CreateChickenFlockInput {

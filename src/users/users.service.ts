@@ -1,29 +1,12 @@
-import { Role, User } from './users.interfaces';
-
+import { DbService } from '../db/db.service';
 import { Injectable } from '@nestjs/common';
+import { User } from './users.interfaces';
 
 @Injectable()
 export class UsersService {
-    private readonly users: User[];
+    constructor(private readonly dbService: DbService) {}
 
-    constructor() {
-        this.users = [
-            {
-                uid: 1,
-                username: 'owner',
-                password: 'owner',
-                role: Role.OWNER,
-            },
-            {
-                uid: 2,
-                username: 'worker',
-                password: 'worker',
-                role: Role.WORKER,
-            },
-        ];
-    }
-
-    async findOne(username: string): Promise<User | undefined> {
-        return this.users.find(user => user.username === username);
+    async findOne(username: string): Promise<User> {
+        return this.dbService.getUserByUsername(username);
     }
 }

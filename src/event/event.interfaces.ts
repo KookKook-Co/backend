@@ -14,7 +14,7 @@ interface Block {
     url?: string;
 }
 
-export interface DailyInfoDTO {
+export interface DailyInfo {
     timestamp: Date;
     food: FoodInput;
     water: WaterInput;
@@ -34,4 +34,32 @@ interface WaterInput {
 interface VaccineInput {
     type: string;
     concentration: number;
+}
+
+export interface SubmitUnqualifiedChickenDTO {
+    date: string;
+    timestamp: Date;
+    round: Round;
+    unqualifiedChickenInfo: UnqualifiedChickenInfo;
+}
+
+enum Round {
+    MORNING = 'MORNING',
+    EVENING = 'EVENING',
+}
+
+interface UnqualifiedChickenInfo {
+    amountDead: number;
+    amountZleg: number;
+    amountDwaft: number;
+    amountSick: number;
+}
+
+export interface ChickenFlockInfo {
+    dateIn: string;
+    dateOut: string;
+    generation: string;
+    type: string;
+    amountIn: number;
+    gender: string;
 }

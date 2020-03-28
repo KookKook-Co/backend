@@ -1,4 +1,3 @@
-import { DbService } from '../src/db/db.service';
 import { NestFactory } from '@nestjs/core';
 import { SeederModule } from './seeder/seeder.module';
 import { SeederService } from './seeder/seeder.service';

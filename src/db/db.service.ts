@@ -12,8 +12,8 @@ import {
     CreateWaterRecordInput,
     LatestEnvironmentOutput,
     LatestUrl,
+    LoginUserInfo,
     UserDataOutput,
-    UserLoginOutput,
 } from './db.interfaces';
 
 import { ConfigService } from '@nestjs/config';
@@ -34,18 +34,18 @@ export class DbService {
 
     createUser = (createUserInput: CreateUserInput) =>
         this
-            .dbPoolQuery(`INSERT INTO "User" ("username", "hashedPwd", "isCurrentUser", "firstName", "lastName", "role", "imgUrl", "hid") \
+            .dbPoolQuery(`INSERT INTO "User" ("username", "hashedPwd", "isCurrentUser", "firstName", "lastName", "role", "imageUrl", "hid") \
                 VALUES ('${createUserInput.username}', '${createUserInput.hashedPwd}', '${createUserInput.isCurrentUser}',
                 '${createUserInput.firstName}', '${createUserInput.lastName}', '${createUserInput.role}',
-                 '${createUserInput.imgUrl}', '${createUserInput.hid}');`);
+                 '${createUserInput.imageUrl}', '${createUserInput.hid}');`);
 
     getUserUid = (fname, lname) =>
         this.dbPoolQuery(`SELECT uid FROM "User" \
                 WHERE fname = '${fname}' AND lname = '${lname}';`);
 
-    getUserPwd = (fname, lname) =>
-        this.dbPoolQuery(`SELECT pwd FROM "User" \
-                WHERE fname = '${fname}' AND lname = '${lname}';`);
+    getUserByUsername = (username: string) =>
+        this.dbPoolQuery(`SELECT * FROM "User" \
+                WHERE username = '${username}';`);
 
     getUser = async (uid: number): Promise<UserDataOutput> => {
         const queryArr = await this.dbPoolQuery(
@@ -54,9 +54,9 @@ export class DbService {
         return queryArr.rows[0];
     };
 
-    getUserLogin = async (uid: number): Promise<UserLoginOutput> => {
+    getLoginUserInfo = async (uid: string): Promise<LoginUserInfo> => {
         const queryArr = await this
-            .dbPoolQuery(`SELECT "H"."hno", "U"."imgUrl", "U"."role" FROM "User" "U" \
+            .dbPoolQuery(`SELECT "H"."hno", "U"."imageUrl", "U"."role" FROM "User" "U" \
             LEFT JOIN "House" "H" \
             ON "U"."hid" = "H"."hid" \
             WHERE "U"."uid" = ${uid}`);

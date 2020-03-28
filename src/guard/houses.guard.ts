@@ -5,21 +5,18 @@ import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class HousesGuard implements CanActivate {
     constructor(private readonly reflector: Reflector) {}
 
     canActivate(
         context: ExecutionContext,
     ): boolean | Promise<boolean> | Observable<boolean> {
-        const roles = this.reflector.get<string[]>(
-            'roles',
-            context.getHandler(),
-        );
         const request = context.switchToHttp().getRequest();
         const user: UserPayload = request.user;
+        const hno: number = request.hno;
         if (user.role === Role.OWNER) {
             return true;
         }
-        return roles.indexOf(user.role) !== -1;
+        return hno === user.hno;
     }
 }

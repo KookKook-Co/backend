@@ -1,16 +1,15 @@
 import { Controller, Post, Body, Res, Get, UseGuards } from '@nestjs/common';
-import { User, CreateUserDTO, Role } from './users.interfaces';
+import { CreateUserDTO } from './users.interfaces';
 import { Response } from 'express';
 import { RolesGuard } from '../guard/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '../decorator/roles.decorator';
 import { DbService } from '../db/db.service';
+import { CreateUserInput } from '../db/db.interfaces';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly dbService: DbService) {}
 
-    @Roles(Role.OWNER)
     @UseGuards(AuthGuard(), RolesGuard)
     @Post()
     async createAccount(
@@ -18,23 +17,26 @@ export class UsersController {
         @Res() res: Response,
     ) {
         try {
-            const createAccount = (data: any) => true as any;
-
-            const payload = await createAccount(createUserDTO);
+            const { user, hno } = createUserDTO;
+            const hid = await this.dbService.getHid(hno);
+            const createUserInput: CreateUserInput = {
+                ...user,
+                isCurrentUser: true,
+                hid,
+            };
+            const payload = await this.dbService.createUser(createUserInput);
             res.status(200).send(payload);
         } catch (err) {
             res.status(400).send(err);
         }
     }
 
-    @Roles(Role.OWNER)
     @UseGuards(AuthGuard(), RolesGuard)
     @Get('')
     async fetchAllAccounts() {
         return true;
     }
 
-    @Roles(Role.OWNER)
     @UseGuards(AuthGuard(), RolesGuard)
     @Post('update')
     async updateUser() {
