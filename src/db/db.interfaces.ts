@@ -55,6 +55,7 @@ export interface CreateSensorInput {
 
 export interface CreateChickenRecordInput {
     chicTime: string;
+    period: string;
     amountDead: number;
     amountZleg: number;
     amountDwaft: number;

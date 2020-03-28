@@ -93,6 +93,7 @@ export class SeederService {
             createTable(
                 'ChickenRecord',
                 '"chicTime" TIMESTAMP, \
+                "period" VARCHAR(10), \
                 "amountDead" INT, \
                 "amountZleg" INT, \
                 "amountDwaft" INT, \
@@ -402,6 +403,7 @@ export class SeederService {
         await this.dbService.createCamera(camera4);
         let chickenRecordInput: CreateChickenRecordInput = {
             chicTime: '1584011015',
+            period: 'morning',
             amountDead: 10,
             amountZleg: 5,
             amountDwaft: 2,
@@ -413,6 +415,7 @@ export class SeederService {
 
         let chickenRecordInput2: CreateChickenRecordInput = {
             chicTime: '1584011015',
+            period: 'morning',
             amountDead: 40,
             amountZleg: 4,
             amountDwaft: 3,
@@ -424,6 +427,7 @@ export class SeederService {
 
         let chickenRecordInput3: CreateChickenRecordInput = {
             chicTime: '1584023974',
+            period: 'afternoon',
             amountDead: 13,
             amountZleg: 4,
             amountDwaft: 4,
@@ -435,6 +439,7 @@ export class SeederService {
 
         let chickenRecordInput4: CreateChickenRecordInput = {
             chicTime: '1584023974',
+            period: 'afternoon',
             amountDead: 4,
             amountZleg: 7,
             amountDwaft: 3,
