@@ -10,12 +10,14 @@ import {
     CreateUserInput,
     CreateVacRecordInput,
     CreateWaterRecordInput,
+    EnvironmentBetweenTimestampOutput,
+    EnvironmentOutput,
     GetChickenFlockInfoOutput,
-    LatestEnvironmentOutput,
     LatestUrl,
     LoginUserInfo,
     SumAmountChickenRecordOutput,
     UserDataOutput,
+    getEnvironmentBySidOutput,
 } from './db.interfaces';
 
 import { ConfigService } from '@nestjs/config';
@@ -37,9 +39,9 @@ export class DbService {
 
     createUser = (createUserInput: CreateUserInput) =>
         this
-            .dbPoolQuery(`INSERT INTO "User" ("username", "hashedPwd", "isCurrentUser", "firstName", "lastName", "role", "imageUrl", "hid") \
+            .dbPoolQuery(`INSERT INTO "User" ("username", "hashedPwd", "isCurrentUser", "firstName", "lastName", "lineID", "role", "imageUrl", "hid") \
                 VALUES ('${createUserInput.username}', '${createUserInput.hashedPwd}', '${createUserInput.isCurrentUser}',
-                '${createUserInput.firstName}', '${createUserInput.lastName}', '${createUserInput.role}',
+                '${createUserInput.firstName}', '${createUserInput.lastName}', '${createUserInput.lineID}', '${createUserInput.role}',
                  '${createUserInput.imageUrl}', '${createUserInput.hid}');`);
 
     getUserUid = (fname, lname) =>
@@ -80,7 +82,7 @@ export class DbService {
     getLatestEnvironment = async (
         hid: number,
         sid: number,
-    ): Promise<LatestEnvironmentOutput> => {
+    ): Promise<EnvironmentOutput> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity" \
             FROM "Environment" "E" \
@@ -180,15 +182,15 @@ export class DbService {
 
     createCamera = (input: CreateCameraInput) =>
         this
-            .dbPoolQuery(`INSERT INTO "Camera" ("cid", "xPosCam", "yPosCam", "hid") \
-                          VALUES ('${input.cid}', '${input.xPosCam}', '${input.yPosCam}', '${input.hid}');`);
+            .dbPoolQuery(`INSERT INTO "Camera" ("cid", "cno", "xPosCam", "yPosCam", "hid") \
+                          VALUES ('${input.cid}', '${input.cno}', '${input.xPosCam}', '${input.yPosCam}', '${input.hid}');`);
     getCameraInfo = cid =>
         this.dbPoolQuery(`SELECT * FROM "Camera" WHERE cid = ${cid};`);
     createImage = (imageInput: CreateCamImgInput) =>
         this
-            .dbPoolQuery(`INSERT INTO "Image" ("timestamp", "url", "cid", "hid")  \
+            .dbPoolQuery(`INSERT INTO "Image" ("timestamp", "url", "amountDead", "cid", "hid")  \
                             VALUES (TO_TIMESTAMP(${imageInput.timestamp}), '${imageInput.url}',
-                            '${imageInput.cid}', '${imageInput.hid}');`);
+                            '${imageInput.amountDead}', '${imageInput.cid}', '${imageInput.hid}');`);
 
     createChickenRecord = (chickenRecordInput: CreateChickenRecordInput) =>
         this
@@ -276,6 +278,83 @@ export class DbService {
     ): Promise<GetChickenFlockInfoOutput> => {
         const queryArr = await this.dbPoolQuery(`SELECT * FROM "Chicken" \
         WHERE hid = ${hid}`);
+        return queryArr.rows[0];
+    };
+
+    getLast24HrsTemperature = async (hid, sid) => {
+        const queryArr = await this.dbPoolQuery(`SELECT * FROM "Environment" \
+        WHERE "hid" = '${hid}' AND "sid" = '${sid}' \
+        AND "timestamp" >= NOW() - INTERVAL '1' DAY;`);
+        const queryObj = queryArr.rows[0];
+        return queryObj;
+    };
+
+    getLatestTemperatureBySid = async (hid, sid) => {
+        const queryArr = await this
+            .dbPoolQuery(`SELECT "temperature" FROM "Environment" \
+        WHERE hid = ${hid} AND sid = ${sid} ORDER BY timestamp DESC LIMIT 1;`);
+        return queryArr.rows[0];
+    };
+
+    getTemperatureBetweenTimestampBySid = async (hid, sid, tsStart, tsEnd) => {
+        const queryArr = await this
+            .dbPoolQuery(`SELECT "timestamp", "temperature" FROM "Environment" \
+        WHERE hid = ${hid} AND sid = '${sid}' \
+        AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') \
+        AND TO_TIMESTAMP('${tsEnd}');`);
+        return queryArr.rows;
+    };
+
+    getLastNTemperatureBySid = async (hid, sid, number) => {
+        const queryArr = await this
+            .dbPoolQuery(`SELECT "timestamp", "temperature" FROM "Environment" \
+        WHERE hid = ${hid} AND sid = ${sid} \
+        ORDER BY timestamp DESC LIMIT '${number}';`);
+        return queryArr.rows;
+    };
+
+    getLatestEnvironmentBySid = async (
+        sid: string,
+        hid: number,
+    ): Promise<getEnvironmentBySidOutput> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity" \
+            FROM "Environment" "E" \
+            WHERE "E"."hid" = '${hid}' \
+                AND "E"."sid" = '${sid}' \
+                AND "E"."timestamp" = \
+                    (SELECT MAX(timestamp) \
+                        FROM "Environment" "E2"  \
+                        WHERE "E2"."hid" = '${hid}' AND "E2"."sid" = '${sid}')`,
+        );
+        return { sid: sid, hid: hid, environment: queryArr.rows[0] };
+    };
+
+    getEnvironmentBetweenTimestampBySid = async (
+        sid,
+        hid,
+        tsStart,
+        tsEnd,
+    ): Promise<EnvironmentBetweenTimestampOutput> => {
+        const queryArr = await this
+            .dbPoolQuery(`SELECT "timestamp", "windspeed", "ammonia", "temperature", "humidity" FROM "Environment" \
+        WHERE hid = ${hid} AND sid = '${sid}' \
+        AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') \
+        AND TO_TIMESTAMP('${tsEnd}');`);
+        return { sid: sid, hid: hid, environmentSet: queryArr.rows };
+    };
+
+    getLatestAmountDeadChickenByCid = async (cid: string, hid: number) => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "I"."amountDead" \
+            FROM "Image" "I" \
+            WHERE "I"."hid" = '${hid}' \
+                AND "I"."cid" = '${cid}' \
+                AND "I"."timestamp" = \
+                    (SELECT MAX(timestamp) \
+                        FROM "Image" "I2"  \
+                        WHERE "I2"."hid" = '${hid}' AND "I2"."cid" = '${cid}')`,
+        );
         return queryArr.rows[0];
     };
 }

@@ -59,6 +59,7 @@ export class SeederService {
                 "isCurrentUser" BOOLEAN, \
                 "firstName" VARCHAR(50), \
                 "lastName" VARCHAR(50), \
+                "lineID" VARCHAR(50), \
                 "role" VARCHAR(50), \
                 "imageUrl" VARCHAR, \
                 "hid" INT, \
@@ -156,7 +157,8 @@ export class SeederService {
         query_list.push(
             createTable(
                 'Camera',
-                '"cid" INT, \
+                '"cid" VARCHAR, \
+                "cno" INT, \
                 "xPosCam" INT, \
                 "yPosCam" INT, \
                 "hid" INT NOT NULL, \
@@ -169,7 +171,8 @@ export class SeederService {
                 'Image',
                 '"timestamp" TIMESTAMP, \
                 "url" VARCHAR, \
-                "cid" INT NOT NULL, \
+                "amountDead" INT, \
+                "cid" VARCHAR NOT NULL, \
                 "hid" INT NOT NULL, \
                 PRIMARY KEY (timestamp, cid, hid)',
             ),
@@ -178,7 +181,7 @@ export class SeederService {
         query_list.push(
             createTable(
                 'Sensor',
-                '"sid" INT, \
+                '"sid" VARCHAR, \
                 "xPosSen" INT, \
                 "yPosSen" INT, \
                 "hid" INT NOT NULL, \
@@ -194,7 +197,7 @@ export class SeederService {
                 "ammonia" DOUBLE PRECISION, \
                 "temperature" DOUBLE PRECISION, \
                 "humidity" DOUBLE PRECISION, \
-                "sid" INT NOT NULL, \
+                "sid" VARCHAR NOT NULL, \
                 "hid" INT NOT NULL, \
                 PRIMARY KEY (timestamp, sid, hid)',
             ),
@@ -304,6 +307,7 @@ export class SeederService {
             isCurrentUser: true,
             firstName: 'worker1',
             lastName: 'lastname1',
+            lineID: 'line1',
             role: 'worker',
             imageUrl: 'http://www.kk.com/img/1',
             hid: 1,
@@ -315,6 +319,7 @@ export class SeederService {
             isCurrentUser: true,
             firstName: 'worker2',
             lastName: 'lastname2',
+            lineID: 'line2',
             role: 'worker',
             imageUrl: 'http://www.kk.com/img/2',
             hid: 2,
@@ -344,49 +349,53 @@ export class SeederService {
             hid: 2,
         };
         const sensor1: CreateSensorInput = {
-            sid: 1,
+            sid: '1',
             hid: 1,
             xPosSen: 10,
             yPosSen: 20,
         };
         const camera1: CreateCameraInput = {
-            cid: 1,
+            cid: '1',
+            cno: 1,
             hid: 1,
             xPosCam: 10,
             yPosCam: 20,
         };
         const sensor2: CreateSensorInput = {
-            sid: 2,
+            sid: '2',
             hid: 1,
             xPosSen: 20,
             yPosSen: 40,
         };
         const camera2: CreateCameraInput = {
-            cid: 2,
+            cid: '2',
+            cno: 2,
             hid: 1,
             xPosCam: 20,
             yPosCam: 40,
         };
         const sensor3: CreateSensorInput = {
-            sid: 3,
+            sid: '3',
             hid: 2,
             xPosSen: 10,
             yPosSen: 20,
         };
         const camera3: CreateCameraInput = {
-            cid: 3,
+            cid: '3',
+            cno: 1,
             hid: 2,
             xPosCam: 10,
             yPosCam: 20,
         };
         const sensor4: CreateSensorInput = {
-            sid: 4,
+            sid: '4',
             hid: 2,
             xPosSen: 20,
             yPosSen: 40,
         };
         const camera4: CreateCameraInput = {
-            cid: 4,
+            cid: '4',
+            cno: 2,
             hid: 2,
             xPosCam: 20,
             yPosCam: 40,
@@ -611,7 +620,7 @@ export class SeederService {
             ammonia: 23,
             temperature: 27.8,
             humidity: 48.6,
-            sid: 1,
+            sid: '1',
             hid: 1,
         };
         await this.dbService.createEnvData(environmentInput);
@@ -622,7 +631,7 @@ export class SeederService {
             ammonia: 24,
             temperature: 28.8,
             humidity: 48.5,
-            sid: 2,
+            sid: '2',
             hid: 1,
         };
         await this.dbService.createEnvData(environmentInput2);
@@ -633,7 +642,7 @@ export class SeederService {
             ammonia: 22,
             temperature: 26.4,
             humidity: 40.5,
-            sid: 3,
+            sid: '3',
             hid: 2,
         };
         await this.dbService.createEnvData(environmentInput3);
@@ -644,14 +653,15 @@ export class SeederService {
             ammonia: 20,
             temperature: 27.4,
             humidity: 41.5,
-            sid: 4,
+            sid: '4',
             hid: 2,
         };
         await this.dbService.createEnvData(environmentInput4);
         let imageInput: CreateCamImgInput = {
             timestamp: '1584011605',
             url: 'http://www.kookkook.com/img/1_1',
-            cid: 1,
+            amountDead: 3,
+            cid: '1',
             hid: 1,
         };
 
@@ -659,7 +669,8 @@ export class SeederService {
         let imageInput2: CreateCamImgInput = {
             timestamp: '1584011605',
             url: 'http://www.kookkook.com/img/1_2',
-            cid: 2,
+            amountDead: 5,
+            cid: '2',
             hid: 1,
         };
         await this.dbService.createImage(imageInput2);
@@ -667,7 +678,8 @@ export class SeederService {
         let imageInput3: CreateCamImgInput = {
             timestamp: '1584090805',
             url: 'http://www.kookkook.com/img/2_3',
-            cid: 3,
+            amountDead: 1,
+            cid: '3',
             hid: 2,
         };
         await this.dbService.createImage(imageInput3);
@@ -675,7 +687,8 @@ export class SeederService {
         let imageInput4: CreateCamImgInput = {
             timestamp: '1584090805',
             url: 'http://www.kookkook.com/img/2_4',
-            cid: 4,
+            amountDead: 6,
+            cid: '4',
             hid: 2,
         };
         await this.dbService.createImage(imageInput4);

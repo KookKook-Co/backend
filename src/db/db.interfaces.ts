@@ -1,4 +1,3 @@
-import { Role } from '../users/users.interfaces';
 
 export interface CreateUserInput {
     username: string;
@@ -6,6 +5,7 @@ export interface CreateUserInput {
     isCurrentUser: boolean;
     firstName: string;
     lastName: string;
+    lineID: string;
     role: string;
     imageUrl: string;
     hid: number;
@@ -40,14 +40,15 @@ export interface CreateChickenFlockInput {
 }
 
 export interface CreateCameraInput {
-    cid: number;
+    cid: string;
+    cno: number;
     hid: number;
     xPosCam: number;
     yPosCam: number;
 }
 
 export interface CreateSensorInput {
-    sid: number;
+    sid: string;
     hid: number;
     xPosSen: number;
     yPosSen: number;
@@ -103,18 +104,19 @@ export interface CreateEnvDataInput {
     ammonia: number;
     temperature: number;
     humidity: number;
-    sid: number;
+    sid: string;
     hid: number;
 }
 
 export interface CreateCamImgInput {
     timestamp: string;
     url: string;
-    cid: number;
+    amountDead: number;
+    cid: string;
     hid: number;
 }
 
-export interface LatestEnvironmentOutput {
+export interface EnvironmentOutput {
     windspeed: number;
     ammonia: number;
     temperature: number;
@@ -145,4 +147,22 @@ export interface GetChickenFlockInfoOutput {
     amountIn: number;
     gender: string;
     hid: number;
+}
+
+export interface getEnvironmentBySidOutput {
+    sid: string;
+    hid: number;
+    environment: EnvironmentOutput;
+}
+export interface environmentSetOutput {
+    timestamp: string;
+    windspeed: number;
+    ammonia: number;
+    temperature: number;
+    humidity: number;
+}
+export interface EnvironmentBetweenTimestampOutput {
+    sid: string;
+    hid: number;
+    environmentSet: Array<environmentSetOutput>;
 }
