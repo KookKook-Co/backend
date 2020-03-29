@@ -124,3 +124,25 @@ export interface LatestEnvironmentOutput {
 export interface LatestUrl {
     url: string;
 }
+
+export interface SumAmountEachTypeOutput {
+    SumAmountDead: number;
+    SumAmountZleg: number;
+    SumAmountDwaft: number;
+    SumAmountSick: number;
+}
+export interface SumAmountChickenRecordOutput {
+    hid: number;
+    date: string;
+    SumAmountEachType: SumAmountEachTypeOutput;
+}
+
+export interface GetChickenFlockInfoOutput {
+    dateIn: string;
+    dateOut: string;
+    generation: string;
+    type: string;
+    amountIn: number;
+    gender: string;
+    hid: number;
+}

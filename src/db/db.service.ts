@@ -10,15 +10,18 @@ import {
     CreateUserInput,
     CreateVacRecordInput,
     CreateWaterRecordInput,
+    GetChickenFlockInfoOutput,
     LatestEnvironmentOutput,
     LatestUrl,
     LoginUserInfo,
+    SumAmountChickenRecordOutput,
     UserDataOutput,
 } from './db.interfaces';
 
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
+import { async } from 'rxjs/internal/scheduler/async';
 import { poolQuery } from './utils';
 
 @Injectable()
@@ -217,4 +220,62 @@ export class DbService {
             .dbPoolQuery(`INSERT INTO "WaterRecord" ("waterMeter1", "waterMeter2", "waterConsumed", "timestamp", "date", "hid") \
                         VALUES ('${waterRecordInput.waterMeter1}', '${waterRecordInput.waterMeter2}', '${waterRecordInput.waterConsumed}',
                         TO_TIMESTAMP('${waterRecordInput.timestamp}'), TO_DATE('${waterRecordInput.date}', 'DD-MM-YYYY'), '${waterRecordInput.hid}');`);
+
+    isDailyRecordTupleExist = async (
+        date: string,
+        hid: number,
+    ): Promise<Boolean> => {
+        const queryArr = await this
+            .dbPoolQuery(`SELECT COUNT(1) FROM "DailyRecord" \
+        WHERE date = TO_DATE('${date}', 'DD-MM-YYYY') AND hid = '${hid}';`);
+        const queryObj = queryArr.rows[0];
+        return queryObj['count'] == 0 ? false : true;
+    };
+
+    isDailyDataRecordTupleExist = async (
+        timestamp: string,
+        date: string,
+        hid: number,
+    ): Promise<Boolean> => {
+        const queryArr = await this
+            .dbPoolQuery(`SELECT COUNT(1) FROM "DailyDataRecord" \
+        WHERE timestamp = TO_TIMESTAMP('${timestamp}') AND date = TO_DATE('${date}', 'DD-MM-YYYY') AND hid = '${hid}';`);
+        const queryObj = queryArr.rows[0];
+        return queryObj['count'] == 0 ? false : true;
+    };
+
+    isUsernameExist = async (username: string): Promise<Boolean> => {
+        const queryArr = await this.dbPoolQuery(`SELECT COUNT(1) FROM "User" \
+        WHERE username = '${username}';`);
+        const queryObj = queryArr.rows[0];
+        return queryObj['count'] == 0 ? false : true;
+    };
+
+    getSumAmountChickenRecord = async (
+        date: string,
+        hid: number,
+    ): Promise<SumAmountChickenRecordOutput> => {
+        const queryArr = await this
+            .dbPoolQuery(`SELECT SUM("amountDead") "SumAmountDead", \
+                        SUM("amountZleg") "SumAmountZleg", \
+                        SUM("amountDwaft") "SumAmountDwaft", \
+                        SUM("amountSick") "SumAmountSick" \
+                        FROM "ChickenRecord" \
+                        WHERE date = TO_DATE('${date}', 'DD-MM-YYYY') AND hid = ${hid}`);
+        const queryObj = queryArr.rows[0];
+        const queryObj2 = {
+            hid: hid,
+            date: date,
+            SumAmountEachType: queryObj,
+        };
+        return queryObj2;
+    };
+
+    getChickenFlockInfo = async (
+        hid: number,
+    ): Promise<GetChickenFlockInfoOutput> => {
+        const queryArr = await this.dbPoolQuery(`SELECT * FROM "Chicken" \
+        WHERE hid = ${hid}`);
+        return queryArr.rows[0];
+    };
 }
