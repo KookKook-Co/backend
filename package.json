@@ -30,6 +30,7 @@
     "@nestjs/platform-socket.io": "^7.0.3",
     "@nestjs/websockets": "^7.0.3",
     "bcrypt": "^4.0.1",
+    "moment": "^2.24.0",
     "mqtt": "^3.0.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",

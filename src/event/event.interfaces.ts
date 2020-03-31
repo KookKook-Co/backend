@@ -39,11 +39,11 @@ interface VaccineInput {
 export interface SubmitUnqualifiedChickenDTO {
     date: string;
     timestamp: Date;
-    round: Round;
+    period: Period;
     unqualifiedChickenInfo: UnqualifiedChickenInfo;
 }
 
-enum Round {
+enum Period {
     MORNING = 'MORNING',
     EVENING = 'EVENING',
 }

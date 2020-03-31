@@ -19,6 +19,7 @@ import {
 import { Response } from 'express';
 import { RolesGuard, HousesGuard } from '../guard';
 import { DbService } from '../db/db.service';
+import * as moment from 'moment';
 
 @Controller('event')
 export class EventController {
@@ -31,6 +32,13 @@ export class EventController {
     @Get('line')
     sendMsg() {
         this.notiService.sendLineMsg();
+    }
+
+    @UseGuards(AuthGuard())
+    @Get('env/weekly')
+    async getWeeklyEnvData(@Query() query) {
+        const { xPosSen, yPosSen, hno } = query;
+        return {};
     }
 
     @UseGuards(AuthGuard(), HousesGuard)
@@ -116,7 +124,7 @@ export class EventController {
 
             const hid = await this.dbService.getHid(req.hno);
 
-            const date = body.date;
+            const { date, period } = body;
             if (!(await checkExist(date, hid))) {
                 await this.dbService.createDailyRecord(date, hid);
             } else {
@@ -124,6 +132,7 @@ export class EventController {
                     date,
                     chicTime: body.timestamp.getTime().toString(),
                     hid,
+                    period,
                     ...body.unqualifiedChickenInfo,
                 });
             }

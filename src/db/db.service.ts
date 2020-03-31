@@ -23,7 +23,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
-import { async } from 'rxjs/internal/scheduler/async';
 import { poolQuery } from './utils';
 
 @Injectable()

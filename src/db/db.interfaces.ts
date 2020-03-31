@@ -1,3 +1,4 @@
+import { Role } from '../users/users.interfaces';
 
 export interface CreateUserInput {
     username: string;
@@ -133,6 +134,7 @@ export interface SumAmountEachTypeOutput {
     SumAmountDwaft: number;
     SumAmountSick: number;
 }
+
 export interface SumAmountChickenRecordOutput {
     hid: number;
     date: string;
@@ -154,6 +156,7 @@ export interface getEnvironmentBySidOutput {
     hid: number;
     environment: EnvironmentOutput;
 }
+
 export interface environmentSetOutput {
     timestamp: string;
     windspeed: number;
@@ -161,6 +164,7 @@ export interface environmentSetOutput {
     temperature: number;
     humidity: number;
 }
+
 export interface EnvironmentBetweenTimestampOutput {
     sid: string;
     hid: number;

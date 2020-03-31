@@ -41,15 +41,31 @@ export class EventGateway
 
     @SubscribeMessage('getRealtimeData')
     handleMessage(client: Socket, payload: any) {
+        const { hno } = payload;
         setInterval(() => {
             const rand = () => Math.random() * 100;
-            const currentData: RealtimeData = {
-                temperature: rand(),
-                humidity: rand(),
-                windSpeed: rand(),
-                ammonia: rand(),
+
+            const currentData = (): RealtimeData => {
+                return {
+                    temperature: rand(),
+                    humidity: rand(),
+                    windSpeed: rand(),
+                    ammonia: rand(),
+                };
             };
-            client.emit('pipeRealtimeData', currentData);
+
+            const realtimeData = [];
+
+            for (let i = 1; i < 3; i++) {
+                for (let j = 1; j <= 3; j++) {
+                    realtimeData.push({
+                        xPosSen: i,
+                        yPosSen: j,
+                        environmentalData: currentData(),
+                    });
+                }
+            }
+            client.emit('pipeRealtimeData', realtimeData);
         }, 2000);
     }
 }
