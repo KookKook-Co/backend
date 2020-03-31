@@ -1,5 +1,3 @@
-import { Role } from '../users/users.interfaces';
-
 export interface CreateUserInput {
     username: string;
     hashedPwd: string;
@@ -27,7 +25,7 @@ export interface UserDataOutput {
 export interface LoginUserInfo {
     hno: number;
     imageUrl: string;
-    role: Role;
+    role: string;
 }
 
 export interface CreateChickenFlockInput {
@@ -151,13 +149,12 @@ export interface GetChickenFlockInfoOutput {
     hid: number;
 }
 
-export interface getEnvironmentBySidOutput {
+export interface GetEnvironmentBySidOutput {
     sid: string;
     hid: number;
     environment: EnvironmentOutput;
 }
-
-export interface environmentSetOutput {
+export interface EnvironmentSetOutput {
     timestamp: string;
     windspeed: number;
     ammonia: number;
@@ -168,5 +165,5 @@ export interface environmentSetOutput {
 export interface EnvironmentBetweenTimestampOutput {
     sid: string;
     hid: number;
-    environmentSet: Array<environmentSetOutput>;
+    environmentSet: Array<EnvironmentSetOutput>;
 }

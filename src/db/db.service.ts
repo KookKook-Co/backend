@@ -13,11 +13,11 @@ import {
     EnvironmentBetweenTimestampOutput,
     EnvironmentOutput,
     GetChickenFlockInfoOutput,
+    GetEnvironmentBySidOutput,
     LatestUrl,
     LoginUserInfo,
     SumAmountChickenRecordOutput,
     UserDataOutput,
-    getEnvironmentBySidOutput,
 } from './db.interfaces';
 
 import { ConfigService } from '@nestjs/config';
@@ -315,7 +315,7 @@ export class DbService {
     getLatestEnvironmentBySid = async (
         sid: string,
         hid: number,
-    ): Promise<getEnvironmentBySidOutput> => {
+    ): Promise<GetEnvironmentBySidOutput> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity" \
             FROM "Environment" "E" \
