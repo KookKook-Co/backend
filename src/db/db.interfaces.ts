@@ -1,3 +1,5 @@
+import { Role } from '../users/users.interfaces';
+
 export interface CreateUserInput {
     username: string;
     hashedPwd: string;
@@ -5,7 +7,7 @@ export interface CreateUserInput {
     firstName: string;
     lastName: string;
     lineID: string;
-    role: string;
+    role: Role;
     imageUrl: string;
     hid: number;
 }
@@ -17,7 +19,7 @@ export interface UserDataOutput {
     isCurrentUser: boolean;
     firstName: string;
     lastName: string;
-    role: string;
+    role: Role;
     imageUrl: string;
     hid: number;
 }
@@ -25,7 +27,7 @@ export interface UserDataOutput {
 export interface LoginUserInfo {
     hno: number;
     imageUrl: string;
-    role: string;
+    role: Role;
 }
 
 export interface CreateChickenFlockInput {

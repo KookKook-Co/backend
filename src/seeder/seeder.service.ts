@@ -22,6 +22,7 @@ import { ConfigService } from '@nestjs/config';
 import { DbService } from '../db/db.service';
 import { Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
+import { Role } from '../users/users.interfaces';
 import { poolQuery } from '../db/utils';
 
 @Injectable()
@@ -308,7 +309,7 @@ export class SeederService {
             firstName: 'worker1',
             lastName: 'lastname1',
             lineID: 'line1',
-            role: 'worker',
+            role: Role.WORKER,
             imageUrl: 'http://www.kk.com/img/1',
             hid: 1,
         };
@@ -320,7 +321,7 @@ export class SeederService {
             firstName: 'worker2',
             lastName: 'lastname2',
             lineID: 'line2',
-            role: 'worker',
+            role: Role.WORKER,
             imageUrl: 'http://www.kk.com/img/2',
             hid: 2,
         };

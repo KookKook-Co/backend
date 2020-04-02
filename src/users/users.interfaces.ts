@@ -33,4 +33,5 @@ interface UserDTO {
     lastName: string;
     role: Role;
     imageUrl: string;
+    lineID: string;
 }
