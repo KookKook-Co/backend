@@ -169,3 +169,11 @@ export interface EnvironmentBetweenTimestampOutput {
     hid: number;
     environmentSet: Array<EnvironmentSetOutput>;
 }
+
+export interface LastImageForEachCameraOutput {
+    cid: string;
+    xPosCam: number;
+    yPosCam: number;
+    url: string;
+    amountDead: number;
+}
