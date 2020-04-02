@@ -1,4 +1,4 @@
-export interface RealtimeData {
+export interface RealTimeData {
     temperature: number;
     humidity: number;
     windSpeed: number;

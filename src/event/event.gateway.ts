@@ -9,7 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 
 import { Logger } from '@nestjs/common';
-import { RealtimeData } from './event.interfaces';
+import { RealTimeData } from './event.interfaces';
 
 @WebSocketGateway()
 export class EventGateway
@@ -39,13 +39,13 @@ export class EventGateway
         };
     }
 
-    @SubscribeMessage('getRealtimeData')
-    handleMessage(client: Socket, payload: any) {
+    @SubscribeMessage('getRealTimeData')
+    pipeData(client: Socket, payload: any) {
         const { hno } = payload;
         setInterval(() => {
             const rand = () => Math.random() * 100;
 
-            const currentData = (): RealtimeData => {
+            const currentData = (): RealTimeData => {
                 return {
                     temperature: rand(),
                     humidity: rand(),
@@ -65,7 +65,12 @@ export class EventGateway
                     });
                 }
             }
-            client.emit('pipeRealtimeData', realtimeData);
+            client.emit('pipeRealTimeData', realtimeData);
         }, 2000);
+    }
+
+    @SubscribeMessage('sendEnvironmentalData')
+    receiveRealtimeData(client: Socket, payload: any) {
+        const { sid, environmentalData } = payload;
     }
 }

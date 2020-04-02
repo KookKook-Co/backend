@@ -3,7 +3,6 @@ version: '3.2'
 services:
   backend:
     build: .
-    image: patsk135/kookkook-backend-dev:latest
     container_name: kookkook-backend-dev
     restart: always
     ports:
