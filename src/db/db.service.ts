@@ -187,6 +187,25 @@ export class DbService {
                             VALUES (TO_TIMESTAMP(${environmentInput.timestamp}), ${environmentInput.windspeed},
                             '${environmentInput.ammonia}', '${environmentInput.temperature}', '${environmentInput.humidity}',
                             '${environmentInput.sid}', '${environmentInput.hid}');`);
+    createQueryString = (environmentInput: CreateEnvDataInput) =>
+        `INSERT INTO "Environment" (timestamp, windspeed, ammonia, temperature, humidity, sid, hid) \
+                            VALUES (TO_TIMESTAMP(${environmentInput.timestamp}), ${environmentInput.windspeed},
+                            '${environmentInput.ammonia}', '${environmentInput.temperature}', '${environmentInput.humidity}',
+                            '${environmentInput.sid}', '${environmentInput.hid}');`;
+
+    createQueryFromList = async (
+        environmentInputList: Array<CreateEnvDataInput>,
+    ) => {
+        let envInputList = environmentInputList;
+        console.log(envInputList);
+        let queryString = '';
+        for (let ele in envInputList) {
+            console.log(ele);
+            let tmp = this.createQueryString(envInputList[ele]);
+            queryString = queryString + tmp;
+        }
+        return this.dbPoolQuery(queryString);
+    };
 
     getLatestEnvData = hid =>
         this.dbPoolQuery(`SELECT * FROM "Environment"
@@ -259,7 +278,7 @@ export class DbService {
 
     //////////////////////////////////////////////////////////////////////////////
     //table Image
-    
+
     createImage = (imageInput: CreateCamImgInput) =>
         this
             .dbPoolQuery(`INSERT INTO "Image" ("timestamp", "url", "amountDead", "cid", "hid")  \
@@ -309,7 +328,7 @@ export class DbService {
 
     //////////////////////////////////////////////////////////////////////////////
     //table ChickenRecord
-    
+
     createChickenRecord = (chickenRecordInput: CreateChickenRecordInput) =>
         this
             .dbPoolQuery(`INSERT INTO "ChickenRecord" ("chicTime", "period", "amountDead", "amountZleg", "amountDwaft", "amountSick", "date", "hid") \
