@@ -356,21 +356,60 @@ export class SeederService {
         const sensor1: CreateSensorInput = {
             sid: '1',
             hid: 1,
-            xPosSen: 10,
-            yPosSen: 20,
+            xPosSen: 1,
+            yPosSen: 1,
         };
-        const camera1: CreateCameraInput = {
-            cid: '1',
-            cno: 1,
-            hid: 1,
-            xPosCam: 10,
-            yPosCam: 20,
-        };
+
         const sensor2: CreateSensorInput = {
             sid: '2',
             hid: 1,
-            xPosSen: 20,
-            yPosSen: 40,
+            xPosSen: 1,
+            yPosSen: 2,
+        };
+
+        const sensor3: CreateSensorInput = {
+            sid: '3',
+            hid: 1,
+            xPosSen: 1,
+            yPosSen: 3,
+        };
+
+        const sensor4: CreateSensorInput = {
+            sid: '4',
+            hid: 1,
+            xPosSen: 2,
+            yPosSen: 1,
+        };
+
+        const sensor5: CreateSensorInput = {
+            sid: '5',
+            hid: 1,
+            xPosSen: 2,
+            yPosSen: 2,
+        };
+        const sensor6: CreateSensorInput = {
+            sid: '6',
+            hid: 1,
+            xPosSen: 2,
+            yPosSen: 3,
+        };
+        const sensor7: CreateSensorInput = {
+            sid: '7',
+            hid: 2,
+            xPosSen: 1,
+            yPosSen: 1,
+        };
+        const sensor8: CreateSensorInput = {
+            sid: '8',
+            hid: 2,
+            xPosSen: 1,
+            yPosSen: 2,
+        };
+        const sensor9: CreateSensorInput = {
+            sid: '9',
+            hid: 1,
+            xPosSen: 1,
+            yPosSen: 3,
         };
         const camera2: CreateCameraInput = {
             cid: '2',
@@ -379,11 +418,12 @@ export class SeederService {
             xPosCam: 20,
             yPosCam: 40,
         };
-        const sensor3: CreateSensorInput = {
-            sid: '3',
-            hid: 2,
-            xPosSen: 10,
-            yPosSen: 20,
+        const camera1: CreateCameraInput = {
+            cid: '1',
+            cno: 1,
+            hid: 1,
+            xPosCam: 10,
+            yPosCam: 20,
         };
         const camera3: CreateCameraInput = {
             cid: '3',
@@ -391,12 +431,6 @@ export class SeederService {
             hid: 2,
             xPosCam: 10,
             yPosCam: 20,
-        };
-        const sensor4: CreateSensorInput = {
-            sid: '4',
-            hid: 2,
-            xPosSen: 20,
-            yPosSen: 40,
         };
         const camera4: CreateCameraInput = {
             cid: '4',
@@ -411,6 +445,11 @@ export class SeederService {
         await this.dbService.createSensor(sensor2);
         await this.dbService.createSensor(sensor3);
         await this.dbService.createSensor(sensor4);
+        await this.dbService.createSensor(sensor5);
+        await this.dbService.createSensor(sensor6);
+        await this.dbService.createSensor(sensor7);
+        await this.dbService.createSensor(sensor8);
+        await this.dbService.createSensor(sensor9);
         await this.dbService.createCamera(camera1);
         await this.dbService.createCamera(camera2);
         await this.dbService.createCamera(camera3);
@@ -640,24 +679,136 @@ export class SeederService {
         await this.dbService.createEnvData(environmentInput2);
 
         let environmentInput3: CreateEnvDataInput = {
-            timestamp: '1584090805',
+            timestamp: '1584011605',
+            windspeed: 130,
+            ammonia: 22,
+            temperature: 23.8,
+            humidity: 44.6,
+            sid: '3',
+        };
+
+        await this.dbService.createEnvData(environmentInput3);
+        let environmentInput4: CreateEnvDataInput = {
+            timestamp: '1584090605',
             windspeed: 143,
             ammonia: 22,
             temperature: 26.4,
             humidity: 40.5,
-            sid: '3',
+            sid: '4',
         };
-        await this.dbService.createEnvData(environmentInput3);
 
-        let environmentInput4: CreateEnvDataInput = {
-            timestamp: '1584090805',
+        await this.dbService.createEnvData(environmentInput4);
+
+        let environmentInput5: CreateEnvDataInput = {
+            timestamp: '1584090605',
             windspeed: 139,
             ammonia: 20,
             temperature: 27.4,
             humidity: 41.5,
+            sid: '5',
+        };
+        await this.dbService.createEnvData(environmentInput5);
+
+        let environmentInput6: CreateEnvDataInput = {
+            timestamp: '1584090605',
+            windspeed: 129,
+            ammonia: 28,
+            temperature: 27.5,
+            humidity: 41.3,
+            sid: '6',
+        };
+        await this.dbService.createEnvData(environmentInput6);
+        let environmentInput01: CreateEnvDataInput = {
+            timestamp: '1584011805',
+            windspeed: 118,
+            ammonia: 24,
+            temperature: 23.3,
+            humidity: 41.3,
+            sid: '1',
+        };
+        await this.dbService.createEnvData(environmentInput01);
+
+        let environmentInput21: CreateEnvDataInput = {
+            timestamp: '1584011805',
+            windspeed: 133,
+            ammonia: 29,
+            temperature: 23.4,
+            humidity: 42.3,
+            sid: '2',
+        };
+        await this.dbService.createEnvData(environmentInput21);
+
+        let environmentInput31: CreateEnvDataInput = {
+            timestamp: '1584011805',
+            windspeed: 132,
+            ammonia: 23,
+            temperature: 24.8,
+            humidity: 44.3,
+            sid: '3',
+        };
+
+        await this.dbService.createEnvData(environmentInput31);
+        let environmentInput41: CreateEnvDataInput = {
+            timestamp: '1584090805',
+            windspeed: 141,
+            ammonia: 20,
+            temperature: 23.3,
+            humidity: 42.9,
             sid: '4',
         };
-        await this.dbService.createEnvData(environmentInput4);
+
+        await this.dbService.createEnvData(environmentInput41);
+
+        let environmentInput51: CreateEnvDataInput = {
+            timestamp: '1584090805',
+            windspeed: 149,
+            ammonia: 19,
+            temperature: 23.4,
+            humidity: 43.5,
+            sid: '5',
+        };
+        await this.dbService.createEnvData(environmentInput51);
+
+        let environmentInput61: CreateEnvDataInput = {
+            timestamp: '1584090805',
+            windspeed: 124,
+            ammonia: 23,
+            temperature: 24.5,
+            humidity: 41.2,
+            sid: '6',
+        };
+        await this.dbService.createEnvData(environmentInput61);
+
+        let environmentInput7: CreateEnvDataInput = {
+            timestamp: '1584090805',
+            windspeed: 128,
+            ammonia: 27,
+            temperature: 28.2,
+            humidity: 42.3,
+            sid: '7',
+        };
+        await this.dbService.createEnvData(environmentInput7);
+
+        let environmentInput8: CreateEnvDataInput = {
+            timestamp: '1584090805',
+            windspeed: 158,
+            ammonia: 23,
+            temperature: 33.2,
+            humidity: 32.3,
+            sid: '8',
+        };
+        await this.dbService.createEnvData(environmentInput8);
+
+        let environmentInput9: CreateEnvDataInput = {
+            timestamp: '1584090805',
+            windspeed: 128,
+            ammonia: 25,
+            temperature: 35.2,
+            humidity: 35.3,
+            sid: '9',
+        };
+        await this.dbService.createEnvData(environmentInput9);
+
         let imageInput: CreateCamImgInput = {
             timestamp: '1584011605',
             url: 'http://www.kookkook.com/img/1_1',
