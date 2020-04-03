@@ -106,7 +106,6 @@ export interface CreateEnvDataInput {
     temperature: number;
     humidity: number;
     sid: string;
-    hid: number;
 }
 
 export interface CreateCamImgInput {
@@ -114,7 +113,6 @@ export interface CreateCamImgInput {
     url: string;
     amountDead: number;
     cid: string;
-    hid: number;
 }
 
 export interface EnvironmentOutput {
@@ -126,19 +124,6 @@ export interface EnvironmentOutput {
 
 export interface LatestUrl {
     url: string;
-}
-
-export interface SumAmountEachTypeOutput {
-    SumAmountDead: number;
-    SumAmountZleg: number;
-    SumAmountDwaft: number;
-    SumAmountSick: number;
-}
-
-export interface SumAmountChickenRecordOutput {
-    hid: number;
-    date: string;
-    SumAmountEachType: SumAmountEachTypeOutput;
 }
 
 export interface GetChickenFlockInfoOutput {
@@ -176,4 +161,16 @@ export interface LastImageForEachCameraOutput {
     yPosCam: number;
     url: string;
     amountDead: number;
+}
+
+
+export interface UpdateFoodRecordInput {
+    timestamp: string;
+    date: string;
+    hid: number;
+    newfoodSilo: number;
+    newfoodIn: number;
+    newfoodRemain: number;
+    newfoodConsumed: number;
+    
 }

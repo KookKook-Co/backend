@@ -163,7 +163,7 @@ export class SeederService {
                 "xPosCam" INT, \
                 "yPosCam" INT, \
                 "hid" INT NOT NULL, \
-                PRIMARY KEY (cid, hid)',
+                PRIMARY KEY (cid)',
             ),
         );
 
@@ -174,8 +174,15 @@ export class SeederService {
                 "url" VARCHAR, \
                 "amountDead" INT, \
                 "cid" VARCHAR NOT NULL, \
-                "hid" INT NOT NULL, \
-                PRIMARY KEY (timestamp, cid, hid)',
+                PRIMARY KEY (timestamp, cid)',
+            ),
+        );
+        query_list.push(
+            createTable(
+                'CollectedDeadChickenTime',
+                '"timestamp" TIMESTAMP, \
+                "cid" VARCHAR NOT NULL, \
+                PRIMARY KEY (timestamp, cid)',
             ),
         );
 
@@ -186,7 +193,7 @@ export class SeederService {
                 "xPosSen" INT, \
                 "yPosSen" INT, \
                 "hid" INT NOT NULL, \
-                PRIMARY KEY (sid, hid)',
+                PRIMARY KEY (sid)',
             ),
         );
 
@@ -199,8 +206,7 @@ export class SeederService {
                 "temperature" DOUBLE PRECISION, \
                 "humidity" DOUBLE PRECISION, \
                 "sid" VARCHAR NOT NULL, \
-                "hid" INT NOT NULL, \
-                PRIMARY KEY (timestamp, sid, hid)',
+                PRIMARY KEY (timestamp, sid)',
             ),
         );
 
@@ -215,6 +221,16 @@ export class SeederService {
                 'House',
                 'hid',
                 'hid_constraint',
+            ),
+        );
+
+        query_list.push(
+            addConstraint(
+                'CollectedDeadChickenTime',
+                'cid',
+                'Camera',
+                'cid',
+                'cid_constraint',
             ),
         );
 
@@ -266,33 +282,21 @@ export class SeederService {
             ),
         );
         query_list.push(
-            addMultiConstraint(
-                'Camera',
-                'hid',
-                'House',
-                'hid',
-                'hid_constraint',
-            ),
+            addConstraint('Camera', 'hid', 'House', 'hid', 'hid_constraint'),
         );
         query_list.push(
-            addMultiConstraint(
-                'Image',
-                'cid, hid',
-                'Camera',
-                'cid, hid',
-                'cid_hid_constraint',
-            ),
+            addConstraint('Image', 'cid', 'Camera', 'cid', 'cid_constraint'),
         );
         query_list.push(
             addConstraint('Sensor', 'hid', 'House', 'hid', 'hid_constraint'),
         );
         query_list.push(
-            addMultiConstraint(
+            addConstraint(
                 'Environment',
-                'sid, hid',
+                'sid',
                 'Sensor',
-                'sid, hid',
-                'sid_hid_constraint',
+                'sid',
+                'sid_constraint',
             ),
         );
         await poolQuery(this.pool, query_list.join(''));
@@ -622,7 +626,6 @@ export class SeederService {
             temperature: 27.8,
             humidity: 48.6,
             sid: '1',
-            hid: 1,
         };
         await this.dbService.createEnvData(environmentInput);
 
@@ -633,7 +636,6 @@ export class SeederService {
             temperature: 28.8,
             humidity: 48.5,
             sid: '2',
-            hid: 1,
         };
         await this.dbService.createEnvData(environmentInput2);
 
@@ -644,7 +646,6 @@ export class SeederService {
             temperature: 26.4,
             humidity: 40.5,
             sid: '3',
-            hid: 2,
         };
         await this.dbService.createEnvData(environmentInput3);
 
@@ -655,7 +656,6 @@ export class SeederService {
             temperature: 27.4,
             humidity: 41.5,
             sid: '4',
-            hid: 2,
         };
         await this.dbService.createEnvData(environmentInput4);
         let imageInput: CreateCamImgInput = {
@@ -663,7 +663,6 @@ export class SeederService {
             url: 'http://www.kookkook.com/img/1_1',
             amountDead: 3,
             cid: '1',
-            hid: 1,
         };
 
         await this.dbService.createImage(imageInput);
@@ -672,7 +671,6 @@ export class SeederService {
             url: 'http://www.kookkook.com/img/1_2',
             amountDead: 5,
             cid: '2',
-            hid: 1,
         };
         await this.dbService.createImage(imageInput2);
 
@@ -681,7 +679,6 @@ export class SeederService {
             url: 'http://www.kookkook.com/img/2_3',
             amountDead: 1,
             cid: '3',
-            hid: 2,
         };
         await this.dbService.createImage(imageInput3);
 
@@ -690,9 +687,10 @@ export class SeederService {
             url: 'http://www.kookkook.com/img/2_4',
             amountDead: 6,
             cid: '4',
-            hid: 2,
         };
         await this.dbService.createImage(imageInput4);
+        await this.dbService.createCollectedDeadChickenTime('1584011605', '2');
+        await this.dbService.createCollectedDeadChickenTime('1584090805', '4');
     };
 
     dropAllTable = async () => {
@@ -700,6 +698,7 @@ export class SeederService {
         query_list.push(dropTable('ChickenRecord'));
         query_list.push(dropTable('Environment'));
         query_list.push(dropTable('FoodRecord'));
+        query_list.push(dropTable('CollectedDeadChickenTime'));
         query_list.push(dropTable('Image'));
         query_list.push(dropTable('VacRecord'));
         query_list.push(dropTable('WaterRecord'));

@@ -4,10 +4,10 @@ export const createDatabase = (db_name: string) =>
 export const dropDatabase = (db_name: string) => `DROP DATABASE ${db_name};`;
 
 export const createEmptyTable = (table_name: string) =>
-    `CREATE TABLE ${table_name};`;
+    `CREATE TABLE IF NOT EXISTS ${table_name};`;
 
 export const createTable = (table_name: string, column_data: string) =>
-    `CREATE TABLE "${table_name}"(${column_data});`;
+    `CREATE TABLE IF NOT EXISTS "${table_name}"(${column_data});`;
 
 export const dropTable = table_name => {
     return `DROP TABLE "${table_name}";`;
