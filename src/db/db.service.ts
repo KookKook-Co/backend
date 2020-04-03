@@ -73,8 +73,7 @@ export class DbService {
     isUsernameExist = async (username: string): Promise<Boolean> => {
         const queryArr = await this.dbPoolQuery(`SELECT COUNT(1) FROM "User" \
                         WHERE username = '${username}';`);
-        const queryObj = queryArr.rows[0];
-        return queryObj['count'] == 0 ? false : true;
+        return queryArr.rows[0]['count'] == 0 ? false : true;
     };
 
     updateLineID = (uid: number, newLineID: string) =>
@@ -92,8 +91,7 @@ export class DbService {
             FROM "House" "H" \
             WHERE "H"."hid" = '${hno}';`,
         );
-        const queryObj = queryArr.rows[0];
-        return queryObj;
+        return queryArr.rows[0];
     };
 
     createHouse = (hno, length, width, scale) =>
@@ -127,8 +125,7 @@ export class DbService {
         const queryArr = await this
             .dbPoolQuery(`SELECT COUNT(1) FROM "DailyRecord" \
                     WHERE date = TO_DATE('${date}', 'DD-MM-YYYY') AND hid = '${hid}';`);
-        const queryObj = queryArr.rows[0];
-        return queryObj['count'] == 0 ? false : true;
+        return queryArr.rows[0]['count'] == 0 ? false : true;
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -150,8 +147,8 @@ export class DbService {
 
     getChickenInfo = (hid: number, gen: string) =>
         this
-            .dbPoolQuery(`SELECT date_in, amount_in, type, gender FROM "Chicken" \
-        WHERE hid = '${hid}' AND gen = '${gen}';`);
+            .dbPoolQuery(`SELECT "date_in", "amount_in", "type", "gender" FROM "Chicken" \
+        WHERE "hid" = '${hid}' AND "gen" = '${gen}';`);
 
     //////////////////////////////////////////////////////////////////////////////
     //table Sensor
@@ -161,7 +158,7 @@ export class DbService {
             .dbPoolQuery(`INSERT INTO "Sensor" ("sid", "xPosSen", "yPosSen", "hid") \
                         VALUES ('${input.sid}','${input.xPosSen}', '${input.yPosSen}', '${input.hid}');`);
 
-    getSidByPosition = async (
+    getSidByHidAndPosition = async (
         hid: number,
         xPosSen: number,
         yPosSen: number,
@@ -207,18 +204,18 @@ export class DbService {
         return this.dbPoolQuery(queryString);
     };
 
-    getLatestEnvData = hid =>
-        this.dbPoolQuery(`SELECT * FROM "Environment"
-                        WHERE hid = ${hid} ORDER BY timestamp DESC LIMIT 1;`);
-
-    getEnvDataByDate = (hid, date) =>
-        this.dbPoolQuery(`SELECT * FROM "Environment" WHERE hid = ${hid}
-        AND timestamp BETWEEN TO_TIMESTAMP('${date} 00:00:00','DD-MM-YYYY HH24:MI:SS') 
-        AND TO_TIMESTAMP('${date} 23:59:59','DD-MM-YYYY HH24:MI:SS')`);
+    getEnvDataByDate = async (hid: number, date: string) => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT * FROM "Environment" WHERE hid = ${hid}
+            AND timestamp BETWEEN TO_TIMESTAMP('${date} 00:00:00','DD-MM-YYYY HH24:MI:SS') 
+            AND TO_TIMESTAMP('${date} 23:59:59','DD-MM-YYYY HH24:MI:SS')`,
+        );
+        return queryArr.rows;
+    };
 
     getLatestEnvironment = async (
         hid: number,
-        sid: number,
+        sid: string,
     ): Promise<EnvironmentOutput> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity" \
@@ -230,8 +227,7 @@ export class DbService {
                         FROM "Environment" "E2"  \
                         WHERE "E2"."hid" = '${hid}' AND "E2"."sid" = '${sid}')`,
         );
-        const queryObj = queryArr.rows[0];
-        return queryObj;
+        return queryArr.rows[0];
     };
 
     getLatestEnvironmentBySid = async (
@@ -259,7 +255,7 @@ export class DbService {
     ): Promise<EnvironmentBetweenTimestampOutput> => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "windspeed", "ammonia", "temperature", "humidity" FROM "Environment" \
-            WHERE hid = ${hid} AND sid = '${sid}' \
+            WHERE sid = '${sid}' \
             AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') \
             AND TO_TIMESTAMP('${tsEnd}');`);
         return { sid: sid, hid: hid, environmentSet: queryArr.rows };
@@ -288,15 +284,14 @@ export class DbService {
     getLastestUrl = async (hid: number, cid: number): Promise<LatestUrl> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "I"."url" \
-                                    FROM "Image" "I" \
-                                    WHERE "I"."hid" = '${hid}' AND "I"."cid" = '${cid}' \
-                                        AND "I"."timestamp" = \
-                                            (SELECT MAX(timestamp) \
-                                            FROM "Image" "I2"  \
-                                            WHERE "I2"."hid" = '${hid}' AND "I2"."cid" = '${cid}');`,
+            FROM "Image" "I" \
+            WHERE "I"."hid" = '${hid}' AND "I"."cid" = '${cid}' \
+                AND "I"."timestamp" = \
+                    (SELECT MAX(timestamp) \
+                    FROM "Image" "I2"  \
+                    WHERE "I2"."hid" = '${hid}' AND "I2"."cid" = '${cid}');`,
         );
-        const queryObj = queryArr.rows[0];
-        return queryObj;
+        return queryArr.rows[0];
     };
 
     getLastImageForEachCameraInHid = async (
@@ -352,8 +347,7 @@ export class DbService {
         const queryArr = await this
             .dbPoolQuery(`SELECT COUNT(1) FROM "DailyDataRecord" \
                 WHERE timestamp = TO_TIMESTAMP('${timestamp}') AND date = TO_DATE('${date}', 'DD-MM-YYYY') AND hid = '${hid}';`);
-        const queryObj = queryArr.rows[0];
-        return queryObj['count'] == 0 ? false : true;
+        return queryArr.rows[0]['count'] == 0 ? false : true;
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -387,56 +381,50 @@ export class DbService {
     //////////////////////////////////////////////////////////////////////////////
     //Temperature
 
-    getLast24HrsTemperature = async (hid: number, sid: string) => {
+    getLast24HrsTemperatureBySid = async (sid: string) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "temperature" FROM "Environment" \
-        WHERE "hid" = '${hid}' AND "sid" = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND "timestamp" >= NOW() - INTERVAL '1' DAY;`);
-        return queryArr;
+        return queryArr.rows;
     };
 
-    getLatestTemperatureBySid = async (hid: number, sid: string) => {
+    getLatestTemperatureBySid = async (sid: string) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "temperature" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = ${sid} ORDER BY timestamp DESC LIMIT 1;`);
+        WHERE "sid" = '${sid}' ORDER BY timestamp DESC LIMIT 1;`);
         return queryArr.rows[0];
     };
 
     getTemperatureBetweenTimestampBySid = async (
-        hid: number,
         sid: string,
         tsStart: string,
         tsEnd: string,
     ) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "temperature" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') \
         AND TO_TIMESTAMP('${tsEnd}');`);
-        return queryArr;
+        return queryArr.rows;
     };
 
-    getLastNTemperatureBySid = async (
-        hid: number,
-        sid: string,
-        number: number,
-    ) => {
+    getLastNTemperatureBySid = async (sid: string, number: number) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "temperature" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = ${sid} \
+        WHERE "sid" = '${sid}' \
         ORDER BY timestamp DESC LIMIT '${number}';`);
-        return queryArr;
+        return queryArr.rows;
     };
 
     getMaxAndMinTemperatureBetweenDateBySid = async (
-        hid: number,
         sid: string,
         dateStart: string,
         dateEnd: string,
     ) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT MAX("temperature"), MIN("temperature") FROM "Environment" \
-        WHERE hid = '${hid}' AND sid = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND timestamp BETWEEN TO_TIMESTAMP('${dateStart} 00:00:00','DD-MM-YYYY HH24:MI:SS') \
         AND TO_TIMESTAMP('${dateEnd} 23:59:59','DD-MM-YYYY HH24:MI:SS');`);
         return queryArr.rows[0];
@@ -445,128 +433,117 @@ export class DbService {
     //////////////////////////////////////////////////////////////////////////////
     //Humidity
 
-    getLast24HrsHumidity = async (hid: number, sid: string) => {
+    getLast24HrsHumidityBySid = async (sid: string) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "humidity" FROM "Environment" \
-        WHERE "hid" = '${hid}' AND "sid" = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND "timestamp" >= NOW() - INTERVAL '1' DAY;`);
-        return queryArr;
+        return queryArr.rows;
     };
 
-    getLatestHumidityBySid = async (hid: number, sid: string) => {
+    getLatestHumidityBySid = async (sid: string) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "humidity" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = ${sid} ORDER BY timestamp DESC LIMIT 1;`);
+        WHERE "sid" = '${sid}' ORDER BY timestamp DESC LIMIT 1;`);
         return queryArr.rows[0];
     };
 
     getHumidityBetweenTimestampBySid = async (
-        hid: number,
         sid: string,
         tsStart: string,
         tsEnd: string,
     ) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "humidity" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') \
         AND TO_TIMESTAMP('${tsEnd}');`);
-        return queryArr;
+        return queryArr.rows;
     };
 
-    getLastNHumidityBySid = async (
-        hid: number,
-        sid: string,
-        number: number,
-    ) => {
+    getLastNHumidityBySid = async (sid: string, number: number) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "humidity" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = ${sid} \
+        WHERE "sid" = '${sid}' \
         ORDER BY timestamp DESC LIMIT '${number}';`);
-        return queryArr;
+        return queryArr.rows;
     };
 
     //////////////////////////////////////////////////////////////////////////////
     //Ammonia
 
-    getLast24HrsAmmonia = async (hid: number, sid: string) => {
+    getLast24HrsAmmoniaBySid = async (sid: string) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "ammonia" FROM "Environment" \
-        WHERE "hid" = '${hid}' AND "sid" = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND "timestamp" >= NOW() - INTERVAL '1' DAY;`);
-        return queryArr;
+        return queryArr.rows;
     };
 
-    getLatestAmmoniaBySid = async (hid: number, sid: string) => {
+    getLatestAmmoniaBySid = async (sid: string) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "ammonia" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = ${sid} ORDER BY timestamp DESC LIMIT 1;`);
+        WHERE "sid" = '${sid}' ORDER BY timestamp DESC LIMIT 1;`);
         return queryArr.rows[0];
     };
 
     getAmmoniaBetweenTimestampBySid = async (
-        hid: number,
         sid: string,
         tsStart: string,
         tsEnd: string,
     ) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "ammonia" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') \
         AND TO_TIMESTAMP('${tsEnd}');`);
-        return queryArr;
+        return queryArr.rows;
     };
 
-    getLastNAmmoniaBySid = async (hid: number, sid: string, number: number) => {
+    getLastNAmmoniaBySid = async (sid: string, number: number) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "ammonia" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = ${sid} \
+        WHERE "sid" = '${sid}' \
         ORDER BY timestamp DESC LIMIT '${number}';`);
-        return queryArr;
+        return queryArr.rows;
     };
 
     //////////////////////////////////////////////////////////////////////////////
     //Windspeed
 
-    getLast24HrsWindspeed = async (hid: number, sid: string) => {
+    getLast24HrsWindspeedBySid = async (sid: string) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "windspeed" FROM "Environment" \
-        WHERE "hid" = '${hid}' AND "sid" = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND "timestamp" >= NOW() - INTERVAL '1' DAY;`);
-        return queryArr;
+        return queryArr.rows;
     };
 
-    getLatestWindspeedBySid = async (hid: number, sid: string) => {
+    getLatestWindspeedBySid = async (sid: string) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "windspeed" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = ${sid} ORDER BY timestamp DESC LIMIT 1;`);
+        WHERE "sid" = '${sid}' ORDER BY timestamp DESC LIMIT 1;`);
         return queryArr.rows[0];
     };
 
     getWindspeedBetweenTimestampBySid = async (
-        hid: number,
         sid: string,
         tsStart: string,
         tsEnd: string,
     ) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "windspeed" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = '${sid}' \
+        WHERE "sid" = '${sid}' \
         AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') \
         AND TO_TIMESTAMP('${tsEnd}');`);
-        return queryArr;
+        return queryArr.rows;
     };
 
-    getLastNWindspeedityBySid = async (
-        hid: number,
-        sid: string,
-        number: number,
-    ) => {
+    getLastNWindspeedityBySid = async (sid: string, number: number) => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "timestamp", "windspeed" FROM "Environment" \
-        WHERE hid = ${hid} AND sid = ${sid} \
+        WHERE "sid" = '${sid}' \
         ORDER BY timestamp DESC LIMIT '${number}';`);
-        return queryArr;
+        return queryArr.rows;
     };
 }
