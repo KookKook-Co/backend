@@ -115,18 +115,11 @@ export interface CreateCamImgInput {
     cid: string;
 }
 
-export interface EnvironmentOutput {
-    windspeed: number;
-    ammonia: number;
-    temperature: number;
-    humidity: number;
-}
-
 export interface LatestUrl {
     url: string;
 }
 
-export interface GetChickenFlockInfoOutput {
+export interface ChickenFlockInfoOutput {
     dateIn: string;
     dateOut: string;
     generation: string;
@@ -136,11 +129,14 @@ export interface GetChickenFlockInfoOutput {
     hid: number;
 }
 
-export interface GetEnvironmentBySidOutput {
-    sid: string;
-    environment: EnvironmentOutput;
+export interface EnvironmentInfoOutput {
+    windspeed: number;
+    ammonia: number;
+    temperature: number;
+    humidity: number;
 }
-export interface EnvironmentSetOutput {
+
+export interface EnvironmentInfoSetOutput {
     timestamp: string;
     windspeed: number;
     ammonia: number;
@@ -148,9 +144,13 @@ export interface EnvironmentSetOutput {
     humidity: number;
 }
 
-export interface EnvironmentBetweenTimestampOutput {
+export interface EnvironmentInfoSetAndSidOutput {
     sid: string;
-    environmentSet: Array<EnvironmentSetOutput>;
+    timestamp: string;
+    windspeed: number;
+    ammonia: number;
+    temperature: number;
+    humidity: number;
 }
 
 export interface LastImageForEachCameraOutput {
@@ -169,4 +169,83 @@ export interface UpdateFoodRecordInput {
     newfoodIn: number;
     newfoodRemain: number;
     newfoodConsumed: number;
+}
+
+export interface HouseOutput {
+    hid: number;
+    length: number;
+    width: number;
+    scale: number;
+}
+
+export interface SensorOutput {
+    sid: string;
+    xPosSen: number;
+    yPosSen: number;
+}
+
+export interface CameraOutput {
+    cid: string;
+    cno: number;
+    hid: number;
+    xPosCam: number;
+    yPosCam: number;
+}
+
+export interface ChickenRecord {
+    chicTime: string;
+    period: string;
+    amountDead: number;
+    amountZleg: number;
+    amountDwaft: number;
+    amountSick: number;
+    date: string;
+    hid: number;
+}
+
+export interface FoodRecord {
+    foodSilo: number;
+    foodIn: number;
+    foodRemain: number;
+    foodConsumed: number;
+    timestamp: string;
+    date: string;
+    hid: number;
+}
+
+export interface VacRecord {
+    vacType: string;
+    vacConc: number;
+    timestamp: string;
+    date: string;
+    hid: number;
+}
+
+export interface WaterRecord {
+    waterMeter1: number;
+    waterMeter2: number;
+    waterConsumed: number;
+    timestamp: string;
+    date: string;
+    hid: number;
+}
+
+export interface TemperatureTimestamp {
+    timestamp: string;
+    temperature: number;
+}
+
+export interface HumidityTimestamp {
+    timestamp: string;
+    humidity: number;
+}
+
+export interface AmmoniaTimestamp {
+    timestamp: string;
+    ammonia: number;
+}
+
+export interface WindspeedTimestamp {
+    timestamp: string;
+    windspeed: number;
 }
