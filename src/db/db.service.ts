@@ -1,4 +1,8 @@
 import {
+    AmmoniaTimestamp,
+    CameraOutput,
+    ChickenFlockInfoOutput,
+    ChickenRecord,
     CreateCamImgInput,
     CreateCameraInput,
     CreateChickenFlockInput,
@@ -10,23 +14,20 @@ import {
     CreateUserInput,
     CreateVacRecordInput,
     CreateWaterRecordInput,
-    EnvironmentInfoSetOutput,
     EnvironmentInfoSetAndSidOutput,
-    ChickenFlockInfoOutput,
+    EnvironmentInfoSetOutput,
+    FoodRecord,
     HouseOutput,
+    HumidityTimestamp,
     LastImageForEachCameraOutput,
     LatestUrl,
     LoginUserInfo,
+    MaxAndMinTemperature,
     SensorOutput,
+    TemperatureTimestamp,
     UserDataOutput,
-    CameraOutput,
-    ChickenRecord,
-    FoodRecord,
     VacRecord,
     WaterRecord,
-    TemperatureTimestamp,
-    HumidityTimestamp,
-    AmmoniaTimestamp,
     WindspeedTimestamp,
 } from './db.interfaces';
 
@@ -180,9 +181,9 @@ export class DbService {
 
     getHidByHno = async (hno: number): Promise<number> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "H"."hno" 
+            `SELECT "H"."hid" 
             FROM "House" "H" 
-            WHERE "H"."hid" = '${hno}';`,
+            WHERE "H"."hno" = '${hno}';`,
         );
         return queryArr.rows[0];
     };
@@ -198,9 +199,9 @@ export class DbService {
     //////////////////////////////////////////////////////////////////////////////
     //table DailyRecord
 
-    getDailyRecord = async (hid: number) => {
+    getDailyRecordByHid = async (hid: number) => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT date
+            `SELECT "date"
             FROM "DailyRecord" 
             WHERE "hid" = '${hid}';`,
         );
@@ -394,7 +395,7 @@ export class DbService {
     //////////////////////////////////////////////////////////////////////////////
     //table Image
 
-    getLatestUrl = async (cid: string): Promise<LatestUrl> => {
+    getLatestUrlByCid = async (cid: string): Promise<LatestUrl> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "I"."url" 
             FROM "Image" "I" 
@@ -516,7 +517,7 @@ export class DbService {
         sid: string,
     ): Promise<TemperatureTimestamp> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "timestamp" "temperature"
+            `SELECT "timestamp", "temperature"
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
             ORDER BY timestamp DESC LIMIT 1;`,
@@ -528,7 +529,7 @@ export class DbService {
         sid: string,
     ): Promise<Array<TemperatureTimestamp>> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "timestamp" "temperature" 
+            `SELECT "timestamp", "temperature" 
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
             AND "timestamp" >= NOW() - INTERVAL '1' DAY;`,
@@ -568,15 +569,17 @@ export class DbService {
         sid: string,
         dateStart: string,
         dateEnd: string,
-    ) => {
+    ): Promise<Array<MaxAndMinTemperature>> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT MAX("temperature"), MIN("temperature") 
-            FROM "Environment" 
-            WHERE "sid" = '${sid}' 
-                AND timestamp BETWEEN TO_TIMESTAMP('${dateStart} 00:00:00','DD-MM-YYYY HH24:MI:SS') 
-                AND TO_TIMESTAMP('${dateEnd} 23:59:59','DD-MM-YYYY HH24:MI:SS');`,
+            `SELECT "date", "maxTemperature", "minTemperature" FROM (
+                SELECT "sid", DATE("timestamp") "date",
+                MAX("temperature") as "maxTemperature", MIN("temperature") AS "minTemperature"
+                FROM "Environment"
+                GROUP BY "sid", DATE("timestamp") 
+                ) AS "tmp" WHERE "tmp"."sid" = '${sid}' AND "date" BETWEEN 
+                TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
         );
-        return queryArr.rows[0];
+        return queryArr.rows;
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -584,7 +587,7 @@ export class DbService {
 
     getLatestHumidityBySid = async (
         sid: string,
-    ): Promise<TemperatureTimestamp> => {
+    ): Promise<HumidityTimestamp> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "humidity" 
             FROM "Environment" 
@@ -639,7 +642,7 @@ export class DbService {
 
     getLatestAmmoniaBySid = async (sid: string): Promise<AmmoniaTimestamp> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "ammonia" 
+            `SELECT "timestamp", "ammonia" 
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
             ORDER BY timestamp DESC LIMIT 1;`,
@@ -651,7 +654,7 @@ export class DbService {
         sid: string,
     ): Promise<Array<AmmoniaTimestamp>> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "ammonia" 
+            `SELECT "timestamp", "ammonia" 
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
                 AND "timestamp" >= NOW() - INTERVAL '1' DAY;`,
@@ -694,7 +697,7 @@ export class DbService {
         sid: string,
     ): Promise<WindspeedTimestamp> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "windspeed" 
+            `SELECT "timestamp", "windspeed" 
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
             ORDER BY timestamp DESC LIMIT 1;`,
@@ -706,7 +709,7 @@ export class DbService {
         sid: string,
     ): Promise<Array<WindspeedTimestamp>> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "windspeed" 
+            `SELECT "timestamp", "windspeed" 
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
                 AND "timestamp" >= NOW() - INTERVAL '1' DAY;`,
@@ -724,7 +727,7 @@ export class DbService {
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
                 AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') 
-                AND TO_TIMESTAMP('${tsEnd}');`,
+                    AND TO_TIMESTAMP('${tsEnd}');`,
         );
         return queryArr.rows;
     };

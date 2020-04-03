@@ -137,7 +137,7 @@ export interface EnvironmentInfoOutput {
 }
 
 export interface EnvironmentInfoSetOutput {
-    timestamp: string;
+    timestamp: Date;
     windspeed: number;
     ammonia: number;
     temperature: number;
@@ -146,7 +146,7 @@ export interface EnvironmentInfoSetOutput {
 
 export interface EnvironmentInfoSetAndSidOutput {
     sid: string;
-    timestamp: string;
+    timestamp: Date;
     windspeed: number;
     ammonia: number;
     temperature: number;
@@ -193,13 +193,13 @@ export interface CameraOutput {
 }
 
 export interface ChickenRecord {
-    chicTime: string;
+    chicTime: Date;
     period: string;
     amountDead: number;
     amountZleg: number;
     amountDwaft: number;
     amountSick: number;
-    date: string;
+    date: Date;
     hid: number;
 }
 
@@ -208,16 +208,16 @@ export interface FoodRecord {
     foodIn: number;
     foodRemain: number;
     foodConsumed: number;
-    timestamp: string;
-    date: string;
+    timestamp: Date;
+    date: Date;
     hid: number;
 }
 
 export interface VacRecord {
     vacType: string;
     vacConc: number;
-    timestamp: string;
-    date: string;
+    timestamp: Date;
+    date: Date;
     hid: number;
 }
 
@@ -225,27 +225,33 @@ export interface WaterRecord {
     waterMeter1: number;
     waterMeter2: number;
     waterConsumed: number;
-    timestamp: string;
-    date: string;
+    timestamp: Date;
+    date: Date;
     hid: number;
 }
 
 export interface TemperatureTimestamp {
-    timestamp: string;
+    timestamp: Date;
     temperature: number;
 }
 
 export interface HumidityTimestamp {
-    timestamp: string;
+    timestamp: Date;
     humidity: number;
 }
 
 export interface AmmoniaTimestamp {
-    timestamp: string;
+    timestamp: Date;
     ammonia: number;
 }
 
 export interface WindspeedTimestamp {
-    timestamp: string;
+    timestamp: Date;
     windspeed: number;
+}
+
+export interface MaxAndMinTemperature {
+    date: Date;
+    maxTemperature: number;
+    minTemperature: number;
 }
