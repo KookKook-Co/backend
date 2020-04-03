@@ -138,7 +138,6 @@ export interface GetChickenFlockInfoOutput {
 
 export interface GetEnvironmentBySidOutput {
     sid: string;
-    hid: number;
     environment: EnvironmentOutput;
 }
 export interface EnvironmentSetOutput {
@@ -151,7 +150,6 @@ export interface EnvironmentSetOutput {
 
 export interface EnvironmentBetweenTimestampOutput {
     sid: string;
-    hid: number;
     environmentSet: Array<EnvironmentSetOutput>;
 }
 
@@ -163,7 +161,6 @@ export interface LastImageForEachCameraOutput {
     amountDead: number;
 }
 
-
 export interface UpdateFoodRecordInput {
     timestamp: string;
     date: string;
@@ -172,5 +169,4 @@ export interface UpdateFoodRecordInput {
     newfoodIn: number;
     newfoodRemain: number;
     newfoodConsumed: number;
-    
 }

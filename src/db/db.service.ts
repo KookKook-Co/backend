@@ -118,7 +118,7 @@ export class DbService {
     createCollectedDeadChickenTime = (timestamp: string, cid: string) =>
         this
             .dbPoolQuery(`INSERT INTO "CollectedDeadChickenTime" ("timestamp", "cid") \
-                    VALUES (TO_TIMESTAMP('${timestamp}'), '${cid}';`);
+                    VALUES (TO_TIMESTAMP('${timestamp}'), '${cid}');`);
 
     //////////////////////////////////////////////////////////////////////////////
     //table User
@@ -127,14 +127,14 @@ export class DbService {
         this.dbPoolQuery(`SELECT * FROM "User" \
                 WHERE username = '${username}';`);
 
-    getUser = async (uid: number): Promise<UserDataOutput> => {
+    getUserByUid = async (uid: number): Promise<UserDataOutput> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT * FROM "User" WHERE uid = '${uid}'`,
         );
         return queryArr.rows[0];
     };
 
-    getLoginUserInfo = async (uid: string): Promise<LoginUserInfo> => {
+    getLoginUserInfoByUid = async (uid: string): Promise<LoginUserInfo> => {
         const queryArr = await this
             .dbPoolQuery(`SELECT "H"."hno", "U"."imageUrl", "U"."role" FROM "User" "U" \
             LEFT JOIN "House" "H" \
@@ -157,8 +157,7 @@ export class DbService {
     //////////////////////////////////////////////////////////////////////////////
     //table House
 
-    getHid = async (hno: number) => {
-        //this function return Dictionary containing hid
+    getHidByHno = async (hno: number) => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "H"."hno" \
             FROM "House" "H" \
@@ -195,7 +194,7 @@ export class DbService {
     //////////////////////////////////////////////////////////////////////////////
     //table Chicken
 
-    getChickenFlockInfo = async (
+    getChickenFlockInfoByHid = async (
         hid: number,
     ): Promise<GetChickenFlockInfoOutput> => {
         const queryArr = await this.dbPoolQuery(`SELECT * FROM "Chicken" \
@@ -203,7 +202,7 @@ export class DbService {
         return queryArr.rows[0];
     };
 
-    getChickenInfo = (hid: number, gen: string) =>
+    getChickenFlockByHidAndGen = (hid: number, gen: string) =>
         this
             .dbPoolQuery(`SELECT "date_in", "amount_in", "type", "gender" FROM "Chicken" \
         WHERE "hid" = '${hid}' AND "gen" = '${gen}';`);
@@ -226,6 +225,15 @@ export class DbService {
             .dbPoolQuery(`SELECT "sid", "xPosSen", "yPosSen" FROM "Sensor" \
             WHERE "hid" = '${hid}';`);
         return queryArr.rows;
+    };
+
+    getHidBySid = async (sid: string) => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "S"."hid" \
+            FROM "Sensor" "S" \
+            WHERE "S"."sid" = '${sid}';`,
+        );
+        return queryArr.rows[0];
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -251,65 +259,59 @@ export class DbService {
         return this.dbPoolQuery(queryString);
     };
 
-    //this one need to fix
-    getEnvDataByDate = async (hid: number, date: string) => {
+    getEnvironmentByHidAndDate = async (hid: number, date: string) => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT * FROM "Environment" WHERE hid = ${hid}
-            AND timestamp BETWEEN TO_TIMESTAMP('${date} 00:00:00','DD-MM-YYYY HH24:MI:SS') 
+            `SELECT "E"."timestamp", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity", "E"."sid"
+            FROM "Environment" "E"
+            LEFT JOIN "Sensor" "S" ON "E"."sid" = "S"."sid"
+            WHERE "S"."hid" = '${hid}'
+            AND "E"."timestamp" BETWEEN TO_TIMESTAMP('${date} 00:00:00','DD-MM-YYYY HH24:MI:SS') 
             AND TO_TIMESTAMP('${date} 23:59:59','DD-MM-YYYY HH24:MI:SS')`,
         );
         return queryArr.rows;
     };
 
-    //this one need to fix
-    getLatestEnvironment = async (
+    getLatestEnivonmentForEachSensorInHid = async (
         hid: number,
-        sid: string,
-    ): Promise<EnvironmentOutput> => {
+    ): Promise<Array<EnvironmentOutput>> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity" \
-                FROM "Environment" "E" \
-                WHERE "E"."hid" = '${hid}' \
-                    AND "E"."sid" = '${sid}' \
-                    AND "E"."timestamp" = \
-                        (SELECT MAX(timestamp) \
-                        FROM "Environment" "E2"  \
-                        WHERE "E2"."hid" = '${hid}' AND "E2"."sid" = '${sid}')`,
+            `SELECT "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity", "E"."sid" \
+            FROM "Environment" "E" \
+            LEFT JOIN "Sensor" "S" ON "E"."sid" = "S"."sid"
+            WHERE "S"."hid" = ${hid} AND "E"."timestamp" = 
+                (SELECT MAX(timestamp) FROM "Environment"
+                WHERE "sid" = "S"."sid");`,
         );
-        return queryArr.rows[0];
+        return queryArr.rows;
     };
 
-    //this one need to fix
     getLatestEnvironmentBySid = async (
         sid: string,
-        hid: number,
     ): Promise<GetEnvironmentBySidOutput> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity" \
                 FROM "Environment" "E" \
-                WHERE "E"."hid" = '${hid}' \
-                    AND "E"."sid" = '${sid}' \
+                WHERE "E"."sid" = '${sid}' \
                     AND "E"."timestamp" = \
-                        (SELECT MAX(timestamp) \
-                            FROM "Environment" "E2"  \
-                            WHERE "E2"."hid" = '${hid}' AND "E2"."sid" = '${sid}')`,
+                    (SELECT MAX(timestamp) \
+                        FROM "Environment" "E2"  \
+                        WHERE "E2"."sid" = '${sid}')`,
         );
-        return { sid: sid, hid: hid, environment: queryArr.rows[0] };
+        return { sid: sid, environment: queryArr.rows[0] };
     };
 
-    //this one need to fix
     getEnvironmentBetweenTimestampBySid = async (
         sid,
-        hid,
         tsStart,
         tsEnd,
     ): Promise<EnvironmentBetweenTimestampOutput> => {
-        const queryArr = await this
-            .dbPoolQuery(`SELECT "timestamp", "windspeed", "ammonia", "temperature", "humidity" FROM "Environment" \
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "timestamp", "windspeed", "ammonia", "temperature", "humidity" FROM "Environment" \
             WHERE sid = '${sid}' \
             AND timestamp BETWEEN TO_TIMESTAMP('${tsStart}') \
-            AND TO_TIMESTAMP('${tsEnd}');`);
-        return { sid: sid, hid: hid, environmentSet: queryArr.rows };
+            AND TO_TIMESTAMP('${tsEnd}');`,
+        );
+        return { sid: sid, environmentSet: queryArr.rows };
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -318,23 +320,32 @@ export class DbService {
     getCameraInfo = cid =>
         this.dbPoolQuery(`SELECT * FROM "Camera" WHERE cid = ${cid};`);
 
-    //////////////////////////////////////////////////////////////////////////////
-    //table Image
-
-    getLastestUrl = async (hid: number, cid: number): Promise<LatestUrl> => {
+    getHidByCid = async (cid: string) => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT "I"."url" \
-            FROM "Image" "I" \
-            WHERE "I"."hid" = '${hid}' AND "I"."cid" = '${cid}' \
-                AND "I"."timestamp" = \
-                    (SELECT MAX(timestamp) \
-                    FROM "Image" "I2"  \
-                    WHERE "I2"."hid" = '${hid}' AND "I2"."cid" = '${cid}');`,
+            `SELECT "C"."hid" \
+            FROM "Camera" "C" \
+            WHERE "C"."cid" = '${cid}';`,
         );
         return queryArr.rows[0];
     };
 
-    getLastImageForEachCameraInHid = async (
+    //////////////////////////////////////////////////////////////////////////////
+    //table Image
+
+    getLatestUrl = async (cid: string): Promise<LatestUrl> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "I"."url" \
+            FROM "Image" "I" \
+            WHERE "I"."cid" = '${cid}' \
+                AND "I"."timestamp" = \
+                    (SELECT MAX(timestamp) \
+                    FROM "Image" "I2"  \
+                    WHERE "I2"."cid" = '${cid}');`,
+        );
+        return queryArr.rows[0];
+    };
+
+    getLastImageForEachCameraByHid = async (
         hid: number,
     ): Promise<Array<LastImageForEachCameraOutput>> => {
         const queryArr = await this.dbPoolQuery(
@@ -347,16 +358,15 @@ export class DbService {
         return queryArr.rows;
     };
 
-    getLatestAmountDeadChickenByCid = async (cid: string, hid: number) => {
+    getLatestAmountDeadChickenByCid = async (cid: string) => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "I"."amountDead" \
             FROM "Image" "I" \
-            WHERE "I"."hid" = '${hid}' \
-                AND "I"."cid" = '${cid}' \
+            WHERE "I"."cid" = '${cid}' \
                 AND "I"."timestamp" = \
                     (SELECT MAX(timestamp) \
                         FROM "Image" "I2"  \
-                        WHERE "I2"."hid" = '${hid}' AND "I2"."cid" = '${cid}')`,
+                        WHERE "I2"."cid" = '${cid}')`,
         );
         return queryArr.rows[0];
     };
