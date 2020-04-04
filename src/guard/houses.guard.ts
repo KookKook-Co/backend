@@ -13,7 +13,7 @@ export class HousesGuard implements CanActivate {
     ): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToHttp().getRequest();
         const user: UserPayload = request.user;
-        const hno: number = request.hno;
+        const hno = parseInt(request.query.hno) || parseInt(request.body.hno);
         if (user.role === Role.OWNER) {
             return true;
         }

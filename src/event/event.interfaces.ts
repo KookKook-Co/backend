@@ -1,8 +1,21 @@
 export interface RealTimeData {
-    temperature: number;
-    humidity: number;
-    windSpeed: number;
-    ammonia: number;
+    sid: string;
+    irregularEnv: EnvType[];
+    environmentalData: EnvironmentalData;
+}
+
+export enum EnvType {
+    temperature = 'temperature',
+    humidity = 'humidity',
+    windspeed = 'windspeed',
+    ammonia = 'ammonia',
+}
+
+export interface EnvironmentalData {
+    [EnvType.temperature]: number;
+    [EnvType.humidity]: number;
+    [EnvType.windspeed]: number;
+    [EnvType.ammonia]: number;
 }
 
 export interface DeadChickenMapDTO {
@@ -14,14 +27,20 @@ interface Block {
     url?: string;
 }
 
-export interface DailyInfo {
-    timestamp: Date;
-    food: FoodInput;
+export interface PostDailyInfo {
+    hno: number;
+    date: Date;
+    dailyInfo: DailyInfo;
+}
+
+interface DailyInfo {
+    food: FoodInput[];
     water: WaterInput;
-    vaccine: VaccineInput;
+    medicine: MedicineInput[];
 }
 
 interface FoodInput {
+    foodSilo: number;
     foodIn: number;
     foodLeft: number;
 }
@@ -31,7 +50,7 @@ interface WaterInput {
     waterMeter2: number;
 }
 
-interface VaccineInput {
+interface MedicineInput {
     type: string;
     concentration: number;
 }
@@ -43,7 +62,7 @@ export interface SubmitUnqualifiedChickenDTO {
     unqualifiedChickenInfo: UnqualifiedChickenInfo;
 }
 
-enum Period {
+export enum Period {
     MORNING = 'MORNING',
     EVENING = 'EVENING',
 }

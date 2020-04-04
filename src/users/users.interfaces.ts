@@ -1,5 +1,5 @@
 export interface User {
-    uid: string;
+    uid: number;
     username?: string;
     hashedPwd?: string;
     isCurrentUser?: boolean;
@@ -10,7 +10,7 @@ export interface User {
 }
 
 export interface UserPayload {
-    uid: string;
+    uid: number;
     hno: number;
     role: Role;
 }

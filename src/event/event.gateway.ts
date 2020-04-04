@@ -1,3 +1,6 @@
+import * as moment from 'moment';
+
+import { EnvType, EnvironmentalData, RealTimeData } from './event.interfaces';
 import {
     OnGatewayConnection,
     OnGatewayDisconnect,
@@ -8,13 +11,19 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+import { CheckIrrEnvService } from './checkIrrEnv.services';
+import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
-import { RealTimeData } from './event.interfaces';
 
 @WebSocketGateway()
 export class EventGateway
     implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     private logger: Logger = new Logger('EventGateway');
+
+    constructor(
+        private readonly dbService: DbService,
+        private readonly checkIrrEnv: CheckIrrEnvService,
+    ) {}
 
     @WebSocketServer()
     server: Server;
@@ -40,33 +49,76 @@ export class EventGateway
     }
 
     @SubscribeMessage('getRealTimeData')
-    pipeData(client: Socket, payload: any) {
-        const { hno } = payload;
-        setInterval(() => {
-            const rand = () => Math.random() * 100;
+    async pipeData(client: Socket, payload: any) {
+        // random
+        const rand = () => parseFloat((Math.random() * 100).toFixed(1));
 
-            const currentData = (): RealTimeData => {
-                return {
-                    temperature: rand(),
-                    humidity: rand(),
-                    windSpeed: rand(),
-                    ammonia: rand(),
-                };
+        const currentData = (): EnvironmentalData => {
+            return {
+                temperature: rand(),
+                humidity: rand(),
+                windspeed: rand(),
+                ammonia: rand(),
             };
+        };
 
-            const realtimeData = [];
+        // const rndIrreg = (): EnvType[] => {
+        //     const all = [
+        //         EnvType.temperature,
+        //         EnvType.humidity,
+        //         EnvType.windspeed,
+        //         EnvType.ammonia,
+        //     ];
 
-            for (let i = 1; i < 3; i++) {
-                for (let j = 1; j <= 3; j++) {
-                    realtimeData.push({
-                        xPosSen: i,
-                        yPosSen: j,
-                        environmentalData: currentData(),
-                    });
-                }
+        //     return all.reduce((a, b) => {
+        //         if (rand() < 5) a.push(b);
+        //         return a;
+        //     }, []);
+        // };
+
+        // random
+
+        // const { hno } = payload;
+
+        // const hid = await this.dbService.getHidByHno(hno);
+        // const { dateIn } = await this.dbService.getLatestChickenFlockInfoByHid(
+        //     hid,
+        // );
+
+        // const now = moment(new Date());
+        // const chickenAge = moment.duration(now.diff(moment(dateIn))).asDays();
+
+        // setInterval(async () => {
+        //     const houseEnvInfo = await this.dbService.getLatestEnivonmentForEachSensorInHid(
+        //         hid,
+        //     );
+
+        //     const houseEnv = houseEnvInfo.map(each => {
+        //         const { sid, timestamp, ...env } = each;
+        //         return {
+        //             sid,
+        //             irregularEnv: this.checkIrrEnv.getIrrEnv(chickenAge, env),
+        //             environmentalData: env,
+        //         };
+        //     });
+
+        //     client.emit('pipeRealTimeData', houseEnv);
+        // }, 5000);
+
+        setInterval(() => {
+            const houseRealTimeData: RealTimeData[] = [];
+
+            for (let i = 1; i <= 6; i++) {
+                const currData = currentData();
+                houseRealTimeData.push({
+                    sid: i.toString(),
+                    irregularEnv: this.checkIrrEnv.getIrrEnv(10, currData),
+                    environmentalData: currData,
+                });
             }
-            client.emit('pipeRealTimeData', realtimeData);
-        }, 2000);
+            // console.log(houseRealTimeData);
+            client.emit('pipeRealTimeData', houseRealTimeData);
+        }, 5000);
     }
 
     @SubscribeMessage('sendEnvironmentalData')

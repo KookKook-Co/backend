@@ -18,7 +18,7 @@ export class UsersController {
     ) {
         try {
             const { user, hno } = createUserDTO;
-            const hid = await this.dbService.getHid(hno);
+            const hid = await this.dbService.getHidByHno(hno);
             const createUserInput: CreateUserInput = {
                 ...user,
                 isCurrentUser: true,

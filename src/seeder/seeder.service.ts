@@ -306,21 +306,21 @@ export class SeederService {
         await this.dbService.createHouse(1, 10, 10, 10);
         await this.dbService.createHouse(2, 10, 10, 10);
         let UserDataInput: CreateUserInput = {
-            username: 'username1',
+            username: 'owner',
             hashedPwd:
-                '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
+                '$2b$04$vpJ4H0yfvyN68IsbAS4e2eQ3A/wPJvK2bWqpq6CDhhHX9Y63IhHyG',
             isCurrentUser: true,
             firstName: 'worker1',
             lastName: 'lastname1',
             lineID: 'line1',
-            role: Role.WORKER,
+            role: Role.OWNER,
             imageUrl: 'http://www.kk.com/img/1',
             hid: 1,
         };
         let UserDataInput2: CreateUserInput = {
-            username: 'username2',
+            username: 'worker',
             hashedPwd:
-                '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',
+                '$2b$04$C4GP5tj3zJCpgOHOBHmbfe1ahTVhvhfch6uwJ1Gv7vSUE3nJfJuyS',
             isCurrentUser: true,
             firstName: 'worker2',
             lastName: 'lastname2',

@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 
-import { User, UserPayload } from '../users/users.interfaces';
+import { Role, User, UserPayload } from '../users/users.interfaces';
 
 import { DbService } from '../db/db.service';
 import { Injectable } from '@nestjs/common';
@@ -32,19 +32,29 @@ export class AuthService {
                 imageUrl,
                 hno,
                 role,
-            } = await this.dbService.getLoginUserInfo(uid);
+            } = await this.dbService.getLoginUserInfoByUid(uid);
             const payload: UserPayload = {
                 uid,
                 hno,
                 role,
             };
             const access_token = this.jwtService.sign(payload);
-            return {
-                access_token,
-                imageUrl,
-                hno,
-                role,
-            };
+
+            if (role === Role.OWNER || role === Role.ADMIN) {
+                return {
+                    access_token,
+                    imageUrl,
+                    hno: await this.dbService.getAllHno(),
+                    role,
+                };
+            } else {
+                return {
+                    access_token,
+                    imageUrl,
+                    hno,
+                    role,
+                };
+            }
         } catch (err) {
             console.log(err);
         }
