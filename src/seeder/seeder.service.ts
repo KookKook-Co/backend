@@ -411,34 +411,21 @@ export class SeederService {
             xPosSen: 1,
             yPosSen: 3,
         };
-        const camera2: CreateCameraInput = {
-            cid: '2',
-            cno: 2,
-            hid: 1,
-            xPosCam: 20,
-            yPosCam: 40,
-        };
-        const camera1: CreateCameraInput = {
-            cid: '1',
-            cno: 1,
-            hid: 1,
-            xPosCam: 10,
-            yPosCam: 20,
-        };
-        const camera3: CreateCameraInput = {
-            cid: '3',
-            cno: 1,
-            hid: 2,
-            xPosCam: 10,
-            yPosCam: 20,
-        };
-        const camera4: CreateCameraInput = {
-            cid: '4',
-            cno: 2,
-            hid: 2,
-            xPosCam: 20,
-            yPosCam: 40,
-        };
+
+        let no = 1;
+        for (let i = 1; i <= 13; i++) {
+            for (let j = 1; j <= 24; j++) {
+                const cameraInput: CreateCameraInput = {
+                    cid: `${no}`,
+                    cno: no,
+                    hid: 1,
+                    xPosCam: i,
+                    yPosCam: j,
+                };
+                await this.dbService.createCamera(cameraInput);
+                no++;
+            }
+        }
         await this.dbService.createChickenFlock(chickenInput);
         await this.dbService.createChickenFlock(chickenInput2);
         await this.dbService.createSensor(sensor1);
@@ -450,10 +437,6 @@ export class SeederService {
         await this.dbService.createSensor(sensor7);
         await this.dbService.createSensor(sensor8);
         await this.dbService.createSensor(sensor9);
-        await this.dbService.createCamera(camera1);
-        await this.dbService.createCamera(camera2);
-        await this.dbService.createCamera(camera3);
-        await this.dbService.createCamera(camera4);
         let chickenRecordInput: CreateChickenRecordInput = {
             chicTime: '1584011015',
             period: 'MORNING',
@@ -809,37 +792,40 @@ export class SeederService {
         };
         await this.dbService.createEnvData(environmentInput9);
 
-        let imageInput: CreateCamImgInput = {
-            timestamp: '1584011605',
-            url: 'http://www.kookkook.com/img/1_1',
-            amountDead: 3,
-            cid: '1',
-        };
+        for (let i = 1; i <= 312; i++) {
+            let imageInput: CreateCamImgInput = {
+                timestamp: '1584011605',
+                url: `http://www.kookkook.com/img/${i}`,
+                amountDead: Math.floor(Math.random() * 10),
+                cid: `${i}`,
+            };
+            await this.dbService.createImage(imageInput);
+        }
 
-        await this.dbService.createImage(imageInput);
-        let imageInput2: CreateCamImgInput = {
-            timestamp: '1584011605',
-            url: 'http://www.kookkook.com/img/1_2',
-            amountDead: 5,
-            cid: '2',
-        };
-        await this.dbService.createImage(imageInput2);
+        // await this.dbService.createImage(imageInput);
+        // let imageInput2: CreateCamImgInput = {
+        //     timestamp: '1584011605',
+        //     url: 'http://www.kookkook.com/img/1_2',
+        //     amountDead: 5,
+        //     cid: '2',
+        // };
+        // await this.dbService.createImage(imageInput2);
 
-        let imageInput3: CreateCamImgInput = {
-            timestamp: '1584090805',
-            url: 'http://www.kookkook.com/img/2_3',
-            amountDead: 1,
-            cid: '3',
-        };
-        await this.dbService.createImage(imageInput3);
+        // let imageInput3: CreateCamImgInput = {
+        //     timestamp: '1584090805',
+        //     url: 'http://www.kookkook.com/img/2_3',
+        //     amountDead: 1,
+        //     cid: '3',
+        // };
+        // await this.dbService.createImage(imageInput3);
 
-        let imageInput4: CreateCamImgInput = {
-            timestamp: '1584090805',
-            url: 'http://www.kookkook.com/img/2_4',
-            amountDead: 6,
-            cid: '4',
-        };
-        await this.dbService.createImage(imageInput4);
+        // let imageInput4: CreateCamImgInput = {
+        //     timestamp: '1584090805',
+        //     url: 'http://www.kookkook.com/img/2_4',
+        //     amountDead: 6,
+        //     cid: '4',
+        // };
+        // await this.dbService.createImage(imageInput4);
         await this.dbService.createCollectedDeadChickenTime('1584011605', '2');
         await this.dbService.createCollectedDeadChickenTime('1584090805', '4');
     };
