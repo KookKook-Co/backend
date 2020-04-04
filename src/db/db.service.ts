@@ -185,7 +185,7 @@ export class DbService {
             FROM "House" "H" 
             WHERE "H"."hno" = '${hno}';`,
         );
-        return queryArr.rows[0];
+        return queryArr.rows[0].hid;
     };
 
     getHouseInfoByHno = async (hno: number): Promise<HouseOutput> => {
@@ -194,6 +194,11 @@ export class DbService {
             WHERE hno = '${hno}';`,
         );
         return queryArr.rows[0];
+    };
+
+    getAllHno = async (): Promise<number[]> => {
+        const queryArr = await this.dbPoolQuery(`SELECT "hno" FROM "House";`);
+        return queryArr.rows.map(each => each.hno);
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -232,13 +237,24 @@ export class DbService {
 
     getChickenFlockInfoByHid = async (
         hid: number,
-    ): Promise<Array<ChickenFlockInfoOutput>> => {
+    ): Promise<ChickenFlockInfoOutput[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT * 
             FROM "Chicken" 
             WHERE "hid" = '${hid}'`,
         );
         return queryArr.rows;
+    };
+
+    getLatestChickenFlockInfoByHid = async (
+        hid: number,
+    ): Promise<ChickenFlockInfoOutput> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT * FROM "Chicken" 
+            WHERE "hid" = '${hid}'
+            ORDER BY "dateIn" DESC LIMIT 1;`,
+        );
+        return queryArr.rows[0];
     };
 
     getChickenFlockInfoByHidAndGeneration = async (
@@ -269,9 +285,7 @@ export class DbService {
         return queryArr.rows[0];
     };
 
-    getAllSensorInfoByHid = async (
-        hid: number,
-    ): Promise<Array<SensorOutput>> => {
+    getAllSensorInfoByHid = async (hid: number): Promise<SensorOutput[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "sid", "xPosSen", "yPosSen" 
             FROM "Sensor" 
@@ -298,9 +312,7 @@ export class DbService {
                             '${environmentInput.ammonia}', '${environmentInput.temperature}', '${environmentInput.humidity}',
                             '${environmentInput.sid}');`;
 
-    createEnvFromList = async (
-        environmentInputList: Array<CreateEnvDataInput>,
-    ) => {
+    createEnvFromList = async (environmentInputList: CreateEnvDataInput[]) => {
         let envInputList = environmentInputList;
         console.log(envInputList);
         let queryString = '';
@@ -315,7 +327,7 @@ export class DbService {
     getEnvironmentByHidAndDate = async (
         hid: number,
         date: string,
-    ): Promise<Array<EnvironmentInfoSetAndSidOutput>> => {
+    ): Promise<EnvironmentInfoSetAndSidOutput[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "E"."sid", "E"."timestamp", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity"
             FROM "Environment" "E"
@@ -329,7 +341,7 @@ export class DbService {
 
     getLatestEnivonmentForEachSensorInHid = async (
         hid: number,
-    ): Promise<Array<EnvironmentInfoSetAndSidOutput>> => {
+    ): Promise<EnvironmentInfoSetAndSidOutput[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "E"."sid", "E"."timestamp", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity" 
             FROM "Environment" "E" 
@@ -360,7 +372,7 @@ export class DbService {
         sid,
         tsStart,
         tsEnd,
-    ): Promise<Array<EnvironmentInfoSetOutput>> => {
+    ): Promise<EnvironmentInfoSetOutput[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "windspeed", "ammonia", "temperature", "humidity" 
             FROM "Environment" 
@@ -410,7 +422,7 @@ export class DbService {
 
     getLastImageForEachCameraByHid = async (
         hid: number,
-    ): Promise<Array<LastImageForEachCameraOutput>> => {
+    ): Promise<LastImageForEachCameraOutput[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "C"."cid", "C"."xPosCam", "C"."yPosCam", "I"."url", "I"."amountDead"
             FROM "Camera" "C" JOIN "Image" "I" ON "C"."cid" = "I"."cid"
@@ -527,7 +539,7 @@ export class DbService {
 
     getLast24HrsTemperatureBySid = async (
         sid: string,
-    ): Promise<Array<TemperatureTimestamp>> => {
+    ): Promise<TemperatureTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "temperature" 
             FROM "Environment" 
@@ -541,7 +553,7 @@ export class DbService {
         sid: string,
         tsStart: string,
         tsEnd: string,
-    ): Promise<Array<TemperatureTimestamp>> => {
+    ): Promise<TemperatureTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "temperature" 
             FROM "Environment" 
@@ -555,7 +567,7 @@ export class DbService {
     getLastNTemperatureBySid = async (
         sid: string,
         number: number,
-    ): Promise<Array<TemperatureTimestamp>> => {
+    ): Promise<TemperatureTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "temperature" 
             FROM "Environment" 
@@ -569,7 +581,7 @@ export class DbService {
         sid: string,
         dateStart: string,
         dateEnd: string,
-    ): Promise<Array<MaxAndMinTemperature>> => {
+    ): Promise<MaxAndMinTemperature[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "date", "maxTemperature", "minTemperature" FROM (
                 SELECT "sid", DATE("timestamp") "date",
@@ -599,7 +611,7 @@ export class DbService {
 
     getLast24HrsHumidityBySid = async (
         sid: string,
-    ): Promise<Array<HumidityTimestamp>> => {
+    ): Promise<HumidityTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "humidity" 
             FROM "Environment" 
@@ -613,7 +625,7 @@ export class DbService {
         sid: string,
         tsStart: string,
         tsEnd: string,
-    ): Promise<Array<HumidityTimestamp>> => {
+    ): Promise<HumidityTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "humidity" 
             FROM "Environment" 
@@ -627,7 +639,7 @@ export class DbService {
     getLastNHumidityBySid = async (
         sid: string,
         number: number,
-    ): Promise<Array<HumidityTimestamp>> => {
+    ): Promise<HumidityTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "humidity" 
             FROM "Environment" 
@@ -652,7 +664,7 @@ export class DbService {
 
     getLast24HrsAmmoniaBySid = async (
         sid: string,
-    ): Promise<Array<AmmoniaTimestamp>> => {
+    ): Promise<AmmoniaTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "ammonia" 
             FROM "Environment" 
@@ -666,7 +678,7 @@ export class DbService {
         sid: string,
         tsStart: string,
         tsEnd: string,
-    ): Promise<Array<AmmoniaTimestamp>> => {
+    ): Promise<AmmoniaTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "ammonia" 
             FROM "Environment" 
@@ -680,7 +692,7 @@ export class DbService {
     getLastNAmmoniaBySid = async (
         sid: string,
         number: number,
-    ): Promise<Array<AmmoniaTimestamp>> => {
+    ): Promise<AmmoniaTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "ammonia" 
             FROM "Environment" 
@@ -707,7 +719,7 @@ export class DbService {
 
     getLast24HrsWindspeedBySid = async (
         sid: string,
-    ): Promise<Array<WindspeedTimestamp>> => {
+    ): Promise<WindspeedTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "windspeed" 
             FROM "Environment" 
@@ -721,7 +733,7 @@ export class DbService {
         sid: string,
         tsStart: string,
         tsEnd: string,
-    ): Promise<Array<WindspeedTimestamp>> => {
+    ): Promise<WindspeedTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "windspeed" 
             FROM "Environment" 
@@ -735,7 +747,7 @@ export class DbService {
     getLastNWindspeedityBySid = async (
         sid: string,
         number: number,
-    ): Promise<Array<WindspeedTimestamp>> => {
+    ): Promise<WindspeedTimestamp[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "timestamp", "windspeed" 
             FROM "Environment" 

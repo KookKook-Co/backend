@@ -13,7 +13,7 @@ export interface CreateUserInput {
 }
 
 export interface UserDataOutput {
-    uid: string;
+    uid: number;
     username: string;
     hashedPwd: string;
     isCurrentUser: boolean;
@@ -120,8 +120,8 @@ export interface LatestUrl {
 }
 
 export interface ChickenFlockInfoOutput {
-    dateIn: string;
-    dateOut: string;
+    dateIn: Date;
+    dateOut: Date;
     generation: string;
     type: string;
     amountIn: number;
