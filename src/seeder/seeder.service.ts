@@ -801,31 +801,6 @@ export class SeederService {
             };
             await this.dbService.createImage(imageInput);
         }
-
-        // await this.dbService.createImage(imageInput);
-        // let imageInput2: CreateCamImgInput = {
-        //     timestamp: '1584011605',
-        //     url: 'http://www.kookkook.com/img/1_2',
-        //     amountDead: 5,
-        //     cid: '2',
-        // };
-        // await this.dbService.createImage(imageInput2);
-
-        // let imageInput3: CreateCamImgInput = {
-        //     timestamp: '1584090805',
-        //     url: 'http://www.kookkook.com/img/2_3',
-        //     amountDead: 1,
-        //     cid: '3',
-        // };
-        // await this.dbService.createImage(imageInput3);
-
-        // let imageInput4: CreateCamImgInput = {
-        //     timestamp: '1584090805',
-        //     url: 'http://www.kookkook.com/img/2_4',
-        //     amountDead: 6,
-        //     cid: '4',
-        // };
-        // await this.dbService.createImage(imageInput4);
         await this.dbService.createCollectedDeadChickenTime('1584011605', '2');
         await this.dbService.createCollectedDeadChickenTime('1584090805', '4');
     };
