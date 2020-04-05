@@ -829,9 +829,23 @@ export class SeederService {
             await this.dbService.createHouse(i, 10, 10, 10);
         }
 
+        let ownerDataInput: CreateUserInput = {
+            username: `owner`,
+            hashedPwd:
+                '$2b$04$vpJ4H0yfvyN68IsbAS4e2eQ3A/wPJvK2bWqpq6CDhhHX9Y63IhHyG',
+            isCurrentUser: true,
+            firstName: `ownerfirstname`,
+            lastName: `ownerlastname`,
+            lineID: `lineowner`,
+            role: Role.OWNER,
+            imageUrl: `http://www.kk.com/img/0`,
+            hid: 1,
+        };
+        await this.dbService.createUser(ownerDataInput);
+
         for (let i = 1; i <= 5; i++) {
             for (let j = 1; j <= 2; j++) {
-                let UserDataInput: CreateUserInput = {
+                let userDataInput: CreateUserInput = {
                     username: `worker${i}${j}`,
                     hashedPwd:
                         '$2b$04$vpJ4H0yfvyN68IsbAS4e2eQ3A/wPJvK2bWqpq6CDhhHX9Y63IhHyG',
@@ -843,7 +857,7 @@ export class SeederService {
                     imageUrl: `http://www.kk.com/img/hid=${i}/${j}`,
                     hid: i,
                 };
-                await this.dbService.createUser(UserDataInput);
+                await this.dbService.createUser(userDataInput);
             }
         }
 
