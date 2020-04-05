@@ -5,7 +5,7 @@ services:
     build: .
     image: patsk135/kookkook-backend
     depends_on:
-      - postgres
+      - db
     restart: always
     environment:
       PORT:
