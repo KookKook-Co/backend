@@ -823,4 +823,297 @@ export class SeederService {
         query_list.push(dropTable('User'));
         await poolQuery(this.pool, query_list.join(''));
     };
+
+    seedSampleDataSet2 = async () => {
+        for (let i = 1; i <= 5; i++) {
+            await this.dbService.createHouse(i, 10, 10, 10);
+        }
+
+        for (let i = 1; i <= 5; i++) {
+            for (let j = 1; j <= 2; j++) {
+                let UserDataInput: CreateUserInput = {
+                    username: `worker${i}${j}`,
+                    hashedPwd:
+                        '$2b$04$vpJ4H0yfvyN68IsbAS4e2eQ3A/wPJvK2bWqpq6CDhhHX9Y63IhHyG',
+                    isCurrentUser: true,
+                    firstName: `firstname${i}${j}`,
+                    lastName: `lastname${i}${j}`,
+                    lineID: `lineid${i}${j}`,
+                    role: Role.WORKER,
+                    imageUrl: `http://www.kk.com/img/hid=${i}/${j}`,
+                    hid: i,
+                };
+                await this.dbService.createUser(UserDataInput);
+            }
+        }
+
+        for (let num = 1; num <= 9; num++) {
+            for (let i = 1; i <= 5; i++) {
+                await this.dbService.createDailyRecord(`1${num}-03-2020`, i);
+            }
+        }
+
+        let randomGender = ['MALE', 'FEMEALE'];
+        for (let i = 1; i <= 5; i++) {
+            let randomPostionInlist = Math.floor(
+                Math.random() * randomGender.length,
+            );
+            let chickenInput: CreateChickenFlockInput = {
+                generation: '2020/1',
+                dateIn: '11-03-2020',
+                dateOut: '11-04-2020',
+                type: 'Sally',
+                amountIn: 40000,
+                gender: randomGender[randomPostionInlist],
+                hid: i,
+            };
+            await this.dbService.createChickenFlock(chickenInput);
+        }
+        let uniqueID = 1;
+        for (let house = 1; house <= 5; house++) {
+            let no = 1;
+            for (let i = 1; i <= 13; i++) {
+                for (let j = 1; j <= 24; j++) {
+                    const cameraInput: CreateCameraInput = {
+                        cid: `${uniqueID}`,
+                        cno: no,
+                        hid: house,
+                        xPosCam: i,
+                        yPosCam: j,
+                    };
+                    await this.dbService.createCamera(cameraInput);
+                    no++;
+                    uniqueID++;
+                }
+            }
+        }
+        //CREATE ChickenRecord SAMPLE
+        for (let house = 1; house <= 5; house++) {
+            let chickenRecordInputMorning1: CreateChickenRecordInput = {
+                chicTime: '1583895000',
+                period: 'MORNING',
+                amountDead: Math.floor(Math.random() * 5),
+                amountZleg: Math.floor(Math.random() * 5),
+                amountDwaft: Math.floor(Math.random() * 5),
+                amountSick: Math.floor(Math.random() * 5),
+                date: `11-03-2020`,
+                hid: house,
+            };
+            await this.dbService.createChickenRecord(
+                chickenRecordInputMorning1,
+            );
+        }
+        for (let house = 1; house <= 5; house++) {
+            let chickenRecordInputMorning2: CreateChickenRecordInput = {
+                chicTime: '1583902200',
+                period: 'MORNING',
+                amountDead: Math.floor(Math.random() * 10 + 5),
+                amountZleg: Math.floor(Math.random() * 10 + 5),
+                amountDwaft: Math.floor(Math.random() * 10 + 5),
+                amountSick: Math.floor(Math.random() * 10 + 5),
+                date: `11-03-2020`,
+                hid: house,
+            };
+            await this.dbService.createChickenRecord(
+                chickenRecordInputMorning2,
+            );
+        }
+
+        for (let house = 1; house <= 5; house++) {
+            let chickenRecordInputEvening1: CreateChickenRecordInput = {
+                chicTime: '1583928600',
+                period: 'EVENING',
+                amountDead: Math.floor(Math.random() * 10),
+                amountZleg: Math.floor(Math.random() * 10),
+                amountDwaft: Math.floor(Math.random() * 10),
+                amountSick: Math.floor(Math.random() * 10),
+                date: `11-03-2020`,
+                hid: house,
+            };
+            await this.dbService.createChickenRecord(
+                chickenRecordInputEvening1,
+            );
+        }
+
+        for (let house = 1; house <= 5; house++) {
+            let chickenRecordInputEvening2: CreateChickenRecordInput = {
+                chicTime: '1583935800',
+                period: 'EVENING',
+                amountDead: Math.floor(Math.random() * 10 + 5),
+                amountZleg: Math.floor(Math.random() * 10 + 5),
+                amountDwaft: Math.floor(Math.random() * 10 + 5),
+                amountSick: Math.floor(Math.random() * 10 + 5),
+                date: `11-03-2020`,
+                hid: house,
+            };
+            await this.dbService.createChickenRecord(
+                chickenRecordInputEvening2,
+            );
+        }
+        ////////////////////////////////////////////////////////
+        let ts = 1583895600;
+        for (let t = 1; t <= 30; t++) {
+            for (let house = 1; house <= 5; house++) {
+                let getDate = new Date(0);
+                getDate.setSeconds(ts);
+                let getDay = getDate.getDate();
+                let getMonth = 1 + getDate.getMonth();
+                let getYear = getDate.getFullYear();
+                let inputDate = `${getDay}-${getMonth}-${getYear}`;
+
+                let dailyDataRecordInput: CreateDailyDataRecordInput = {
+                    timestamp: `${ts}`,
+                    date: `${inputDate}`,
+                    hid: house,
+                };
+                // console.log(dailyDataRecordInput);
+                await this.dbService.createDailyDataRecord(
+                    dailyDataRecordInput,
+                );
+            }
+            ts = ts + 60 * 60 * 2;
+        }
+        ts = 1583895600;
+        for (let t = 1; t <= 2; t++) {
+            for (let house = 1; house <= 5; house++) {
+                for (let silo = 1; silo <= 2; silo++) {
+                    let getDate = new Date(0);
+                    getDate.setSeconds(ts);
+                    let getDay = getDate.getDate();
+                    let getMonth = 1 + getDate.getMonth();
+                    let getYear = getDate.getFullYear();
+                    let inputDate = `${getDay}-${getMonth}-${getYear}`;
+
+                    let foodRecordInput: CreateFoodRecordInput = {
+                        foodSilo: silo,
+                        foodIn: 10000,
+                        foodRemain: 8000,
+                        foodConsumed: 2000,
+                        timestamp: `${ts}`,
+                        date: `${inputDate}`,
+                        hid: house,
+                    };
+                    // console.log(foodRecordInput);
+                    await this.dbService.createFoodRecord(foodRecordInput);
+                }
+            }
+            ts = ts + 60 * 60 * 24;
+        }
+
+        ts = 1583895600 + 60 * 60 * 6;
+        for (let t = 1; t <= 1; t++) {
+            for (let house = 1; house <= 5; house++) {
+                let getDate = new Date(0);
+                getDate.setSeconds(ts);
+                let getDay = getDate.getDate();
+                let getMonth = 1 + getDate.getMonth();
+                let getYear = getDate.getFullYear();
+                let inputDate = `${getDay}-${getMonth}-${getYear}`;
+
+                let medicineRecordInput: CreateMedicineRecordInput = {
+                    medicineType: 'NDIB',
+                    medicineConc: 40000,
+                    timestamp: `${ts}`,
+                    date: `${inputDate}`,
+                    hid: house,
+                };
+                await this.dbService.createMedicineRecord(medicineRecordInput);
+            }
+        }
+
+        ts = 1583895600 + 60 * 60 * 8;
+        for (let t = 1; t <= 2; t++) {
+            for (let house = 1; house <= 5; house++) {
+                let getDate = new Date(0);
+                getDate.setSeconds(ts);
+                let getDay = getDate.getDate();
+                let getMonth = 1 + getDate.getMonth();
+                let getYear = getDate.getFullYear();
+                let inputDate = `${getDay}-${getMonth}-${getYear}`;
+
+                let waterRecordInput: CreateWaterRecordInput = {
+                    waterMeter1: 2508392,
+                    waterMeter2: 2530116,
+                    waterConsumed: 663,
+                    timestamp: `${ts}`,
+                    date: `${inputDate}`,
+                    hid: house,
+                };
+                await this.dbService.createWaterRecord(waterRecordInput);
+            }
+            ts = ts + 60 * 60 * 24;
+        }
+
+        uniqueID = 1;
+        for (let house = 1; house <= 5; house++) {
+            for (let i = 1; i <= 2; i++) {
+                for (let j = 1; j <= 3; j++) {
+                    let sensorInput: CreateSensorInput = {
+                        sid: `${uniqueID}`,
+                        hid: house,
+                        xPosSen: i,
+                        yPosSen: j,
+                    };
+                    await this.dbService.createSensor(sensorInput);
+                    uniqueID++;
+                }
+            }
+        }
+
+        ts = 1583895600;
+        for (let t = 1; t <= 30; t++) {
+            uniqueID = 1;
+            for (let house = 1; house <= 5; house++) {
+                for (let no = 1; no <= 2 * 3; no++) {
+                    let environmentInput: CreateEnvDataInput = {
+                        timestamp: `${ts}`,
+                        windspeed: Math.floor(Math.random() * 15 + 110),
+                        ammonia: Math.floor(Math.random() * 5 + 20),
+                        temperature: Math.floor(Math.random() * 10 + 25),
+                        humidity: Math.floor(Math.random() * 20 + 40),
+                        sid: `${uniqueID}`,
+                    };
+                    await this.dbService.createEnvData(environmentInput);
+                    uniqueID++;
+                }
+            }
+            ts = ts + 60 * 60 * 2;
+        }
+
+        ts = 1583895600;
+        for (let t = 1; t <= 2; t++) {
+            uniqueID = 1;
+            for (let house = 1; house <= 2; house++) {
+                for (let i = 1; i <= 13; i++) {
+                    for (let j = 1; j <= 24; j++) {
+                        let imageInput: CreateCamImgInput = {
+                            timestamp: `${ts}`,
+                            url: `http://www.kookkook.com/img/${house}_${uniqueID}_${t}`,
+                            amountDead: Math.floor(Math.random() * 10),
+                            cid: `${uniqueID}`,
+                        };
+                        await this.dbService.createImage(imageInput);
+                        uniqueID++;
+                    }
+                }
+            }
+            ts = ts + 60 * 60 * 2;
+        }
+        ts = 1583895600;
+        for (let t = 1; t <= 2; t++) {
+            uniqueID = 1;
+            for (let house = 1; house <= 2; house++) {
+                for (let i = 1; i <= 13; i++) {
+                    for (let j = 1; j <= 24; j++) {
+                        await this.dbService.createCollectedDeadChickenTime(
+                            `${ts}`,
+                            `${uniqueID}`,
+                        );
+                        uniqueID++;
+                    }
+                }
+            }
+            ts = ts + 60 * 60 * 6;
+        }
+    };
 }
