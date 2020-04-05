@@ -11,7 +11,7 @@ bash scripts/clear-container.sh
 if [ ! "$(docker ps -q -f name=$POSTGRES_CONTAINER_NAME)" ]; then
     echo "# Setting up environment"
     # run postgres & adminer containers
-    docker-compose -f docker-compose.dev.yml up -d
+    docker-compose -f docker-compose.staging.yml up -d
     echo "# Wating for database"
     sleep 5
 fi

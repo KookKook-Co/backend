@@ -14,13 +14,13 @@ services:
       - ./tsconfig.json:/app/tsconfig.json
       - ./tsconfig.build.json:/app/tsconfig.build.json
     ports:
-      - 3000:3000
+      - 4000:4000
     environment:
       NODE_ENV: development
-      PORT: 3000
-      JWT_SECRET: jwtsecret
-      LINE_USERID: U26da3150bd8eb08e92189daf9ca82e3d
-      LINE_BOT_TOKEN: hbuF2G3ORyb6xZsK4ajeUiqPTmFIjNGZqIJr6L9ftCp7gc+dYe0RatFuouYrIi5zGt8uBJX5L6jexP1lLoAtP7Ooa6H/rqtVbOJJaT0vm6JSq0AQ/OHlRMUiV504KApB0tIAVLKxag/4ki5Cmy1gJQdB04t89/1O/w1cDnyilFU=
+      PORT: ${PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      LINE_USERID: ${LINE_USERID}
+      LINE_BOT_TOKEN: ${LINE_BOT_TOKEN}
     working_dir: /app
     command: ['npm', 'run', 'start:dev']
 
@@ -37,7 +37,14 @@ services:
 
   adminer:
     image: adminer
-    container_name: kookkook-adminer-dev
     restart: always
     ports:
       - 8080:8080
+
+  mqtt:
+    image: eclipse-mosquitto
+    restart: always
+    volumes:
+      - ./mosquitto:/mosquitto
+    ports:
+      - 1883:1883

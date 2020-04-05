@@ -305,7 +305,7 @@ export class DbService {
         hid: number,
     ): Promise<ChickenFlockInfoOutput[]> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT * 
+            `SELECT "dateIn", "dateOut", "generation", "type", "amountIn", "gender" 
             FROM "Chicken" 
             WHERE "hid" = '${hid}'
             ORDER BY "dateIn"`,

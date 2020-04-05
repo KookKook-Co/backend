@@ -8,14 +8,15 @@ import {
     Query,
     Request,
     Logger,
+    Delete,
 } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
 import { NotiService } from '../event/noti.service';
 import {
-    ChickenFlockInfo,
     SubmitUnqualifiedChickenDTO,
     PostDailyInfo,
+    CreateChickenFlockDTO,
 } from './event.interfaces';
 import { Response } from 'express';
 import { RolesGuard, HousesGuard } from '../guard';
@@ -72,6 +73,7 @@ export class EventController {
     @Get('env/weekly')
     async getWeeklyEnvData(@Query() query) {
         const { sid, hno } = query;
+        // Wait DB
         return {};
     }
 
@@ -88,16 +90,13 @@ export class EventController {
     @Get('dailydata')
     async getDailyDataInfo(
         @Request() req,
-        @Query('date') date: Date,
+        @Query('date') date: string,
         @Res() res: Response,
     ) {
-        const dbQueryDailyInputInfo = async (date: Date) => true as any;
-        const checkExist = async (data: any) => false;
-
         const formatedDate = moment(date).format('DD-MM-YYYY');
         const hid = await this.dbService.getHidByHno(req.user.hno);
 
-        // if (await this.dbService.getLast(formatedDate.toString(), req.user.hno)) {
+        // if (await this.dbService.getLast(formatedDate, req.user.hno)) {
         //     const dailyInfo: DailyInfo = await this.dbService.get(date);
         //     res.send(dailyInfo);
         // }
@@ -122,8 +121,9 @@ export class EventController {
                 await this.dbService.createDailyRecord(date, hid);
             }
 
+            // Some shit from DB
             await this.dbService.createDailyDataRecord({
-                timestamp: new Date().getTime().toString(),
+                timestamp: (new Date().valueOf() / 1000).toString(),
                 date,
                 hid,
             });
@@ -138,18 +138,20 @@ export class EventController {
     @Get('unqualifiedchicken')
     async getUnqualifiedChickenInfo(
         @Request() req,
-        @Query('date') date: Date,
+        @Query('date') date: string,
         @Res() res: Response,
     ) {
-        const dbQueryDailyInputInfo = async (date: Date) => true as any;
-        const checkExist = async (data: any) => false;
+        const formatedDate = moment(date).format('DD-MM-YYYY');
+        const hid = await this.dbService.getHidByHno(req.user.hno);
 
-        if (await checkExist(req.hno)) {
-            const dailyInfo = await dbQueryDailyInputInfo(date);
-            res.send(dailyInfo);
-        } else {
-            res.send(null);
-        }
+        // Fuck DB
+
+        // res.send(
+        //     await this.dbService.getLatestChickenRecordByHidAndDate(
+        //         hid,
+        //         formatedDate,
+        //     ),
+        // );
     }
 
     @UseGuards(AuthGuard(), HousesGuard)
@@ -160,38 +162,72 @@ export class EventController {
         @Res() res: Response,
     ) {
         try {
-            const checkExist = async (date, hid) => false;
+            const { date, period, unqualifiedChickenInfo } = body;
 
-            const hid = await this.dbService.getHidByHno(req.hno);
+            const hid = await this.dbService.getHidByHno(req.user.hno);
+            const formatedDate = moment(date).format('DD-MM-YYYY');
 
-            const { date, period } = body;
-            if (!(await checkExist(date, hid))) {
-                await this.dbService.createDailyRecord(date, hid);
-            } else {
-                await this.dbService.createChickenRecord({
-                    date,
-                    chicTime: body.timestamp.getTime().toString(),
+            if (
+                !(await this.dbService.isDailyRecordTupleExist(
+                    formatedDate,
                     hid,
-                    period,
-                    ...body.unqualifiedChickenInfo,
-                });
+                ))
+            ) {
+                await this.dbService.createDailyRecord(formatedDate, hid);
             }
+            await this.dbService.createChickenRecord({
+                date: formatedDate,
+                chicTime: (new Date().valueOf() / 1000).toString(),
+                hid,
+                period,
+                ...unqualifiedChickenInfo,
+            });
+
+            res.status(200).send('Success');
         } catch (err) {
             res.status(400).send(err);
         }
     }
 
     @UseGuards(AuthGuard(), RolesGuard)
-    @Post('chickenflock')
-    async addChickenFlock(
-        @Request() req,
-        @Body() chickenFlockInfo: ChickenFlockInfo,
-    ) {
-        const hid = await this.dbService.getHidByHno(req.hno);
-        const payload = await this.dbService.createChickenFlock({
-            ...chickenFlockInfo,
+    @Get('chickenflocks')
+    async getChickenFlock(@Query('hno') hno, @Res() res) {
+        const hid = await this.dbService.getHidByHno(hno);
+        res.send(await this.dbService.getChickenFlockInfoByHid(hid));
+    }
+
+    @UseGuards(AuthGuard(), RolesGuard)
+    @Post('chickenflocks')
+    async addChickenFlock(@Body() body: CreateChickenFlockDTO, @Res() res) {
+        const hid = await this.dbService.getHidByHno(body.hno);
+
+        const chickenflock = await this.dbService.getChickenFlockInfoByHidAndGeneration(
             hid,
-        });
-        return payload;
+            body.chickenFlockInfo.generation,
+        );
+
+        if (!chickenflock) {
+            await this.dbService.createChickenFlock({
+                ...body.chickenFlockInfo,
+                dateIn: moment(body.chickenFlockInfo.dateIn).format(
+                    'DD-MM-YYYY',
+                ),
+                dateOut: moment(body.chickenFlockInfo.dateOut).format(
+                    'DD-MM-YYYY',
+                ),
+                hid,
+            });
+        } else {
+            // Fuck DB update
+            console.log('Wait for Update function.');
+        }
+
+        res.status(200).send('Success');
+    }
+
+    @UseGuards(AuthGuard(), RolesGuard)
+    @Delete('chickenflocks')
+    async deleteChickenFlock(@Query() query, @Res() res) {
+        // Wait DB deleteChickenFlock
     }
 }

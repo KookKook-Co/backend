@@ -28,7 +28,7 @@ export interface CreateUserDTO {
 
 interface UserDTO {
     username: string;
-    hashedPwd: string;
+    password: string;
     firstName: string;
     lastName: string;
     role: Role;

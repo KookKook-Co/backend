@@ -137,7 +137,6 @@ export interface ChickenFlockInfoOutput {
     type: string;
     amountIn: number;
     gender: string;
-    hid: number;
 }
 
 export interface EnvironmentInfoOutput {

@@ -29,7 +29,7 @@ interface Block {
 
 export interface PostDailyInfo {
     hno: number;
-    date: Date;
+    date: string;
     dailyInfo: DailyInfo;
 }
 
@@ -57,8 +57,8 @@ interface MedicineInput {
 
 export interface SubmitUnqualifiedChickenDTO {
     date: string;
-    timestamp: Date;
     period: Period;
+    hno: number;
     unqualifiedChickenInfo: UnqualifiedChickenInfo;
 }
 
@@ -74,11 +74,21 @@ interface UnqualifiedChickenInfo {
     amountSick: number;
 }
 
-export interface ChickenFlockInfo {
+export interface CreateChickenFlockDTO {
+    hno: number;
+    chickenFlockInfo: ChickenFlockInfo;
+}
+
+interface ChickenFlockInfo {
     dateIn: string;
     dateOut: string;
     generation: string;
     type: string;
     amountIn: number;
-    gender: string;
+    gender: Gender;
+}
+
+enum Gender {
+    MALE = 'MALE',
+    FEMALE = 'FEMALE',
 }

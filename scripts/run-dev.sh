@@ -6,7 +6,6 @@ else
     echo "Please set up your .env file before starting your environment."
     exit 1
 fi
-export PORT=3000
 export NODE_ENV=development
 if [ ! "$(docker ps -q -f name=$POSTGRES_CONTAINER_NAME)" ]; then
     bash scripts/setup-dev.sh

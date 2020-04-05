@@ -3,20 +3,16 @@ version: '3.2'
 services:
   backend:
     build: .
-    container_name: kookkook-backend-dev
+    container_name: kookkook-backend
     restart: always
     ports:
-      - 3000:3000
+      - 4000:4000
     environment:
       NODE_ENV: development
-      PORT: 3000
-      JWT_SECRET: jwtsecret
-      LINE_USERID: U26da3150bd8eb08e92189daf9ca82e3d
-      LINE_BOT_TOKEN: hbuF2G3ORyb6xZsK4ajeUiqPTmFIjNGZqIJr6L9ftCp7gc+dYe0RatFuouYrIi5zGt8uBJX5L6jexP1lLoAtP7Ooa6H/rqtVbOJJaT0vm6JSq0AQ/OHlRMUiV504KApB0tIAVLKxag/4ki5Cmy1gJQdB04t89/1O/w1cDnyilFU=
 
   db:
     image: postgres
-    container_name: kookkook-postgres-dev
+    container_name: kookkook-postgres
     restart: always
     volumes:
       - ./db:/var/lib/postgresql/data
