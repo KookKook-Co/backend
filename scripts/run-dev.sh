@@ -7,8 +7,10 @@ else
     exit 1
 fi
 export NODE_ENV=development
-if [ ! "$(docker ps -q -f name=$POSTGRES_CONTAINER_NAME)" ]; then
-    bash scripts/setup-dev.sh
-fi
+
+# if [ ! "$(docker ps -q -f name=$POSTGRES_CONTAINER_NAME)" ]; then
+#     bash scripts/setup-dev.sh
+# fi
+
 echo '# Running dev'
 npm run start:dev

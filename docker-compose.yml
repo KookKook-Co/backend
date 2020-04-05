@@ -3,9 +3,32 @@ version: '3.2'
 services:
   backend:
     build: .
-    container_name: kookkook-backend
+    image: patsk135/kookkook-backend
+    depends_on:
+      - postgres
+    restart: always
     environment:
-      NODE_ENV:
       PORT:
-      SECRET:
-      DB_URI:
+      JWT_SECRET:
+    ports:
+      - 4000:4000
+
+  db:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  postgres:

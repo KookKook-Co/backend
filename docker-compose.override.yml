@@ -4,9 +4,6 @@ services:
   backend:
     image: node:12
     container_name: kookkook-backend-dev
-    depends_on:
-      - db
-    restart: always
     volumes:
       - ./src:/app/src
       - ./node_modules:/app/node_modules
@@ -17,34 +14,15 @@ services:
       - 4000:4000
     environment:
       NODE_ENV: development
-      PORT: ${PORT}
-      JWT_SECRET: ${JWT_SECRET}
-      LINE_USERID: ${LINE_USERID}
-      LINE_BOT_TOKEN: ${LINE_BOT_TOKEN}
+      PORT:
+      JWT_SECRET:
+      LINE_USERID:
+      LINE_BOT_TOKEN:
     working_dir: /app
     command: ['npm', 'run', 'start:dev']
 
   db:
-    image: postgres
     container_name: kookkook-postgres-dev
-    restart: always
-    volumes:
-      - ./db:/var/lib/postgresql/data
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-    ports:
-      - 5432:5432
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-
-  mqtt:
-    image: eclipse-mosquitto
-    restart: always
-    volumes:
-      - ./mosquitto:/mosquitto
-    ports:
-      - 1883:1883

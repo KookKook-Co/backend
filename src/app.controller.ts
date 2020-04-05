@@ -14,7 +14,7 @@ export class AppController {
         return this.appService.getHello();
     }
 
-    @Get('/deletedb')
+    @Get('/dropdb')
     async deleteDb() {
         return await this.seederService.dropAllTable();
     }

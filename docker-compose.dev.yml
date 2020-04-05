@@ -2,13 +2,13 @@ version: '3.2'
 
 services:
   db:
-    image: postgres
-    container_name: kookkook-postgres-dev
+    image: postgres:latest
     restart: always
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
     ports:
       - 5432:5432
 
@@ -17,3 +17,6 @@ services:
     restart: always
     ports:
       - 8080:8080
+
+volumes:
+  postgres:
