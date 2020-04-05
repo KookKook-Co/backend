@@ -6,9 +6,9 @@ import {
     CreateDailyDataRecordInput,
     CreateEnvDataInput,
     CreateFoodRecordInput,
+    CreateMedicineRecordInput,
     CreateSensorInput,
     CreateUserInput,
-    CreateVacRecordInput,
     CreateWaterRecordInput,
 } from '../db/db.interfaces';
 import {
@@ -71,14 +71,14 @@ export class SeederService {
         query_list.push(
             createTable(
                 'Chicken',
-                '"dateIn" DATE, \
+                '"generation" VARCHAR(50), \
+                "dateIn" DATE, \
                 "dateOut" DATE, \
-                "generation" VARCHAR(50), \
                 "type" VARCHAR(20), \
                 "amountIn" INT, \
-                "gender" VARCHAR(1), \
+                "gender" VARCHAR(10), \
                 "hid" INT NOT NULL, \
-                PRIMARY KEY ("dateIn", "hid")',
+                PRIMARY KEY ("generation", "hid")',
             ),
         );
 
@@ -145,13 +145,13 @@ export class SeederService {
 
         query_list.push(
             createTable(
-                'VacRecord',
-                '"vacType" VARCHAR(50), \
-                "vacConc" DOUBLE PRECISION, \
+                'MedicineRecord',
+                '"medicineType" VARCHAR(50), \
+                "medicineConc" DOUBLE PRECISION, \
                 "timestamp" TIMESTAMP, \
                 "date" DATE, \
                 "hid" INT NOT NULL, \
-                PRIMARY KEY ("vacType", "timestamp", "date", "hid")',
+                PRIMARY KEY ("medicineType", "timestamp", "date", "hid")',
             ),
         );
 
@@ -274,7 +274,7 @@ export class SeederService {
         );
         query_list.push(
             addMultiConstraint(
-                'VacRecord',
+                'MedicineRecord',
                 'timestamp, date, hid',
                 'DailyDataRecord',
                 'timestamp, date, hid',
@@ -336,21 +336,21 @@ export class SeederService {
         await this.dbService.createDailyRecord('13-03-2020', 1);
         await this.dbService.createDailyRecord('13-03-2020', 2);
         let chickenInput: CreateChickenFlockInput = {
+            generation: '2020/1',
             dateIn: '12-03-2020',
             dateOut: '12-04-2020',
-            generation: '1/2020',
             type: 'Sally',
             amountIn: 40000,
-            gender: 'm',
+            gender: 'MALE',
             hid: 1,
         };
         let chickenInput2: CreateChickenFlockInput = {
+            generation: '2020/1',
             dateIn: '12-03-2020',
             dateOut: '12-04-2020',
-            generation: '1/2020',
             type: 'Sally',
             amountIn: 40000,
-            gender: 'f',
+            gender: 'FEMALE',
             hid: 2,
         };
         const sensor1: CreateSensorInput = {
@@ -556,23 +556,23 @@ export class SeederService {
         };
         await this.dbService.createDailyDataRecord(dailyDataRecordInput4);
 
-        let vacRecordInput: CreateVacRecordInput = {
-            vacType: 'NDIB',
-            vacConc: 35000,
+        let medicineRecordInput: CreateMedicineRecordInput = {
+            medicineType: 'NDIB',
+            medicineConc: 35000,
             timestamp: '1584018805',
             date: '12-03-2020',
             hid: 1,
         };
-        await this.dbService.createVacRecord(vacRecordInput);
+        await this.dbService.createMedicineRecord(medicineRecordInput);
 
-        let vacRecordInput2: CreateVacRecordInput = {
-            vacType: 'NDIB',
-            vacConc: 40000,
+        let medicineRecordInput2: CreateMedicineRecordInput = {
+            medicineType: 'NDIB',
+            medicineConc: 40000,
             timestamp: '1584018905',
             date: '12-03-2020',
             hid: 2,
         };
-        await this.dbService.createVacRecord(vacRecordInput2);
+        await this.dbService.createMedicineRecord(medicineRecordInput2);
 
         let dailyDataRecordInput5: CreateDailyDataRecordInput = {
             timestamp: '1584019202',
@@ -837,7 +837,7 @@ export class SeederService {
         query_list.push(dropTable('FoodRecord'));
         query_list.push(dropTable('CollectedDeadChickenTime'));
         query_list.push(dropTable('Image'));
-        query_list.push(dropTable('VacRecord'));
+        query_list.push(dropTable('MedicineRecord'));
         query_list.push(dropTable('WaterRecord'));
         query_list.push(dropTable('Camera'));
         query_list.push(dropTable('Sensor'));
