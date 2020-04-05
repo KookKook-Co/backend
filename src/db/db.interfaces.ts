@@ -11,6 +11,17 @@ export interface CreateUserInput {
     imageUrl: string;
     hid: number;
 }
+export interface UserInput {
+    username: string;
+    hashedPwd: string;
+    isCurrentUser: boolean;
+    firstName: string;
+    lastName: string;
+    lineID: string;
+    role: Role;
+    imageUrl: string;
+    hid: number;
+}
 
 export interface UserDataOutput {
     uid: number;
@@ -82,9 +93,9 @@ export interface CreateDailyDataRecordInput {
     hid: number;
 }
 
-export interface CreateVacRecordInput {
-    vacType: string;
-    vacConc: number;
+export interface CreateMedicineRecordInput {
+    medicineType: string;
+    medicineConc: number;
     timestamp: string;
     date: string;
     hid: number;
@@ -213,9 +224,9 @@ export interface FoodRecord {
     hid: number;
 }
 
-export interface VacRecord {
-    vacType: string;
-    vacConc: number;
+export interface MedicineRecord {
+    medicineType: string;
+    medicineConc: number;
     timestamp: Date;
     date: Date;
     hid: number;
@@ -254,4 +265,56 @@ export interface MaxAndMinTemperature {
     date: Date;
     maxTemperature: number;
     minTemperature: number;
+}
+export interface MaxAndMinHumidity {
+    date: Date;
+    maxHumidity: number;
+    minHumidity: number;
+}
+export interface MaxAndMinAmmonia {
+    date: Date;
+    maxAmmonia: number;
+    minAmmonia: number;
+}
+export interface MaxAndMinWindSpeed {
+    date: Date;
+    maxWindSpeed: number;
+    minWindSpeed: number;
+}
+
+export interface DailyDataRecordSet {
+    lastFoodInfo: Array<FoodRecord>;
+    lastMedicineInfo: MedicineRecord;
+    lastWaterInfo: WaterRecord;
+}
+
+export interface DailySetRecordInput {
+    hid: number;
+    date: string;
+    timestamp: string;
+    dailyInfo: DailyInfo;
+}
+
+export interface DailyInfo {
+    food: FoodInput[];
+    water: WaterInput;
+    medicine: MedicineInput;
+}
+
+export interface FoodInput {
+    foodSilo: number;
+    foodIn: number;
+    foodRemain: number;
+    foodConsumed: number;
+}
+
+export interface WaterInput {
+    waterMeter1: number;
+    waterMeter2: number;
+    waterConsumed: number;
+}
+
+export interface MedicineInput {
+    medicineType: string;
+    medicineConc: number;
 }

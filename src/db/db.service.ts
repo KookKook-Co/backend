@@ -10,10 +10,12 @@ import {
     CreateDailyDataRecordInput,
     CreateEnvDataInput,
     CreateFoodRecordInput,
+    CreateMedicineRecordInput,
     CreateSensorInput,
     CreateUserInput,
-    CreateVacRecordInput,
     CreateWaterRecordInput,
+    DailyDataRecordSet,
+    DailySetRecordInput,
     EnvironmentInfoSetAndSidOutput,
     EnvironmentInfoSetOutput,
     FoodRecord,
@@ -22,11 +24,14 @@ import {
     LastImageForEachCameraOutput,
     LatestUrl,
     LoginUserInfo,
+    MaxAndMinAmmonia,
+    MaxAndMinHumidity,
     MaxAndMinTemperature,
+    MaxAndMinWindSpeed,
+    MedicineRecord,
     SensorOutput,
     TemperatureTimestamp,
     UserDataOutput,
-    VacRecord,
     WaterRecord,
     WindspeedTimestamp,
 } from './db.interfaces';
@@ -34,6 +39,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
+import { async } from 'rxjs/internal/scheduler/async';
 import { poolQuery } from './utils';
 
 @Injectable()
@@ -67,9 +73,9 @@ export class DbService {
 
     createChickenFlock = (createChickenInput: CreateChickenFlockInput) =>
         this.dbPoolQuery(`INSERT INTO "Chicken" 
-                        ("dateIn", "dateOut", "generation", "type", "amountIn", "gender", "hid") 
-                        VALUES (TO_DATE('${createChickenInput.dateIn}', 'DD-MM-YYYY'), TO_DATE('${createChickenInput.dateOut}', 'DD-MM-YYYY'),
-                          '${createChickenInput.generation}', '${createChickenInput.type}', ${createChickenInput.amountIn}, '${createChickenInput.gender}','${createChickenInput.hid}');`);
+                        ("generation", "dateIn", "dateOut", "type", "amountIn", "gender", "hid") 
+                        VALUES ('${createChickenInput.generation}', TO_DATE('${createChickenInput.dateIn}', 'DD-MM-YYYY'), TO_DATE('${createChickenInput.dateOut}', 'DD-MM-YYYY'),
+                        '${createChickenInput.type}', ${createChickenInput.amountIn}, '${createChickenInput.gender}','${createChickenInput.hid}');`);
 
     createSensor = (input: CreateSensorInput) =>
         this
@@ -113,11 +119,11 @@ export class DbService {
                                         '${foodRecordInput.foodConsumed}', TO_TIMESTAMP(${foodRecordInput.timestamp}),
                                         TO_DATE('${foodRecordInput.date}', 'DD-MM-YYYY'), '${foodRecordInput.hid}');`);
 
-    createVacRecord = (vacRecordInput: CreateVacRecordInput) =>
+    createMedicineRecord = (medicineRecordInput: CreateMedicineRecordInput) =>
         this
-            .dbPoolQuery(`INSERT INTO "VacRecord" ("vacType", "vacConc", "timestamp", "date", "hid") 
-                    VALUES ('${vacRecordInput.vacType}', '${vacRecordInput.vacConc}',
-                    TO_TIMESTAMP('${vacRecordInput.timestamp}'), TO_DATE('${vacRecordInput.date}', 'DD-MM-YYYY'), '${vacRecordInput.hid}');`);
+            .dbPoolQuery(`INSERT INTO "MedicineRecord" ("medicineType", "medicineConc", "timestamp", "date", "hid") 
+                    VALUES ('${medicineRecordInput.medicineType}', '${medicineRecordInput.medicineConc}',
+                    TO_TIMESTAMP('${medicineRecordInput.timestamp}'), TO_DATE('${medicineRecordInput.date}', 'DD-MM-YYYY'), '${medicineRecordInput.hid}');`);
 
     createWaterRecord = (waterRecordInput: CreateWaterRecordInput) =>
         this
@@ -129,6 +135,37 @@ export class DbService {
         this
             .dbPoolQuery(`INSERT INTO "CollectedDeadChickenTime" ("timestamp", "cid") 
                     VALUES (TO_TIMESTAMP('${timestamp}'), '${cid}');`);
+
+    createDailyDataRecordSet = async (
+        dailyDataRecordSet: DailySetRecordInput,
+    ) => {
+        let foodInput = dailyDataRecordSet.dailyInfo.food;
+        for (let ele in foodInput) {
+            let tmp = foodInput[ele];
+            tmp['hid'] = dailyDataRecordSet.hid;
+            tmp['date'] = dailyDataRecordSet.date;
+            tmp['timestamp'] = dailyDataRecordSet.timestamp;
+            foodInput[ele] = tmp;
+        }
+        let waterInput = dailyDataRecordSet.dailyInfo.water;
+        waterInput['timestamp'] = dailyDataRecordSet.timestamp;
+        waterInput['date'] = dailyDataRecordSet.date;
+        waterInput['hid'] = dailyDataRecordSet.hid;
+
+        let medicineInput = dailyDataRecordSet.dailyInfo.medicine;
+        medicineInput['timestamp'] = dailyDataRecordSet.timestamp;
+        medicineInput['date'] = dailyDataRecordSet.date;
+        medicineInput['hid'] = dailyDataRecordSet.hid;
+        for (let ele in foodInput) {
+            await this.createFoodRecord(foodInput[
+                ele
+            ] as CreateFoodRecordInput);
+        }
+        await this.createWaterRecord(waterInput as CreateWaterRecordInput);
+        await this.createMedicineRecord(
+            medicineInput as CreateMedicineRecordInput,
+        );
+    };
 
     //////////////////////////////////////////////////////////////////////////////
     //table User
@@ -173,6 +210,35 @@ export class DbService {
             `UPDATE "User" 
             SET "lineID" = '${newLineID}' 
             WHERE "uid" = '${uid}';`,
+        );
+    };
+    getAllUsersIDByHid = async (hid: number): Promise<number[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "uid"
+            FROM "User" 
+            WHERE "hid" = ${hid}`,
+        );
+        return queryArr.rows.map(each => each.uid);
+    };
+    getAllUsersInfoByHid = async (hid: number): Promise<UserDataOutput[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT *
+            FROM "User" 
+            WHERE "hid" = ${hid}`,
+        );
+        return queryArr.rows;
+    };
+
+    deleteUserByUid = async (uid: number) => {
+        await this.dbPoolQuery(
+            `DELETE FROM "User" 
+            WHERE "uid" = '${uid}');`,
+        );
+    };
+    deleteUserByUsername = async (username: string) => {
+        await this.dbPoolQuery(
+            `DELETE FROM "User" 
+            WHERE "username" = '${username}');`,
         );
     };
 
@@ -241,7 +307,8 @@ export class DbService {
         const queryArr = await this.dbPoolQuery(
             `SELECT * 
             FROM "Chicken" 
-            WHERE "hid" = '${hid}'`,
+            WHERE "hid" = '${hid}'
+            ORDER BY "dateIn"`,
         );
         return queryArr.rows;
     };
@@ -267,6 +334,24 @@ export class DbService {
             WHERE "hid" = '${hid}' AND "generation" = '${generation}';`,
         );
         return queryArr.rows[0];
+    };
+
+    updateDateOutChickenFlockByHidAndGeneration = async (
+        hid,
+        generation,
+        newDateOut,
+    ) => {
+        await this.dbPoolQuery(
+            `UPDATE "Chicken" 
+            SET "dateOut" = TO_DATE('${newDateOut}','DD_MM_YYYY') 
+            WHERE "hid" = '${hid}' AND "generation" = '${generation}';`,
+        );
+    };
+    deleteChickenFlockByHidAndGeneration = async (hid, generation) => {
+        await this.dbPoolQuery(
+            `DELETE FROM "Chicken" 
+            WHERE hid = '${hid}' AND generation = '${generation}';`,
+        );
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -452,12 +537,25 @@ export class DbService {
     getLatestChickenRecordByHidAndDate = async (
         hid: number,
         date: string,
-    ): Promise<ChickenRecord> => {
+    ): Promise<Array<ChickenRecord>> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT DISTINCT ON ("period") * 
             FROM "ChickenRecord"
-            WHERE hid = ${hid} AND date = TO_DATE('${date}', 'DD-MM-YYYY')
+            WHERE "hid" = ${hid} AND "date" = TO_DATE('${date}', 'DD-MM-YYYY')
             ORDER BY "period", "chicTime" DESC;`,
+        );
+        return queryArr.rows;
+    };
+    getLatestChickenRecordByHidAndDateAndPeriod = async (
+        hid: number,
+        date: string,
+        period: string,
+    ): Promise<ChickenRecord> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT * FROM "ChickenRecord"
+            WHERE "hid" = ${hid} AND "date" = TO_DATE('${date}', 'DD-MM-YYYY') AND
+            "period" = '${period}'
+            ORDER BY "chicTime" DESC LIMIT 1;`,
         );
         return queryArr.rows[0];
     };
@@ -475,6 +573,33 @@ export class DbService {
                 WHERE timestamp = TO_TIMESTAMP('${timestamp}') AND date = TO_DATE('${date}', 'DD-MM-YYYY') AND hid = '${hid}';`);
         return queryArr.rows[0]['count'] == 0 ? false : true;
     };
+    getAllDataRecordByHidAndDate = async (
+        hid: number,
+        date: string,
+    ): Promise<DailyDataRecordSet> => {
+        let foodRecord = await this.getLatestFoodRecordByHidAndDate(hid, date);
+        let medicineRecord = await this.getLatestMedicineRecordByHidAndDate(
+            hid,
+            date,
+        );
+        let waterRecord = await this.getLatestWaterRecordByHidAndDate(
+            hid,
+            date,
+        );
+        if (
+            typeof medicineRecord === 'undefined' &&
+            typeof waterRecord === 'undefined' &&
+            (foodRecord && foodRecord.length == 0)
+        ) {
+            return null;
+        } else {
+            return {
+                lastFoodInfo: foodRecord,
+                lastMedicineInfo: medicineRecord,
+                lastWaterInfo: waterRecord,
+            };
+        }
+    };
 
     //////////////////////////////////////////////////////////////////////////////
     //table FoodRecord
@@ -482,7 +607,7 @@ export class DbService {
     getLatestFoodRecordByHidAndDate = async (
         hid: number,
         date: string,
-    ): Promise<FoodRecord> => {
+    ): Promise<Array<FoodRecord>> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT DISTINCT ON ("foodSilo") * 
             FROM "FoodRecord"
@@ -493,15 +618,15 @@ export class DbService {
     };
 
     //////////////////////////////////////////////////////////////////////////////
-    //table VacRecord
+    //table MedicineRecord
 
-    getLatestVacRecordByHidAndDate = async (
+    getLatestMedicineRecordByHidAndDate = async (
         hid: number,
         date: string,
-    ): Promise<VacRecord> => {
+    ): Promise<MedicineRecord> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT * 
-            FROM "VacRecord"
+            FROM "MedicineRecord"
             WHERE hid = ${hid} AND date = TO_DATE('${date}', 'DD-MM-YYYY')
             ORDER BY timestamp DESC LIMIT 1;`,
         );
@@ -649,6 +774,23 @@ export class DbService {
         return queryArr.rows;
     };
 
+    getMaxAndMinHumidityBetweenDateBySid = async (
+        sid: string,
+        dateStart: string,
+        dateEnd: string,
+    ): Promise<MaxAndMinHumidity[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "date", "maxHumidity", "minHumidity" FROM (
+                SELECT "sid", DATE("timestamp") "date",
+                MAX("humidity") as "maxHumidity", MIN("humidity") AS "minHumidity"
+                FROM "Environment"
+                GROUP BY "sid", DATE("timestamp") 
+                ) AS "tmp" WHERE "tmp"."sid" = '${sid}' AND "date" BETWEEN 
+                TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
+        );
+        return queryArr.rows;
+    };
+
     //////////////////////////////////////////////////////////////////////////////
     //Ammonia
 
@@ -698,6 +840,23 @@ export class DbService {
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
             ORDER BY timestamp DESC LIMIT '${number}';`,
+        );
+        return queryArr.rows;
+    };
+
+    getMaxAndMinAmmoniaBetweenDateBySid = async (
+        sid: string,
+        dateStart: string,
+        dateEnd: string,
+    ): Promise<MaxAndMinAmmonia[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "date", "maxAmmonia", "minAmmonia" FROM (
+                SELECT "sid", DATE("timestamp") "date",
+                MAX("ammonia") as "maxAmmonia", MIN("ammonia") AS "minAmmonia"
+                FROM "Environment"
+                GROUP BY "sid", DATE("timestamp") 
+                ) AS "tmp" WHERE "tmp"."sid" = '${sid}' AND "date" BETWEEN 
+                TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
         );
         return queryArr.rows;
     };
@@ -753,6 +912,22 @@ export class DbService {
             FROM "Environment" 
             WHERE "sid" = '${sid}' 
             ORDER BY timestamp DESC LIMIT '${number}';`,
+        );
+        return queryArr.rows;
+    };
+    getMaxAndMinWindSpeedBetweenDateBySid = async (
+        sid: string,
+        dateStart: string,
+        dateEnd: string,
+    ): Promise<MaxAndMinWindSpeed[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "date", "maxWindSpeed", "minWindSpeed" FROM (
+                SELECT "sid", DATE("timestamp") "date",
+                MAX("windspeed") as "maxWindSpeed", MIN("windspeed") AS "minWindSpeed"
+                FROM "Environment"
+                GROUP BY "sid", DATE("timestamp") 
+                ) AS "tmp" WHERE "tmp"."sid" = '${sid}' AND "date" BETWEEN 
+                TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
         );
         return queryArr.rows;
     };
