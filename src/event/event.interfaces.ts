@@ -27,32 +27,47 @@ interface Block {
     url?: string;
 }
 
+export interface GetWeeklyDailyDataQuery {
+    sid: string;
+    hno: number;
+    type: EnvType;
+    dateStart: Date;
+    dateEnd: Date;
+}
+
 export interface PostDailyInfo {
     hno: number;
     date: string;
     dailyInfo: DailyInfo;
 }
 
-interface DailyInfo {
+export interface DailyInfo {
     food: FoodInput[];
     water: WaterInput;
     medicine: MedicineInput[];
 }
 
-interface FoodInput {
+export interface FoodInput {
     foodSilo: number;
     foodIn: number;
-    foodLeft: number;
+    foodRemain: number;
+    foodConsumed: number;
 }
 
-interface WaterInput {
+export interface WaterInput {
     waterMeter1: number;
     waterMeter2: number;
 }
 
-interface MedicineInput {
-    type: string;
-    concentration: number;
+export interface MedicineInput {
+    medicineType: string;
+    medicineConc: number;
+}
+
+export interface GetUnqualifiedChickenInfo {
+    date: string;
+    period: Period;
+    hno: number;
 }
 
 export interface SubmitUnqualifiedChickenDTO {

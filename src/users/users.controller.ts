@@ -24,9 +24,10 @@ export class UsersController {
 
     @UseGuards(AuthGuard(), RolesGuard)
     @Get()
-    async fetchAllAccounts(@Query('hno') hno) {
-        // Wait DB
-        return true;
+    async fetchAllAccounts(@Query('hno') hno, @Res() res) {
+        const hid = await this.dbService.getHidByHno(hno);
+        // const {hashedPwd} = await this.dbService.getAllUsersInfoByHid(hid);
+        res.send({});
     }
 
     @UseGuards(AuthGuard(), RolesGuard)
@@ -61,8 +62,12 @@ export class UsersController {
 
     @UseGuards(AuthGuard(), RolesGuard)
     @Delete()
-    async deleteUser(@Query('uid') uid) {
-        // Wait DB
-        return true;
+    async deleteUser(@Query('uid') uid, @Res() res) {
+        try {
+            await this.dbService.deleteUserByUid(uid);
+            res.send('Success');
+        } catch (err) {
+            res.status(200).send(err);
+        }
     }
 }

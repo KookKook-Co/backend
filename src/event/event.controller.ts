@@ -17,12 +17,15 @@ import {
     SubmitUnqualifiedChickenDTO,
     PostDailyInfo,
     CreateChickenFlockDTO,
+    GetUnqualifiedChickenInfo,
+    GetWeeklyDailyDataQuery,
 } from './event.interfaces';
 import { Response } from 'express';
 import { RolesGuard, HousesGuard } from '../guard';
 import { DbService } from '../db/db.service';
 import { CheckIrrEnvService } from './checkIrrEnv.services';
-import moment = require('moment');
+import * as moment from 'moment';
+import { DailyInfo } from '../event/event.interfaces';
 
 @Controller('event')
 export class EventController {
@@ -53,7 +56,7 @@ export class EventController {
 
     @UseGuards(AuthGuard(), HousesGuard)
     @Get('sensors')
-    async getSensors(@Query('hno') hno: number, @Res() res) {
+    async getSensors(@Query('hno') hno: number, @Res() res: Response) {
         const hid = await this.dbService.getHidByHno(hno);
         const sensors = await this.dbService.getAllSensorInfoByHid(hid);
         res.send(
@@ -69,12 +72,27 @@ export class EventController {
         );
     }
 
-    @UseGuards(AuthGuard())
+    @UseGuards(AuthGuard(), HousesGuard)
     @Get('env/weekly')
-    async getWeeklyEnvData(@Query() query) {
-        const { sid, hno } = query;
-        // Wait DB
-        return {};
+    async getWeeklyEnvData(
+        @Query() query: GetWeeklyDailyDataQuery,
+        @Res() res: Response,
+    ) {
+        const { sid, type, dateStart, dateEnd } = query;
+
+        // const dateStart = moment().format('DD-MM-YYYY');
+        // const dateEnd = moment()
+        //     .subtract(6, 'days')
+        //     .format('DD-MM-YYYY');
+
+        res.send(
+            await this.dbService.getMaxAndMinBetweenDateBySidandEnvType(
+                type,
+                sid,
+                moment(dateStart).format('DD-MM-YYYY'),
+                moment(dateEnd).format('DD-MM-YYYY'),
+            ),
+        );
     }
 
     @UseGuards(AuthGuard(), HousesGuard)
@@ -94,12 +112,19 @@ export class EventController {
         @Res() res: Response,
     ) {
         const formatedDate = moment(date).format('DD-MM-YYYY');
+        // const formatedDate = '12-03-2020'; // mock
+
         const hid = await this.dbService.getHidByHno(req.user.hno);
 
-        // if (await this.dbService.getLast(formatedDate, req.user.hno)) {
-        //     const dailyInfo: DailyInfo = await this.dbService.get(date);
-        //     res.send(dailyInfo);
-        // }
+        if (await this.dbService.isDailyRecordTupleExist(formatedDate, hid)) {
+            const dailyInfo: DailyInfo = await this.dbService.getAllDataRecordByHidAndDate(
+                hid,
+                formatedDate,
+            );
+            res.send(dailyInfo);
+        } else {
+            res.send(null);
+        }
     }
 
     @UseGuards(AuthGuard(), HousesGuard)
@@ -112,21 +137,53 @@ export class EventController {
         try {
             const hid = await this.dbService.getHidByHno(req.user.hno);
             const date = moment(body.date).format('DD-MM-YYYY');
-            if (
-                !(await this.dbService.isDailyRecordTupleExist(
-                    date.toString(),
-                    hid,
-                ))
-            ) {
+            const dateBefore = moment(body.date)
+                .subtract(1, 'days')
+                .format('DD-MM-YYYY');
+
+            // console.log(body);
+
+            if (!(await this.dbService.isDailyRecordTupleExist(date, hid))) {
                 await this.dbService.createDailyRecord(date, hid);
             }
 
-            // Some shit from DB
-            await this.dbService.createDailyDataRecord({
-                timestamp: (new Date().valueOf() / 1000).toString(),
-                date,
+            const timestamp = (new Date().valueOf() / 1000).toString();
+            // console.log(timestamp);
+
+            // console.log(dateBefore);
+            const waterBefore = await this.dbService.getLatestWaterRecordByHidAndDate(
                 hid,
-            });
+                dateBefore,
+            );
+            // console.log(waterBefore);
+
+            const waterConsumed =
+                body.dailyInfo.water.waterMeter1 +
+                body.dailyInfo.water.waterMeter2 -
+                (waterBefore.waterMeter1 + waterBefore.waterMeter2);
+
+            const { food, water, medicine } = body.dailyInfo;
+
+            const dailyInfo = {
+                food,
+                water: {
+                    ...water,
+                    waterConsumed,
+                },
+                medicine,
+            };
+
+            const payload = {
+                hid,
+                date,
+                timestamp,
+                dailyInfo,
+            };
+
+            console.log(payload);
+            console.log(dailyInfo);
+
+            await this.dbService.createDailyDataRecordSet(payload);
 
             res.status(200).send('Success');
         } catch (err) {
@@ -138,20 +195,24 @@ export class EventController {
     @Get('unqualifiedchicken')
     async getUnqualifiedChickenInfo(
         @Request() req,
-        @Query('date') date: string,
+        @Query() query: GetUnqualifiedChickenInfo,
         @Res() res: Response,
     ) {
-        const formatedDate = moment(date).format('DD-MM-YYYY');
-        const hid = await this.dbService.getHidByHno(req.user.hno);
+        const formatedDate = moment(query.date).format('DD-MM-YYYY');
+        const h_id = await this.dbService.getHidByHno(req.user.hno);
 
-        // Fuck DB
-
-        // res.send(
-        //     await this.dbService.getLatestChickenRecordByHidAndDate(
-        //         hid,
-        //         formatedDate,
-        //     ),
-        // );
+        const {
+            chicTime,
+            period,
+            date,
+            hid,
+            ...remains
+        } = await this.dbService.getLatestChickenRecordByHidAndDateAndPeriod(
+            h_id,
+            formatedDate,
+            query.period,
+        );
+        res.send(remains);
     }
 
     @UseGuards(AuthGuard(), HousesGuard)
@@ -191,14 +252,17 @@ export class EventController {
 
     @UseGuards(AuthGuard(), RolesGuard)
     @Get('chickenflocks')
-    async getChickenFlock(@Query('hno') hno, @Res() res) {
+    async getChickenFlock(@Query('hno') hno, @Res() res: Response) {
         const hid = await this.dbService.getHidByHno(hno);
         res.send(await this.dbService.getChickenFlockInfoByHid(hid));
     }
 
     @UseGuards(AuthGuard(), RolesGuard)
     @Post('chickenflocks')
-    async addChickenFlock(@Body() body: CreateChickenFlockDTO, @Res() res) {
+    async addChickenFlock(
+        @Body() body: CreateChickenFlockDTO,
+        @Res() res: Response,
+    ) {
         const hid = await this.dbService.getHidByHno(body.hno);
 
         const chickenflock = await this.dbService.getChickenFlockInfoByHidAndGeneration(
@@ -227,7 +291,22 @@ export class EventController {
 
     @UseGuards(AuthGuard(), RolesGuard)
     @Delete('chickenflocks')
-    async deleteChickenFlock(@Query() query, @Res() res) {
-        // Wait DB deleteChickenFlock
+    async deleteChickenFlock(@Query() query, @Res() res: Response) {
+        try {
+            const hid = await this.dbService.getHidByHno(query.hno);
+            await this.dbService.deleteChickenFlockByHidAndGeneration(
+                hid,
+                query.generation,
+            );
+            res.send('Success');
+        } catch (err) {
+            res.status(400).send(err);
+        }
+    }
+
+    @UseGuards(AuthGuard(), RolesGuard)
+    @Get('hnos')
+    async getAllHnoForOwner(@Res() res: Response) {
+        res.send(await this.dbService.getAllHno());
     }
 }

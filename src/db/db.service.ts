@@ -14,32 +14,35 @@ import {
     CreateSensorInput,
     CreateUserInput,
     CreateWaterRecordInput,
-    DailyDataRecordSet,
     DailySetRecordInput,
     EnvironmentInfoSetAndSidOutput,
     EnvironmentInfoSetOutput,
-    FoodRecord,
     HouseOutput,
     HumidityTimestamp,
     LastImageForEachCameraOutput,
     LatestUrl,
     LoginUserInfo,
+    MaxAndMin,
     MaxAndMinAmmonia,
     MaxAndMinHumidity,
     MaxAndMinTemperature,
     MaxAndMinWindSpeed,
-    MedicineRecord,
     SensorOutput,
     TemperatureTimestamp,
     UserDataOutput,
-    WaterRecord,
     WindspeedTimestamp,
 } from './db.interfaces';
+import {
+    DailyInfo,
+    EnvType,
+    FoodInput,
+    MedicineInput,
+    WaterInput,
+} from '../event/event.interfaces';
 
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import { Pool } from 'pg';
-import { async } from 'rxjs/internal/scheduler/async';
 import { poolQuery } from './utils';
 
 @Injectable()
@@ -136,15 +139,49 @@ export class DbService {
             .dbPoolQuery(`INSERT INTO "CollectedDeadChickenTime" ("timestamp", "cid") 
                     VALUES (TO_TIMESTAMP('${timestamp}'), '${cid}');`);
 
+    // !!! Bug
+    // createDailyDataRecordSet = async (
+    //     dailyDataRecordSet: DailySetRecordInput,
+    // ) => {
+    //     let foodInput = dailyDataRecordSet.dailyInfo.food;
+    //     for (let ele in foodInput) {
+    //         let tmp = foodInput[ele];
+    //         tmp['hid'] = dailyDataRecordSet.hid;
+    //         tmp['date'] = dailyDataRecordSet.date;
+    //         tmp['timestamp'] = dailyDataRecordSet.timestamp;
+    //         foodInput[ele] = tmp;
+    //     }
+    //     let waterInput = dailyDataRecordSet.dailyInfo.water;
+    //     waterInput['timestamp'] = dailyDataRecordSet.timestamp;
+    //     waterInput['date'] = dailyDataRecordSet.date;
+    //     waterInput['hid'] = dailyDataRecordSet.hid;
+
+    //     let medicineInput = dailyDataRecordSet.dailyInfo.medicine;
+    //     medicineInput['timestamp'] = dailyDataRecordSet.timestamp;
+    //     medicineInput['date'] = dailyDataRecordSet.date;
+    //     medicineInput['hid'] = dailyDataRecordSet.hid;
+    //     // for (let ele in foodInput) {
+    //     //     await this.createFoodRecord(
+    //     //         foodInput[ele] as CreateFoodRecordInput,
+    //     //     );
+    //     // }
+    //     await this.createWaterRecord(waterInput as CreateWaterRecordInput);
+    //     // await this.createMedicineRecord(
+    //     //     medicineInput as CreateMedicineRecordInput,
+    //     // );
+    // };
     createDailyDataRecordSet = async (
         dailyDataRecordSet: DailySetRecordInput,
     ) => {
+        const { dailyInfo, ...dailyRecordInput } = dailyDataRecordSet;
+        await this.createDailyDataRecord(dailyRecordInput);
+
         let foodInput = dailyDataRecordSet.dailyInfo.food;
         for (let ele in foodInput) {
             let tmp = foodInput[ele];
-            tmp['hid'] = dailyDataRecordSet.hid;
-            tmp['date'] = dailyDataRecordSet.date;
             tmp['timestamp'] = dailyDataRecordSet.timestamp;
+            tmp['date'] = dailyDataRecordSet.date;
+            tmp['hid'] = dailyDataRecordSet.hid;
             foodInput[ele] = tmp;
         }
         let waterInput = dailyDataRecordSet.dailyInfo.water;
@@ -153,18 +190,24 @@ export class DbService {
         waterInput['hid'] = dailyDataRecordSet.hid;
 
         let medicineInput = dailyDataRecordSet.dailyInfo.medicine;
-        medicineInput['timestamp'] = dailyDataRecordSet.timestamp;
-        medicineInput['date'] = dailyDataRecordSet.date;
-        medicineInput['hid'] = dailyDataRecordSet.hid;
+        for (let ele in medicineInput) {
+            let tmp = medicineInput[ele];
+            tmp['timestamp'] = dailyDataRecordSet.timestamp;
+            tmp['date'] = dailyDataRecordSet.date;
+            tmp['hid'] = dailyDataRecordSet.hid;
+            medicineInput[ele] = tmp;
+        }
         for (let ele in foodInput) {
-            await this.createFoodRecord(foodInput[
-                ele
-            ] as CreateFoodRecordInput);
+            await this.createFoodRecord(
+                foodInput[ele] as CreateFoodRecordInput,
+            );
         }
         await this.createWaterRecord(waterInput as CreateWaterRecordInput);
-        await this.createMedicineRecord(
-            medicineInput as CreateMedicineRecordInput,
-        );
+        for (let ele in medicineInput) {
+            await this.createMedicineRecord(
+                medicineInput[ele] as CreateMedicineRecordInput,
+            );
+        }
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -220,25 +263,27 @@ export class DbService {
         );
         return queryArr.rows.map(each => each.uid);
     };
-    getAllUsersInfoByHid = async (hid: number): Promise<UserDataOutput[]> => {
-        const queryArr = await this.dbPoolQuery(
-            `SELECT *
-            FROM "User" 
-            WHERE "hid" = ${hid}`,
-        );
-        return queryArr.rows;
-    };
+
+    // Ask Frontend about this Info
+    // getAllUsersInfoByHid = async (hid: number): Promise<UserDataOutput[]> => {
+    //     const queryArr = await this.dbPoolQuery(
+    //         `SELECT "uid", "username", "isCurrentUser"
+    //         FROM "User"
+    //         WHERE "hid" = ${hid}`,
+    //     );
+    //     return queryArr.rows;
+    // };
 
     deleteUserByUid = async (uid: number) => {
         await this.dbPoolQuery(
             `DELETE FROM "User" 
-            WHERE "uid" = '${uid}');`,
+            WHERE "uid" = '${uid}';`,
         );
     };
     deleteUserByUsername = async (username: string) => {
         await this.dbPoolQuery(
             `DELETE FROM "User" 
-            WHERE "username" = '${username}');`,
+            WHERE "username" = '${username}';`,
         );
     };
 
@@ -576,7 +621,7 @@ export class DbService {
     getAllDataRecordByHidAndDate = async (
         hid: number,
         date: string,
-    ): Promise<DailyDataRecordSet> => {
+    ): Promise<DailyInfo> => {
         let foodRecord = await this.getLatestFoodRecordByHidAndDate(hid, date);
         let medicineRecord = await this.getLatestMedicineRecordByHidAndDate(
             hid,
@@ -589,14 +634,15 @@ export class DbService {
         if (
             typeof medicineRecord === 'undefined' &&
             typeof waterRecord === 'undefined' &&
-            (foodRecord && foodRecord.length == 0)
+            foodRecord &&
+            foodRecord.length == 0
         ) {
             return null;
         } else {
             return {
-                lastFoodInfo: foodRecord,
-                lastMedicineInfo: medicineRecord,
-                lastWaterInfo: waterRecord,
+                food: foodRecord,
+                medicine: medicineRecord,
+                water: waterRecord,
             };
         }
     };
@@ -607,9 +653,9 @@ export class DbService {
     getLatestFoodRecordByHidAndDate = async (
         hid: number,
         date: string,
-    ): Promise<Array<FoodRecord>> => {
+    ): Promise<Array<FoodInput>> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT DISTINCT ON ("foodSilo") * 
+            `SELECT DISTINCT ON ("foodSilo") "foodSilo", "foodIn", "foodRemain"
             FROM "FoodRecord"
             WHERE hid = ${hid} AND date = TO_DATE('${date}', 'DD-MM-YYYY')
             ORDER BY "foodSilo", "timestamp" DESC;`,
@@ -623,14 +669,14 @@ export class DbService {
     getLatestMedicineRecordByHidAndDate = async (
         hid: number,
         date: string,
-    ): Promise<MedicineRecord> => {
+    ): Promise<MedicineInput[]> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT * 
+            `SELECT "medicineType", "medicineConc" 
             FROM "MedicineRecord"
             WHERE hid = ${hid} AND date = TO_DATE('${date}', 'DD-MM-YYYY')
-            ORDER BY timestamp DESC LIMIT 1;`,
+            ORDER BY timestamp DESC;`,
         );
-        return queryArr.rows[0];
+        return queryArr.rows;
     };
     //////////////////////////////////////////////////////////////////////////////
     //table WaterRecord
@@ -638,9 +684,9 @@ export class DbService {
     getLatestWaterRecordByHidAndDate = async (
         hid: number,
         date: string,
-    ): Promise<WaterRecord> => {
+    ): Promise<WaterInput> => {
         const queryArr = await this.dbPoolQuery(
-            `SELECT * 
+            `SELECT "waterMeter1", "waterMeter2"
             FROM "WaterRecord"
             WHERE hid = ${hid} AND date = TO_DATE('${date}', 'DD-MM-YYYY')
             ORDER BY timestamp DESC LIMIT 1;`,
@@ -715,6 +761,24 @@ export class DbService {
                 GROUP BY "sid", DATE("timestamp") 
                 ) AS "tmp" WHERE "tmp"."sid" = '${sid}' AND "date" BETWEEN 
                 TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
+        );
+        return queryArr.rows;
+    };
+
+    getMaxAndMinBetweenDateBySidandEnvType = async (
+        envType: EnvType,
+        sid: string,
+        dateStart: string,
+        dateEnd: string,
+    ): Promise<MaxAndMin[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "date", "max", "min" FROM (
+        SELECT "sid", DATE("timestamp") "date",
+        MAX(${envType}) as "max", MIN(${envType}) AS "min"
+        FROM "Environment"
+        GROUP BY "sid", DATE("timestamp")
+        ) AS "tmp" WHERE "tmp"."sid" = '${sid}' AND "date" BETWEEN
+        TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
         );
         return queryArr.rows;
     };

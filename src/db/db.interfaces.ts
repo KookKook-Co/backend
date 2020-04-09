@@ -260,6 +260,12 @@ export interface WindspeedTimestamp {
     windspeed: number;
 }
 
+export interface MaxAndMin {
+    date: Date;
+    max: number;
+    min: number;
+}
+
 export interface MaxAndMinTemperature {
     date: Date;
     maxTemperature: number;
@@ -282,9 +288,9 @@ export interface MaxAndMinWindSpeed {
 }
 
 export interface DailyDataRecordSet {
-    lastFoodInfo: Array<FoodRecord>;
-    lastMedicineInfo: MedicineRecord;
-    lastWaterInfo: WaterRecord;
+    food: Array<FoodRecord>;
+    medicine: MedicineRecord;
+    water: WaterRecord;
 }
 
 export interface DailySetRecordInput {
@@ -297,7 +303,7 @@ export interface DailySetRecordInput {
 export interface DailyInfo {
     food: FoodInput[];
     water: WaterInput;
-    medicine: MedicineInput;
+    medicine: MedicineInput[];
 }
 
 export interface FoodInput {

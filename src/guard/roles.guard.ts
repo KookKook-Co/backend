@@ -20,6 +20,6 @@ export class RolesGuard implements CanActivate {
         if (user.role === Role.OWNER) {
             return true;
         }
-        return roles.indexOf(user.role) !== -1;
+        return roles !== undefined && roles.indexOf(user.role) !== -1;
     }
 }
