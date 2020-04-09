@@ -8,7 +8,7 @@ async function bootstrap() {
     const app = await NestFactory.create(SeederModule);
     const seeder = app.get(SeederService);
     await seeder.seedTableConstraint();
-    await seeder.seedSampleData();
+    await seeder.seedSampleDataSet2();
     app.close();
 }
 

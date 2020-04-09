@@ -902,71 +902,105 @@ export class SeederService {
             }
         }
         //CREATE ChickenRecord SAMPLE
-        for (let house = 1; house <= 5; house++) {
-            let chickenRecordInputMorning1: CreateChickenRecordInput = {
-                chicTime: '1583895000',
-                period: 'MORNING',
-                amountDead: Math.floor(Math.random() * 5),
-                amountZleg: Math.floor(Math.random() * 5),
-                amountDwaft: Math.floor(Math.random() * 5),
-                amountSick: Math.floor(Math.random() * 5),
-                date: `11-03-2020`,
-                hid: house,
-            };
-            await this.dbService.createChickenRecord(
-                chickenRecordInputMorning1,
-            );
-        }
-        for (let house = 1; house <= 5; house++) {
-            let chickenRecordInputMorning2: CreateChickenRecordInput = {
-                chicTime: '1583902200',
-                period: 'MORNING',
-                amountDead: Math.floor(Math.random() * 10 + 5),
-                amountZleg: Math.floor(Math.random() * 10 + 5),
-                amountDwaft: Math.floor(Math.random() * 10 + 5),
-                amountSick: Math.floor(Math.random() * 10 + 5),
-                date: `11-03-2020`,
-                hid: house,
-            };
-            await this.dbService.createChickenRecord(
-                chickenRecordInputMorning2,
-            );
-        }
+        let tsMorning1 = 1583895000;
+        let tsMorning2 = 1583902200;
+        let tsEvening1 = 1583928600;
+        let tsEvening2 = 1583935800;
+        for (let day = 1; day <= 8; day++) {
+            for (let house = 1; house <= 5; house++) {
+                let getDate = new Date(0);
+                getDate.setSeconds(tsMorning1);
+                let getDay = getDate.getDate();
+                let getMonth = 1 + getDate.getMonth();
+                let getYear = getDate.getFullYear();
+                let inputDateMorning1 = `${getDay}-${getMonth}-${getYear}`;
+                let chickenRecordInputMorning1: CreateChickenRecordInput = {
+                    chicTime: `${tsMorning1}`,
+                    period: 'MORNING',
+                    amountDead: Math.floor(Math.random() * 10),
+                    amountZleg: Math.floor(Math.random() * 10),
+                    amountDwaft: Math.floor(Math.random() * 10),
+                    amountSick: Math.floor(Math.random() * 10),
+                    date: inputDateMorning1,
+                    hid: house,
+                };
+                await this.dbService.createChickenRecord(
+                    chickenRecordInputMorning1,
+                );
+            }
+            for (let house = 1; house <= 5; house++) {
+                let getDate = new Date(0);
+                getDate.setSeconds(tsMorning2);
+                let getDay = getDate.getDate();
+                let getMonth = 1 + getDate.getMonth();
+                let getYear = getDate.getFullYear();
+                let inputDateMorning2 = `${getDay}-${getMonth}-${getYear}`;
+                let chickenRecordInputMorning2: CreateChickenRecordInput = {
+                    chicTime: `${tsMorning2}`,
+                    period: 'MORNING',
+                    amountDead: Math.floor(Math.random() * 10 + 5),
+                    amountZleg: Math.floor(Math.random() * 10 + 5),
+                    amountDwaft: Math.floor(Math.random() * 10 + 5),
+                    amountSick: Math.floor(Math.random() * 10 + 5),
+                    date: `${inputDateMorning2}`,
+                    hid: house,
+                };
+                await this.dbService.createChickenRecord(
+                    chickenRecordInputMorning2,
+                );
+            }
 
-        for (let house = 1; house <= 5; house++) {
-            let chickenRecordInputEvening1: CreateChickenRecordInput = {
-                chicTime: '1583928600',
-                period: 'EVENING',
-                amountDead: Math.floor(Math.random() * 10),
-                amountZleg: Math.floor(Math.random() * 10),
-                amountDwaft: Math.floor(Math.random() * 10),
-                amountSick: Math.floor(Math.random() * 10),
-                date: `11-03-2020`,
-                hid: house,
-            };
-            await this.dbService.createChickenRecord(
-                chickenRecordInputEvening1,
-            );
-        }
+            for (let house = 1; house <= 5; house++) {
+                let getDate = new Date(0);
+                getDate.setSeconds(tsEvening1);
+                let getDay = getDate.getDate();
+                let getMonth = 1 + getDate.getMonth();
+                let getYear = getDate.getFullYear();
+                let inputDateEvening1 = `${getDay}-${getMonth}-${getYear}`;
+                let chickenRecordInputEvening1: CreateChickenRecordInput = {
+                    chicTime: `${tsEvening1}`,
+                    period: 'EVENING',
+                    amountDead: Math.floor(Math.random() * 10),
+                    amountZleg: Math.floor(Math.random() * 10),
+                    amountDwaft: Math.floor(Math.random() * 10),
+                    amountSick: Math.floor(Math.random() * 10),
+                    date: `${inputDateEvening1}`,
+                    hid: house,
+                };
+                await this.dbService.createChickenRecord(
+                    chickenRecordInputEvening1,
+                );
+            }
 
-        for (let house = 1; house <= 5; house++) {
-            let chickenRecordInputEvening2: CreateChickenRecordInput = {
-                chicTime: '1583935800',
-                period: 'EVENING',
-                amountDead: Math.floor(Math.random() * 10 + 5),
-                amountZleg: Math.floor(Math.random() * 10 + 5),
-                amountDwaft: Math.floor(Math.random() * 10 + 5),
-                amountSick: Math.floor(Math.random() * 10 + 5),
-                date: `11-03-2020`,
-                hid: house,
-            };
-            await this.dbService.createChickenRecord(
-                chickenRecordInputEvening2,
-            );
+            for (let house = 1; house <= 5; house++) {
+                let getDate = new Date(0);
+                getDate.setSeconds(tsEvening2);
+                let getDay = getDate.getDate();
+                let getMonth = 1 + getDate.getMonth();
+                let getYear = getDate.getFullYear();
+                let inputDateEvening2 = `${getDay}-${getMonth}-${getYear}`;
+                let chickenRecordInputEvening2: CreateChickenRecordInput = {
+                    chicTime: `${tsEvening2}`,
+                    period: 'EVENING',
+                    amountDead: Math.floor(Math.random() * 10 + 5),
+                    amountZleg: Math.floor(Math.random() * 10 + 5),
+                    amountDwaft: Math.floor(Math.random() * 10 + 5),
+                    amountSick: Math.floor(Math.random() * 10 + 5),
+                    date: `${inputDateEvening2}`,
+                    hid: house,
+                };
+                await this.dbService.createChickenRecord(
+                    chickenRecordInputEvening2,
+                );
+            }
+            tsMorning1 = tsMorning1 + 60 * 60 * 24;
+            tsMorning2 = tsMorning2 + 60 * 60 * 24;
+            tsEvening1 = tsEvening1 + 60 * 60 * 24;
+            tsEvening2 = tsEvening2 + 60 * 60 * 24;
         }
         ////////////////////////////////////////////////////////
         let ts = 1583895600;
-        for (let t = 1; t <= 30; t++) {
+        for (let t = 1; t <= 96; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -987,8 +1021,10 @@ export class SeederService {
             }
             ts = ts + 60 * 60 * 2;
         }
+
+        //create Food Record Input one times per day
         ts = 1583895600;
-        for (let t = 1; t <= 2; t++) {
+        for (let t = 1; t <= 7; t++) {
             for (let house = 1; house <= 5; house++) {
                 for (let silo = 1; silo <= 2; silo++) {
                     let getDate = new Date(0);
@@ -1000,9 +1036,9 @@ export class SeederService {
 
                     let foodRecordInput: CreateFoodRecordInput = {
                         foodSilo: silo,
-                        foodIn: 10000,
-                        foodRemain: 8000,
-                        foodConsumed: 2000,
+                        foodIn: 8000 + Math.floor(Math.random() * 2000),
+                        foodRemain: 6000 + Math.floor(Math.random() * 2000),
+                        foodConsumed: 1000 + Math.floor(Math.random() * 1000),
                         timestamp: `${ts}`,
                         date: `${inputDate}`,
                         hid: house,
@@ -1014,6 +1050,7 @@ export class SeederService {
             ts = ts + 60 * 60 * 24;
         }
 
+        //create Medicine Record Only one times
         ts = 1583895600 + 60 * 60 * 6;
         for (let t = 1; t <= 1; t++) {
             for (let house = 1; house <= 5; house++) {
@@ -1034,9 +1071,12 @@ export class SeederService {
                 await this.dbService.createMedicineRecord(medicineRecordInput);
             }
         }
-
+        // create Water Record one times per day
         ts = 1583895600 + 60 * 60 * 8;
-        for (let t = 1; t <= 2; t++) {
+        let meter1 = 2508392;
+        let meter2 = 2530116;
+        let waterconsume = 663;
+        for (let t = 1; t <= 7; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -1046,18 +1086,21 @@ export class SeederService {
                 let inputDate = `${getDay}-${getMonth}-${getYear}`;
 
                 let waterRecordInput: CreateWaterRecordInput = {
-                    waterMeter1: 2508392,
-                    waterMeter2: 2530116,
-                    waterConsumed: 663,
+                    waterMeter1: meter1,
+                    waterMeter2: meter2,
+                    waterConsumed: waterconsume,
                     timestamp: `${ts}`,
                     date: `${inputDate}`,
                     hid: house,
                 };
                 await this.dbService.createWaterRecord(waterRecordInput);
             }
+            meter1 = meter1 + Math.floor(Math.random() * 100);
+            meter2 = 2530116 + Math.floor(Math.random() * 1000);
+            waterconsume = 500 + Math.floor(Math.random() * 200);
             ts = ts + 60 * 60 * 24;
         }
-
+        //create Sensor
         uniqueID = 1;
         for (let house = 1; house <= 5; house++) {
             for (let i = 1; i <= 2; i++) {
@@ -1073,7 +1116,7 @@ export class SeederService {
                 }
             }
         }
-
+        //create Environment Data
         ts = 1583895600;
         for (let t = 1; t <= 30; t++) {
             uniqueID = 1;
@@ -1091,11 +1134,11 @@ export class SeederService {
                     uniqueID++;
                 }
             }
-            ts = ts + 60 * 60 * 2;
+            ts = ts + 60 * 60 * 6;
         }
-
+        //create Image
         ts = 1583895600;
-        for (let t = 1; t <= 2; t++) {
+        for (let t = 1; t <= 20; t++) {
             uniqueID = 1;
             for (let house = 1; house <= 2; house++) {
                 for (let i = 1; i <= 13; i++) {
@@ -1113,6 +1156,7 @@ export class SeederService {
             }
             ts = ts + 60 * 60 * 2;
         }
+        // create Collected Dead Chicken Time
         ts = 1583895600;
         for (let t = 1; t <= 2; t++) {
             uniqueID = 1;
