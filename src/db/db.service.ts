@@ -15,8 +15,11 @@ import {
     CreateUserInput,
     CreateWaterRecordInput,
     DailySetRecordInput,
+    DeadChickenReport,
+    EnvironmentalDataReport,
     EnvironmentInfoSetAndSidOutput,
     EnvironmentInfoSetOutput,
+    FoodConsumptionReport,
     HouseOutput,
     HumidityTimestamp,
     LastImageForEachCameraOutput,
@@ -27,9 +30,11 @@ import {
     MaxAndMinHumidity,
     MaxAndMinTemperature,
     MaxAndMinWindSpeed,
+    MedicineConsumptionReport,
     SensorOutput,
     TemperatureTimestamp,
     UserDataOutput,
+    WaterConsumptionReport,
     WindspeedTimestamp,
 } from './db.interfaces';
 import {
@@ -38,6 +43,7 @@ import {
     FoodInput,
     MedicineInput,
     WaterInput,
+    EnvironmentalData,
 } from '../event/event.interfaces';
 
 import { ConfigService } from '@nestjs/config';
@@ -208,6 +214,75 @@ export class DbService {
                 medicineInput[ele] as CreateMedicineRecordInput,
             );
         }
+    };
+
+    //////////////////////////////////////////////////////////////////////////////
+    //Report
+
+    getEnvironmentalDataReport = async (
+        hid: number,
+        generation: string,
+    ): Promise<EnvironmentalDataReport[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "E"."timestamp", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity"
+            FROM "Environment" "E"
+            JOIN "Sensor" "S" ON "S"."sid" = "E"."sid"
+            JOIN "Chicken" "C" ON "C"."hid" = "S"."hid"
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+        );
+        return queryArr.rows;
+    };
+
+    getFoodConsumptionReport = async (
+        hid: number,
+        generation: string,
+    ): Promise<FoodConsumptionReport[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "F"."timestamp", "F"."foodSilo", "F"."foodIn", "F"."foodRemain", "F"."foodConsumed"
+            FROM "FoodRecord" "F"
+            JOIN "Chicken" "C" ON "C"."hid" = "F"."hid"
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+        );
+        return queryArr.rows;
+    };
+
+    getWaterConsumptionReport = async (
+        hid: number,
+        generation: string,
+    ): Promise<WaterConsumptionReport[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "W"."timestamp", "W"."waterMeter1", "W"."waterMeter2", "W"."waterConsumed"
+            FROM "WaterRecord" "W"
+            JOIN "Chicken" "C" ON "C"."hid" = "W"."hid"
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+        );
+        return queryArr.rows;
+    };
+
+    getMedicineConsumptionReport = async (
+        hid: number,
+        generation: string,
+    ): Promise<MedicineConsumptionReport[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "M"."timestamp", "M"."medicineType", "M"."medicineConc"
+            FROM "MedicineRecord" "M"
+            JOIN "Chicken" "C" ON "C"."hid" = "M"."hid"
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+        );
+        return queryArr.rows;
+    };
+
+    getDeadChickenReport = async (
+        hid: number,
+        generation: string,
+    ): Promise<DeadChickenReport[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "R"."date", "R"."chicTime", "R"."period", "R"."amountDead", "R"."amountZleg", "R"."amountDwaft", "R"."amountSick"
+            FROM "ChickenRecord" "R"
+            JOIN "Chicken" "C" ON "C"."hid" = "R"."hid"
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+        );
+        return queryArr.rows;
     };
 
     //////////////////////////////////////////////////////////////////////////////

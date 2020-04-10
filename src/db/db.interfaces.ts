@@ -323,3 +323,52 @@ export interface MedicineInput {
     medicineType: string;
     medicineConc: number;
 }
+
+export interface EnvironmentalDataReport {
+    hid: number;
+    generation: string;
+    timestamp: Date;
+    windspeed: number;
+    ammonia: number;
+    temperature: number;
+    humidity: number;
+}
+
+export interface FoodConsumptionReport {
+    hid: number;
+    generation: string;
+    timestamp: Date;
+    foodSilo: number;
+    foodIn: number;
+    foodRemain: number;
+    foodConsumed: number;
+}
+
+export interface WaterConsumptionReport {
+    hid: number;
+    generation: string;
+    timestamp: Date;
+    waterMeter1: number;
+    waterMeter2: number;
+    waterConsumed: number;
+}
+
+export interface MedicineConsumptionReport {
+    hid: number;
+    generation: string;
+    timestamp: Date;
+    medicineType: string;
+    medicineConc: number;
+}
+
+export interface DeadChickenReport {
+    hid: number;
+    generation: string;
+    date: string;
+    chicTime: string;
+    period: string;
+    amountDead: number;
+    amountZleg: number;
+    amountDwaft: number;
+    amountSick: number;
+}
