@@ -591,13 +591,13 @@ export class DbService {
         return queryArr.rows;
     };
 
-    getHidBySid = async (sid: string): Promise<string> => {
+    getHidBySid = async (sid: string): Promise<number> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "S"."hid" 
             FROM "Sensor" "S" 
             WHERE "S"."sid" = '${sid}';`,
         );
-        return queryArr.rows[0];
+        return queryArr.rows[0].hid;
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -692,13 +692,13 @@ export class DbService {
         return queryArr.rows[0];
     };
 
-    getHidByCid = async (cid: string): Promise<string> => {
+    getHidByCid = async (cid: string): Promise<number> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "C"."hid" 
             FROM "Camera" "C" 
             WHERE "C"."cid" = '${cid}';`,
         );
-        return queryArr.rows[0];
+        return queryArr.rows[0].hid;
     };
 
     //////////////////////////////////////////////////////////////////////////////

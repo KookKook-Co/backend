@@ -347,7 +347,7 @@ export class SeederService {
             lastName: 'lastname1',
             lineID: 'line1',
             role: Role.OWNER,
-            imageUrl: 'http://www.kk.com/img/1',
+            imageUrl: 'https://i.imgur.com/M9CxSGh.jpg',
             hid: 1,
         };
         let UserDataInput2: CreateUserInput = {
@@ -359,7 +359,7 @@ export class SeederService {
             lastName: 'lastname2',
             lineID: 'line2',
             role: Role.WORKER,
-            imageUrl: 'http://www.kk.com/img/2',
+            imageUrl: 'https://i.imgur.com/asFo8tE.jpg',
             hid: 2,
         };
         await this.dbService.createUser(UserDataInput);
@@ -828,7 +828,7 @@ export class SeederService {
         for (let i = 1; i <= 312; i++) {
             let imageInput: CreateCamImgInput = {
                 timestamp: '1584011605',
-                url: `http://www.kookkook.com/img/${i}`,
+                url: `https://i.imgur.com/0jQOC0U.jpg`,
                 amountDead: Math.floor(Math.random() * 10),
                 cid: `${i}`,
             };
@@ -871,7 +871,7 @@ export class SeederService {
             lastName: `ownerlastname`,
             lineID: `lineowner`,
             role: Role.OWNER,
-            imageUrl: `http://www.kk.com/img/0`,
+            imageUrl: `https://i.imgur.com/M9CxSGh.jpg`,
             hid: 1,
         };
         await this.dbService.createUser(ownerDataInput);
@@ -887,7 +887,7 @@ export class SeederService {
                     lastName: `lastname${i}${j}`,
                     lineID: `lineid${i}${j}`,
                     role: Role.WORKER,
-                    imageUrl: `http://www.kk.com/img/hid=${i}/${j}`,
+                    imageUrl: `https://i.imgur.com/asFo8tE.jpg`,
                     hid: i,
                 };
                 await this.dbService.createUser(userDataInput);
@@ -1178,7 +1178,7 @@ export class SeederService {
                     for (let j = 1; j <= 24; j++) {
                         let imageInput: CreateCamImgInput = {
                             timestamp: `${ts}`,
-                            url: `http://www.kookkook.com/img/${house}_${uniqueID}_${t}`,
+                            url: `https://i.imgur.com/0jQOC0U.jpg`,
                             amountDead: Math.floor(Math.random() * 10),
                             cid: `${uniqueID}`,
                         };
