@@ -16,9 +16,9 @@ import {
     CreateWaterRecordInput,
     DailySetRecordInput,
     DeadChickenReport,
-    EnvironmentalDataReport,
     EnvironmentInfoSetAndSidOutput,
     EnvironmentInfoSetOutput,
+    EnvironmentalDataReport,
     FoodConsumptionReport,
     HouseOutput,
     HumidityTimestamp,
@@ -34,16 +34,17 @@ import {
     SensorOutput,
     TemperatureTimestamp,
     UserDataOutput,
+    UserInput,
     WaterConsumptionReport,
     WindspeedTimestamp,
 } from './db.interfaces';
 import {
     DailyInfo,
     EnvType,
+    EnvironmentalData,
     FoodInput,
     MedicineInput,
     WaterInput,
-    EnvironmentalData,
 } from '../event/event.interfaces';
 
 import { ConfigService } from '@nestjs/config';
@@ -222,67 +223,92 @@ export class DbService {
     getEnvironmentalDataReport = async (
         hid: number,
         generation: string,
-    ): Promise<EnvironmentalDataReport[]> => {
-        const queryArr = await this.dbPoolQuery(
-            `SELECT "C"."hid", "C"."generation", "E"."timestamp", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity"
+    ): Promise<string> => {
+        let tmp_generation = generation.replace('/', '_');
+        let filename = `EnvironmentalDataReport_Hid${hid}_Generation${tmp_generation}.csv`;
+        await this.dbPoolQuery(
+            `COPY
+            (SELECT "C"."hid", "C"."generation", "E"."timestamp","S"."sid", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity"
             FROM "Environment" "E"
             JOIN "Sensor" "S" ON "S"."sid" = "E"."sid"
             JOIN "Chicken" "C" ON "C"."hid" = "S"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
+            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
         );
-        return queryArr.rows;
+        return filename;
     };
 
     getFoodConsumptionReport = async (
         hid: number,
         generation: string,
-    ): Promise<FoodConsumptionReport[]> => {
-        const queryArr = await this.dbPoolQuery(
-            `SELECT "C"."hid", "C"."generation", "F"."timestamp", "F"."foodSilo", "F"."foodIn", "F"."foodRemain", "F"."foodConsumed"
+    ): Promise<string> => {
+        let tmp_generation = generation.replace('/', '_');
+        let filename = `FoodConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
+        await this.dbPoolQuery(
+            `COPY 
+            (SELECT "C"."hid", "C"."generation", "F"."timestamp", "F"."foodSilo", "F"."foodIn", "F"."foodRemain", "F"."foodConsumed"
             FROM "FoodRecord" "F"
             JOIN "Chicken" "C" ON "C"."hid" = "F"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
+            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
         );
-        return queryArr.rows;
+        return filename;
     };
 
     getWaterConsumptionReport = async (
         hid: number,
         generation: string,
-    ): Promise<WaterConsumptionReport[]> => {
+    ): Promise<string> => {
+        let tmp_generation = generation.replace('/', '_');
+        let filename = `WaterConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
         const queryArr = await this.dbPoolQuery(
-            `SELECT "C"."hid", "C"."generation", "W"."timestamp", "W"."waterMeter1", "W"."waterMeter2", "W"."waterConsumed"
+            `COPY
+            (SELECT "C"."hid", "C"."generation", "W"."timestamp", "W"."waterMeter1", "W"."waterMeter2", "W"."waterConsumed"
             FROM "WaterRecord" "W"
             JOIN "Chicken" "C" ON "C"."hid" = "W"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
+            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
         );
-        return queryArr.rows;
+        return filename;
     };
 
     getMedicineConsumptionReport = async (
         hid: number,
         generation: string,
-    ): Promise<MedicineConsumptionReport[]> => {
+    ): Promise<string> => {
+        let tmp_generation = generation.replace('/', '_');
+        let filename = `WaterConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
         const queryArr = await this.dbPoolQuery(
-            `SELECT "C"."hid", "C"."generation", "M"."timestamp", "M"."medicineType", "M"."medicineConc"
+            `COPY
+            (SELECT "C"."hid", "C"."generation", "M"."timestamp", "M"."medicineType", "M"."medicineConc"
             FROM "MedicineRecord" "M"
             JOIN "Chicken" "C" ON "C"."hid" = "M"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
+            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
         );
-        return queryArr.rows;
+        return filename;
     };
 
     getDeadChickenReport = async (
         hid: number,
         generation: string,
-    ): Promise<DeadChickenReport[]> => {
-        const queryArr = await this.dbPoolQuery(
-            `SELECT "C"."hid", "C"."generation", "R"."date", "R"."chicTime", "R"."period", "R"."amountDead", "R"."amountZleg", "R"."amountDwaft", "R"."amountSick"
+    ): Promise<string> => {
+        let tmp_generation = generation.replace('/', '_');
+        let filename = `DeadChickenReport_Hid${hid}_Generation${tmp_generation}.csv`;
+        await this.dbPoolQuery(
+            `COPY
+            (SELECT "C"."hid", "C"."generation", "R"."date", "R"."chicTime", "R"."period",
+            "R"."amountDead", "R"."amountZleg", "R"."amountDwaft", "R"."amountSick"
             FROM "ChickenRecord" "R"
-            JOIN "Chicken" "C" ON "C"."hid" = "R"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
+            JOIN (
+            SELECT "hid", "date", MAX("chicTime") AS "recentChicTime", "period"
+            FROM "ChickenRecord"
+            GROUP BY "hid", "date", "period") "M" 
+            ON "R"."hid" = "M"."hid" AND "R"."date" = "M"."date" AND "R"."chicTime" = "M"."recentChicTime"
+            JOIN "Chicken" "C" ON "C"."hid" = "R"."hid" AND "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
+            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
         );
-        return queryArr.rows;
+        return filename;
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -327,6 +353,22 @@ export class DbService {
         await this.dbPoolQuery(
             `UPDATE "User" 
             SET "lineID" = '${newLineID}' 
+            WHERE "uid" = '${uid}';`,
+        );
+    };
+    updateUserInfo = async (uid: number, updateUserInfo: UserInput) => {
+        await this.dbPoolQuery(
+            `UPDATE "User" 
+            SET 
+            "username" = '${updateUserInfo.username}',
+            "hashedPwd"= '${updateUserInfo.hashedPwd}',
+            "isCurrentUser"= '${updateUserInfo.isCurrentUser}',
+            "firstName"= '${updateUserInfo.firstName}',
+            "lastName"= '${updateUserInfo.lastName}',
+            "lineID"= '${updateUserInfo.lineID}',
+            "role"= '${updateUserInfo.role}',
+            "imageUrl"= '${updateUserInfo.imageUrl}',
+            "hid"= '${updateUserInfo.hid}'
             WHERE "uid" = '${uid}';`,
         );
     };
@@ -1069,5 +1111,59 @@ export class DbService {
                 TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
         );
         return queryArr.rows;
+    };
+
+    convertToCSV = objArray => {
+        var array =
+            typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+        var str = '';
+
+        for (var i = 0; i < array.length; i++) {
+            var line = '';
+            for (var index in array[i]) {
+                if (line != '') line += ',';
+
+                line += array[i][index];
+            }
+
+            str += line + '\r\n';
+        }
+
+        return str;
+    };
+
+    exportCSVFile = (headers, items, fileTitle) => {
+        if (headers) {
+            items.unshift(headers);
+        }
+
+        // Convert Object to JSON
+        var jsonObject = JSON.stringify(items);
+
+        var csv = this.convertToCSV(jsonObject);
+
+        var exportedFilenmae =
+            '/Users/theeratnon/Desktop/kookkook_non/backend/src/db' +
+                fileTitle +
+                '.csv' || 'export.csv';
+
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        if (navigator.msSaveBlob) {
+            // IE 10+
+            navigator.msSaveBlob(blob, exportedFilenmae);
+        } else {
+            var link = document.createElement('a');
+            if (link.download !== undefined) {
+                // feature detection
+                // Browsers that support HTML5 download attribute
+                var url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', exportedFilenmae);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
     };
 }
