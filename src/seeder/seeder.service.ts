@@ -876,12 +876,26 @@ export class SeederService {
         };
         await this.dbService.createUser(ownerDataInput);
 
+        let userDataInput: CreateUserInput = {
+            username: `worker`,
+            hashedPwd:
+                '$2b$04$C4GP5tj3zJCpgOHOBHmbfe1ahTVhvhfch6uwJ1Gv7vSUE3nJfJuyS',
+            isCurrentUser: true,
+            firstName: `firstname`,
+            lastName: `lastname`,
+            lineID: `lineid`,
+            role: Role.WORKER,
+            imageUrl: `https://i.imgur.com/asFo8tE.jpg`,
+            hid: 1,
+        };
+        await this.dbService.createUser(userDataInput);
+
         for (let i = 1; i <= 5; i++) {
             for (let j = 1; j <= 2; j++) {
                 let userDataInput: CreateUserInput = {
                     username: `worker${i}${j}`,
                     hashedPwd:
-                        '$2b$04$vpJ4H0yfvyN68IsbAS4e2eQ3A/wPJvK2bWqpq6CDhhHX9Y63IhHyG',
+                        '$2b$04$C4GP5tj3zJCpgOHOBHmbfe1ahTVhvhfch6uwJ1Gv7vSUE3nJfJuyS',
                     isCurrentUser: true,
                     firstName: `firstname${i}${j}`,
                     lastName: `lastname${i}${j}`,

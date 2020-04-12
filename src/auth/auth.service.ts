@@ -19,10 +19,13 @@ export class AuthService {
         username: string,
         password: string,
     ): Promise<User | null> {
-        const { hashedPwd, ...result } = await this.userService.findOne(
-            username,
-        );
-        return (await bcrypt.compare(password, hashedPwd)) ? result : null;
+        const user = await this.userService.findOne(username);
+        if (user === null || user === undefined) {
+            return null;
+        } else {
+            const { hashedPwd, ...result } = user;
+            return (await bcrypt.compare(password, hashedPwd)) ? result : null;
+        }
     }
 
     async login(user: User) {
