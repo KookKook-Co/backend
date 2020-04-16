@@ -210,15 +210,15 @@ export class DbService {
             medicineInput[ele] = tmp;
         }
         for (let ele in foodInput) {
-            await this.createFoodRecord(foodInput[
-                ele
-            ] as CreateFoodRecordInput);
+            await this.createFoodRecord(
+                foodInput[ele] as CreateFoodRecordInput,
+            );
         }
         await this.createWaterRecord(waterInput as CreateWaterRecordInput);
         for (let ele in medicineInput) {
-            await this.createMedicineRecord(medicineInput[
-                ele
-            ] as CreateMedicineRecordInput);
+            await this.createMedicineRecord(
+                medicineInput[ele] as CreateMedicineRecordInput,
+            );
         }
     };
 
@@ -231,15 +231,25 @@ export class DbService {
     ): Promise<string> => {
         let tmp_generation = generation.replace('/', '_');
         let filename = `EnvironmentalDataReport_Hid${hid}_Generation${tmp_generation}.csv`;
-        await this.dbPoolQuery(
-            `COPY
-            (SELECT "C"."hid", "C"."generation", "E"."timestamp","S"."sid", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity"
+        let list_record = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "E"."timestamp","S"."sid", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity"
             FROM "Environment" "E"
             JOIN "Sensor" "S" ON "S"."sid" = "E"."sid"
             JOIN "Chicken" "C" ON "C"."hid" = "S"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
-            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
         );
+        list_record = list_record.rows;
+        let header = [
+            { id: 'hid', title: 'hid' },
+            { id: 'generation', title: 'generation' },
+            { id: 'timestamp', title: 'timestamp' },
+            { id: 'sid', title: 'sid' },
+            { id: 'windspeed', title: 'windspeed' },
+            { id: 'ammonia', title: 'ammonia' },
+            { id: 'temperature', title: 'temperature' },
+            { id: 'humidity', title: 'humidity' },
+        ];
+        await this.exportCSV(header, list_record, filename);
         return filename;
     };
 
@@ -249,14 +259,23 @@ export class DbService {
     ): Promise<string> => {
         let tmp_generation = generation.replace('/', '_');
         let filename = `FoodConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
-        await this.dbPoolQuery(
-            `COPY 
-            (SELECT "C"."hid", "C"."generation", "F"."timestamp", "F"."foodSilo", "F"."foodIn", "F"."foodRemain", "F"."foodConsumed"
+        let list_record = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "F"."timestamp", "F"."foodSilo", "F"."foodIn", "F"."foodRemain", "F"."foodConsumed"
             FROM "FoodRecord" "F"
             JOIN "Chicken" "C" ON "C"."hid" = "F"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
-            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
+        list_record = list_record.rows;
+        let header = [
+            { id: 'hid', title: 'hid' },
+            { id: 'generation', title: 'generation' },
+            { id: 'timestamp', title: 'timestamp' },
+            { id: 'foodSilo', title: 'foodSilo' },
+            { id: 'foodIn', title: 'foodIn' },
+            { id: 'foodRemain', title: 'foodRemain' },
+            { id: 'foodConsumed', title: 'foodConsumed' },
+        ];
+        await this.exportCSV(header, list_record, filename);
         return filename;
     };
 
@@ -266,14 +285,22 @@ export class DbService {
     ): Promise<string> => {
         let tmp_generation = generation.replace('/', '_');
         let filename = `WaterConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
-        const queryArr = await this.dbPoolQuery(
-            `COPY
-            (SELECT "C"."hid", "C"."generation", "W"."timestamp", "W"."waterMeter1", "W"."waterMeter2", "W"."waterConsumed"
+        let list_record = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "W"."timestamp", "W"."waterMeter1", "W"."waterMeter2", "W"."waterConsumed"
             FROM "WaterRecord" "W"
             JOIN "Chicken" "C" ON "C"."hid" = "W"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
-            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
+        list_record = list_record.rows;
+        let header = [
+            { id: 'hid', title: 'hid' },
+            { id: 'generation', title: 'generation' },
+            { id: 'timestamp', title: 'timestamp' },
+            { id: 'waterMeter1', title: 'waterMeter1' },
+            { id: 'waterMeter2', title: 'waterMeter2' },
+            { id: 'waterConsumed', title: 'waterConsumed' },
+        ];
+        await this.exportCSV(header, list_record, filename);
         return filename;
     };
 
@@ -282,15 +309,22 @@ export class DbService {
         generation: string,
     ): Promise<string> => {
         let tmp_generation = generation.replace('/', '_');
-        let filename = `WaterConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
-        const queryArr = await this.dbPoolQuery(
-            `COPY
-            (SELECT "C"."hid", "C"."generation", "M"."timestamp", "M"."medicineType", "M"."medicineConc"
+        let filename = `MedicineConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
+        let list_record = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "M"."timestamp", "M"."medicineType", "M"."medicineConc"
             FROM "MedicineRecord" "M"
             JOIN "Chicken" "C" ON "C"."hid" = "M"."hid"
-            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
-            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
+        list_record = list_record.rows;
+        let header = [
+            { id: 'hid', title: 'hid' },
+            { id: 'generation', title: 'generation' },
+            { id: 'timestamp', title: 'timestamp' },
+            { id: 'medicineType', title: 'medicineType' },
+            { id: 'medicineConc', title: 'medicineConc' },
+        ];
+        await this.exportCSV(header, list_record, filename);
         return filename;
     };
 
@@ -300,9 +334,8 @@ export class DbService {
     ): Promise<string> => {
         let tmp_generation = generation.replace('/', '_');
         let filename = `DeadChickenReport_Hid${hid}_Generation${tmp_generation}.csv`;
-        await this.dbPoolQuery(
-            `COPY
-            (SELECT "C"."hid", "C"."generation", "R"."date", "R"."chicTime", "R"."period",
+        let list_record = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation", "R"."date", "R"."chicTime", "R"."period",
             "R"."amountDead", "R"."amountZleg", "R"."amountDwaft", "R"."amountSick"
             FROM "ChickenRecord" "R"
             JOIN (
@@ -310,9 +343,21 @@ export class DbService {
             FROM "ChickenRecord"
             GROUP BY "hid", "date", "period") "M" 
             ON "R"."hid" = "M"."hid" AND "R"."date" = "M"."date" AND "R"."chicTime" = "M"."recentChicTime"
-            JOIN "Chicken" "C" ON "C"."hid" = "R"."hid" AND "C"."hid" = '${hid}' AND "C"."generation" = '${generation}')
-            TO '/tmp/${filename}' WITH DELIMITER ',' CSV HEADER;`,
+            JOIN "Chicken" "C" ON "C"."hid" = "R"."hid" AND "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
+        list_record = list_record.rows;
+        let header = [
+            { id: 'hid', title: 'hid' },
+            { id: 'generation', title: 'generation' },
+            { id: 'date', title: 'date' },
+            { id: 'chicTime', title: 'chicTime' },
+            { id: 'period', title: 'period' },
+            { id: 'amountDead', title: 'amountDead' },
+            { id: 'amountZleg', title: 'amountZleg' },
+            { id: 'amountDwarf', title: 'amountDwarf' },
+            { id: 'amountSick', title: 'amountSick' },
+        ];
+        await this.exportCSV(header, list_record, filename);
         return filename;
     };
 
@@ -1117,58 +1162,12 @@ export class DbService {
         );
         return queryArr.rows;
     };
-
-    convertToCSV = objArray => {
-        var array =
-            typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-        var str = '';
-
-        for (var i = 0; i < array.length; i++) {
-            var line = '';
-            for (var index in array[i]) {
-                if (line != '') line += ',';
-
-                line += array[i][index];
-            }
-
-            str += line + '\r\n';
-        }
-
-        return str;
-    };
-
-    exportCSVFile = (headers, items, fileTitle) => {
-        if (headers) {
-            items.unshift(headers);
-        }
-
-        // Convert Object to JSON
-        var jsonObject = JSON.stringify(items);
-
-        var csv = this.convertToCSV(jsonObject);
-
-        var exportedFilenmae =
-            '/Users/theeratnon/Desktop/kookkook_non/backend/src/db' +
-                fileTitle +
-                '.csv' || 'export.csv';
-
-        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        if (navigator.msSaveBlob) {
-            // IE 10+
-            navigator.msSaveBlob(blob, exportedFilenmae);
-        } else {
-            var link = document.createElement('a');
-            if (link.download !== undefined) {
-                // feature detection
-                // Browsers that support HTML5 download attribute
-                var url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', exportedFilenmae);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
+    exportCSV = async (header, list_record, filename) => {
+        const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+        const csvWriter = createCsvWriter({
+            header: header,
+            path: `csv/${filename}`,
+        });
+        csvWriter.writeRecords(list_record);
     };
 }
