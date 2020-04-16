@@ -34,9 +34,33 @@ export class SeederService {
 
     private pool = new Pool({
         connectionString:
+            process.env.DB_URI2 || this.configService.get<string>('DB_URI2'),
+    });
+
+    private poolInit = new Pool({
+        connectionString:
             process.env.DB_URI || this.configService.get<string>('DB_URI'),
     });
 
+    seedNewDatabase = async () => {
+        await poolQuery(this.poolInit, `CREATE DATABASE "chicken_farm";`);
+    };
+    seedNewDatabaseUser = async () => {
+        await poolQuery(
+            this.poolInit,
+            `CREATE USER user1 WITH PASSWORD 'password';
+        GRANT ALL PRIVILEGES ON DATABASE "chicken_farm" to "user1";`,
+        );
+    };
+    dropDatabase = async () => {
+        await poolQuery(
+            this.poolInit,
+            `DROP DATABASE IF EXISTS "chicken_farm"`,
+        );
+    };
+    dropDatabaseUser = async () => {
+        await poolQuery(this.poolInit, `DROP USER IF EXISTS "user1"`);
+    };
     seedTableConstraint = async () => {
         const query_list = [];
         query_list.push(
@@ -209,7 +233,16 @@ export class SeederService {
                 PRIMARY KEY (timestamp, sid)',
             ),
         );
-
+        query_list.push(
+            addConstraint(
+                'User',
+                'hid',
+                'House',
+                'hid',
+                'hid_constraint',
+                'ON UPDATE NO ACTION ON DELETE NO ACTION',
+            ),
+        );
         query_list.push(
             addConstraint('Chicken', 'hid', 'House', 'hid', 'hid_constraint'),
         );
@@ -819,8 +852,8 @@ export class SeederService {
         query_list.push(dropTable('Chicken'));
         query_list.push(dropTable('DailyDataRecord'));
         query_list.push(dropTable('DailyRecord'));
-        query_list.push(dropTable('House'));
         query_list.push(dropTable('User'));
+        query_list.push(dropTable('House'));
         await poolQuery(this.pool, query_list.join(''));
     };
 

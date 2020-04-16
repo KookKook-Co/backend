@@ -58,6 +58,11 @@ export class DbService {
 
     private pool = new Pool({
         connectionString:
+            process.env.DB_URI2 || this.configService.get<string>('DB_URI2'),
+    });
+
+    private poolInit = new Pool({
+        connectionString:
             process.env.DB_URI || this.configService.get<string>('DB_URI'),
     });
 
@@ -205,15 +210,15 @@ export class DbService {
             medicineInput[ele] = tmp;
         }
         for (let ele in foodInput) {
-            await this.createFoodRecord(
-                foodInput[ele] as CreateFoodRecordInput,
-            );
+            await this.createFoodRecord(foodInput[
+                ele
+            ] as CreateFoodRecordInput);
         }
         await this.createWaterRecord(waterInput as CreateWaterRecordInput);
         for (let ele in medicineInput) {
-            await this.createMedicineRecord(
-                medicineInput[ele] as CreateMedicineRecordInput,
-            );
+            await this.createMedicineRecord(medicineInput[
+                ele
+            ] as CreateMedicineRecordInput);
         }
     };
 
