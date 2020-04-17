@@ -107,3 +107,11 @@ enum Gender {
     MALE = 'MALE',
     FEMALE = 'FEMALE',
 }
+
+export enum Report {
+    ENVIRONMENT = 'ENVIRONMENT',
+    FOOD = 'FOOD',
+    WATER = 'WATER',
+    MEDICINE = 'MEDICINE',
+    CHICKEN = 'CHICKEN',
+}

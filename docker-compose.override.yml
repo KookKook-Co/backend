@@ -10,14 +10,12 @@ services:
       - ./package.json:/app/package.json
       - ./tsconfig.json:/app/tsconfig.json
       - ./tsconfig.build.json:/app/tsconfig.build.json
-    ports:
-      - 4000:4000
+      - ./csv:/app/csv
     environment:
+      DB_URI: postgres://postgres:password@db/postgres
+      QUERY_DB_URI: postgres://user1:password@db/chicken_farm
       NODE_ENV: development
-      PORT:
-      JWT_SECRET:
-      LINE_USERID:
-      LINE_BOT_TOKEN:
+      HOST_IP: mqtt
     working_dir: /app
     command: ['npm', 'run', 'start:dev']
 

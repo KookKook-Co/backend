@@ -8,6 +8,7 @@ import { EventController } from './event.controller';
 import { EventGateway } from './event.gateway';
 import { Module } from '@nestjs/common';
 import { NotiService } from './notification.service';
+import { ReportController } from './report.controller';
 
 @Module({
     imports: [
@@ -24,7 +25,7 @@ import { NotiService } from './notification.service';
             },
         ]),
     ],
-    controllers: [EventController, CheckerController],
+    controllers: [EventController, CheckerController, ReportController],
     providers: [EventGateway, NotiService, CheckerService],
 })
 export class EventModule {}

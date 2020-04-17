@@ -8,11 +8,3 @@ services:
 
   db:
     container_name: kookkook-postgres-staging
-
-  mqtt:
-    image: eclipse-mosquitto
-    restart: always
-    volumes:
-      - ./mosquitto:/mosquitto
-    ports:
-      - 1883:1883
