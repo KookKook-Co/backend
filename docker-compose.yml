@@ -9,10 +9,13 @@ services:
     restart: always
     environment:
       DB_URI:
+      QUERY_DB_URI:
       PORT:
       HOST_IP:
       MQTT_PORT:
       JWT_SECRET:
+      EMAIL_USER:
+      EMAIL_PASSWORD:
     ports:
       - 4000:4000
 

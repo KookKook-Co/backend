@@ -34,7 +34,8 @@ export class SeederService {
 
     private pool = new Pool({
         connectionString:
-            process.env.DB_URI2 || this.configService.get<string>('DB_URI2'),
+            process.env.QUERY_DB_URI ||
+            this.configService.get<string>('QUERY_DB_URI'),
     });
 
     private poolInit = new Pool({

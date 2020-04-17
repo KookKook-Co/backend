@@ -15,11 +15,8 @@ import {
     CreateUserInput,
     CreateWaterRecordInput,
     DailySetRecordInput,
-    DeadChickenReport,
     EnvironmentInfoSetAndSidOutput,
     EnvironmentInfoSetOutput,
-    EnvironmentalDataReport,
-    FoodConsumptionReport,
     HouseOutput,
     HumidityTimestamp,
     LastImageForEachCameraOutput,
@@ -30,18 +27,15 @@ import {
     MaxAndMinHumidity,
     MaxAndMinTemperature,
     MaxAndMinWindSpeed,
-    MedicineConsumptionReport,
     SensorOutput,
     TemperatureTimestamp,
     UserDataOutput,
     UserInput,
-    WaterConsumptionReport,
     WindspeedTimestamp,
 } from './db.interfaces';
 import {
     DailyInfo,
     EnvType,
-    EnvironmentalData,
     FoodInput,
     MedicineInput,
     WaterInput,
@@ -58,12 +52,8 @@ export class DbService {
 
     private pool = new Pool({
         connectionString:
-            process.env.DB_URI2 || this.configService.get<string>('DB_URI2'),
-    });
-
-    private poolInit = new Pool({
-        connectionString:
-            process.env.DB_URI || this.configService.get<string>('DB_URI'),
+            process.env.QUERY_DB_URI ||
+            this.configService.get<string>('QUERY_DB_URI'),
     });
 
     private dbPoolQuery = query_list => poolQuery(this.pool, query_list);
@@ -151,37 +141,6 @@ export class DbService {
             .dbPoolQuery(`INSERT INTO "CollectedDeadChickenTime" ("timestamp", "cid") 
                     VALUES (TO_TIMESTAMP('${timestamp}'), '${cid}');`);
 
-    // !!! Bug
-    // createDailyDataRecordSet = async (
-    //     dailyDataRecordSet: DailySetRecordInput,
-    // ) => {
-    //     let foodInput = dailyDataRecordSet.dailyInfo.food;
-    //     for (let ele in foodInput) {
-    //         let tmp = foodInput[ele];
-    //         tmp['hid'] = dailyDataRecordSet.hid;
-    //         tmp['date'] = dailyDataRecordSet.date;
-    //         tmp['timestamp'] = dailyDataRecordSet.timestamp;
-    //         foodInput[ele] = tmp;
-    //     }
-    //     let waterInput = dailyDataRecordSet.dailyInfo.water;
-    //     waterInput['timestamp'] = dailyDataRecordSet.timestamp;
-    //     waterInput['date'] = dailyDataRecordSet.date;
-    //     waterInput['hid'] = dailyDataRecordSet.hid;
-
-    //     let medicineInput = dailyDataRecordSet.dailyInfo.medicine;
-    //     medicineInput['timestamp'] = dailyDataRecordSet.timestamp;
-    //     medicineInput['date'] = dailyDataRecordSet.date;
-    //     medicineInput['hid'] = dailyDataRecordSet.hid;
-    //     // for (let ele in foodInput) {
-    //     //     await this.createFoodRecord(
-    //     //         foodInput[ele] as CreateFoodRecordInput,
-    //     //     );
-    //     // }
-    //     await this.createWaterRecord(waterInput as CreateWaterRecordInput);
-    //     // await this.createMedicineRecord(
-    //     //     medicineInput as CreateMedicineRecordInput,
-    //     // );
-    // };
     createDailyDataRecordSet = async (
         dailyDataRecordSet: DailySetRecordInput,
     ) => {
@@ -1162,6 +1121,7 @@ export class DbService {
         );
         return queryArr.rows;
     };
+
     exportCSV = async (header, list_record, filename) => {
         const createCsvWriter = require('csv-writer').createObjectCsvWriter;
         const csvWriter = createCsvWriter({

@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
-import { NotiService } from './notification.service';
 import {
     SubmitUnqualifiedChickenDTO,
     PostDailyInfo,
@@ -30,7 +29,6 @@ import { DailyInfo } from '../event/event.interfaces';
 @Controller('event')
 export class EventController {
     constructor(
-        private readonly notiService: NotiService,
         private readonly checkIrrEnvService: CheckerService,
         private readonly dbService: DbService,
     ) {}
@@ -92,7 +90,6 @@ export class EventController {
     @UseGuards(AuthGuard(), HousesGuard)
     @Get('deadchickenmap')
     async getDeadChickenMap(@Query('hno') hno, @Res() res: Response) {
-        this.logger.log('/GET /deadchickenmap');
         const hid = await this.dbService.getHidByHno(hno);
         const result = await this.dbService.getLastImageForEachCameraByHid(hid);
         res.send(result);
