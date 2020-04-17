@@ -3,7 +3,7 @@ import { EnvType, EnvironmentalData } from './event.interfaces';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class CheckIrrEnvService {
+export class CheckerService {
     private readonly ageRange = [4, 8, 15, 22, 29];
     private readonly normalMinTemperature = [
         23.3,
@@ -48,15 +48,20 @@ export class CheckIrrEnvService {
         [EnvType.ammonia]: this.checkIrrAmmonia,
     };
 
-    getIrrEnv(age: number, envData: EnvironmentalData) {
-        const irrEnv: EnvType[] = [];
-
+    private getAgeIndex = (age: number) => {
         let ageIndex = 0;
         for (ageIndex = 0; ageIndex < this.ageRange.length; ageIndex++) {
             if (age < this.ageRange[ageIndex]) {
                 break;
             }
         }
+        return ageIndex;
+    };
+
+    getIrrEnv(age: number, envData: EnvironmentalData) {
+        const irrEnv: EnvType[] = [];
+
+        const ageIndex = this.getAgeIndex(age);
 
         // console.log(`ageIndex: ${ageIndex}`);
 
@@ -71,5 +76,9 @@ export class CheckIrrEnvService {
         });
 
         return irrEnv;
+    }
+
+    isIrrEnv(age: number, type: EnvType, value: number) {
+        return this.checkList[type](this.getAgeIndex(age), value);
     }
 }

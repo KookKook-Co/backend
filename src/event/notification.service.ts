@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 export class NotiService {
     constructor(private readonly configService: ConfigService) {}
 
-    sendLineMsg() {
+    sendLineMsg(hno, type, value) {
         const headers = {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.configService.get<string>(
@@ -15,16 +15,12 @@ export class NotiService {
             ) || process.env.LINE_BOT_TOKEN}`,
         };
         const body = JSON.stringify({
-            to: `${this.configService.get<string>('LINE_USERID') ||
-                process.env.LINE_USERID}`,
+            to: `${this.configService.get<string>('LINE_GROUPID') ||
+                process.env.LINE_GROUPID}`,
             messages: [
                 {
                     type: 'text',
-                    text: 'Hello',
-                },
-                {
-                    type: 'text',
-                    text: 'How are you?',
+                    text: `Warning !!! House ${hno} has irregular ${type} condition. \nCurrent ${type} is ${value}.`,
                 },
             ],
         });

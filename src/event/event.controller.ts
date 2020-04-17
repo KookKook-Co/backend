@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
-import { NotiService } from '../event/noti.service';
+import { NotiService } from './notification.service';
 import {
     SubmitUnqualifiedChickenDTO,
     PostDailyInfo,
@@ -23,7 +23,7 @@ import {
 import { Response } from 'express';
 import { RolesGuard, HousesGuard } from '../guard';
 import { DbService } from '../db/db.service';
-import { CheckIrrEnvService } from './checkIrrEnv.services';
+import { CheckerService } from './checker.services';
 import * as moment from 'moment';
 import { DailyInfo } from '../event/event.interfaces';
 
@@ -31,7 +31,7 @@ import { DailyInfo } from '../event/event.interfaces';
 export class EventController {
     constructor(
         private readonly notiService: NotiService,
-        private readonly checkIrrEnvService: CheckIrrEnvService,
+        private readonly checkIrrEnvService: CheckerService,
         private readonly dbService: DbService,
     ) {}
 
@@ -46,12 +46,6 @@ export class EventController {
             ammonia: 20.1,
         };
         console.log(this.checkIrrEnvService.getIrrEnv(28, data));
-    }
-
-    @UseGuards(AuthGuard())
-    @Get('line')
-    sendMsg() {
-        this.notiService.sendLineMsg();
     }
 
     @UseGuards(AuthGuard(), HousesGuard)
@@ -108,13 +102,13 @@ export class EventController {
     @Get('dailydata')
     async getDailyDataInfo(
         @Request() req,
-        @Query('date') date: string,
+        @Query() query,
         @Res() res: Response,
     ) {
-        const formatedDate = moment(date).format('DD-MM-YYYY');
+        const formatedDate = moment(query.date).format('DD-MM-YYYY');
         // const formatedDate = '12-03-2020'; // mock
 
-        const hid = await this.dbService.getHidByHno(req.user.hno);
+        const hid = await this.dbService.getHidByHno(query.hno);
 
         if (await this.dbService.isDailyRecordTupleExist(formatedDate, hid)) {
             const dailyInfo: DailyInfo = await this.dbService.getAllDataRecordByHidAndDate(
@@ -135,7 +129,7 @@ export class EventController {
         @Res() res: Response,
     ) {
         try {
-            const hid = await this.dbService.getHidByHno(req.user.hno);
+            const hid = await this.dbService.getHidByHno(body.hno);
             const date = moment(body.date).format('DD-MM-YYYY');
             const dateBefore = moment(body.date)
                 .subtract(1, 'days')
@@ -199,7 +193,7 @@ export class EventController {
         @Res() res: Response,
     ) {
         const formatedDate = moment(query.date).format('DD-MM-YYYY');
-        const h_id = await this.dbService.getHidByHno(req.user.hno);
+        const h_id = await this.dbService.getHidByHno(query.hno);
 
         const {
             chicTime,
@@ -225,7 +219,7 @@ export class EventController {
         try {
             const { date, period, unqualifiedChickenInfo } = body;
 
-            const hid = await this.dbService.getHidByHno(req.user.hno);
+            const hid = await this.dbService.getHidByHno(body.hno);
             const formatedDate = moment(date).format('DD-MM-YYYY');
 
             if (

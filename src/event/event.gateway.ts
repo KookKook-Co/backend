@@ -11,7 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-import { CheckIrrEnvService } from './checkIrrEnv.services';
+import { CheckerService } from './checker.services';
 import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 
@@ -22,7 +22,7 @@ export class EventGateway
 
     constructor(
         private readonly dbService: DbService,
-        private readonly checkIrrEnv: CheckIrrEnvService,
+        private readonly checkIrrEnv: CheckerService,
     ) {}
 
     @WebSocketServer()
