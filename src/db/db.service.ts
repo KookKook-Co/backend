@@ -2,6 +2,7 @@ import {
     AmmoniaTimestamp,
     CameraOutput,
     ChickenFlockInfoOutput,
+    ChickenFlockUpdate,
     ChickenRecord,
     CreateCamImgInput,
     CreateCameraInput,
@@ -183,17 +184,84 @@ export class DbService {
 
     //////////////////////////////////////////////////////////////////////////////
     //Report
+    getDateInAndDateOutByHidAndGeneration = async (
+        hid: number,
+        generation: string,
+    ) => {
+        let chickenFlockInfo = await this.getChickenFlockInfoByHidAndGeneration(
+            hid,
+            generation,
+        );
+        let dateIn = chickenFlockInfo.dateIn.toLocaleDateString();
+        let splitDateIn = dateIn.split('/');
+        let rearrangeDateIn = `${splitDateIn[1]}-${splitDateIn[0]}-${splitDateIn[2]}`;
+        let dateOut = chickenFlockInfo.dateOut.toLocaleDateString();
+        let splitDateOut = dateOut.split('/');
+        let rearrangeDateOut = `${splitDateOut[1]}-${splitDateOut[0]}-${splitDateOut[2]}`;
+        return { dateIn: rearrangeDateIn, dateOut: rearrangeDateOut };
+    };
+
+    getMaxMinEnvironmentalDataReport = async (
+        hid: number,
+        generation: string,
+    ): Promise<string> => {
+        let dateInAndDateOut = await this.getDateInAndDateOutByHidAndGeneration(
+            hid,
+            generation,
+        );
+        let tmp_generation = generation.replace('/', '_');
+        let filename = `MaxAndMinEnvironmentalDataReport_Hid${hid}_Generation${tmp_generation}.csv`;
+        let list_record = await this.dbPoolQuery(
+            `SELECT "C"."hid", "C"."generation","S"."sid", "date", "tmp"."maxWindspeed", "tmp"."minWinspeed", "tmp"."maxAmmonia", "tmp"."minAmmonia",
+            "tmp"."maxTemperature", "tmp"."minTemperature","tmp"."maxHumidity","tmp"."minHumidity"
+            FROM(
+            SELECT "sid", DATE("timestamp") "date",
+            MAX("windspeed") as "maxWindspeed", MIN("windspeed") AS "minWinspeed",
+            MAX("ammonia") as "maxAmmonia", MIN("ammonia") AS "minAmmonia",
+            MAX("temperature") as "maxTemperature", MIN("temperature") AS "minTemperature",
+            MAX("humidity") as "maxHumidity", MIN("humidity") AS "minHumidity"
+            FROM "Environment"
+            GROUP BY "sid", DATE("timestamp")) AS "tmp"
+            JOIN "Sensor" "S" ON "S"."sid" = "tmp"."sid" AND "tmp"."date"
+            BETWEEN TO_DATE('${dateInAndDateOut.dateIn}', 'DD-MM-YYYY') AND TO_DATE('${dateInAndDateOut.dateOut}', 'DD-MM-YYYY')
+            JOIN "Chicken" "C" ON "C"."hid" = "S"."hid"
+            WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'
+            ORDER BY "date", "S"."sid"`,
+        );
+        list_record = list_record.rows;
+        let header = [
+            { id: 'hid', title: 'hid' },
+            { id: 'generation', title: 'generation' },
+            { id: 'sid', title: 'sid' },
+            { id: 'date', title: 'date' },
+            { id: 'maxWindspeed', title: 'maxWindspeed' },
+            { id: 'minWindspeed', title: 'minWindspeed' },
+            { id: 'maxAmmonia', title: 'maxAmmonia' },
+            { id: 'minAmmonia', title: 'minAmmonia' },
+            { id: 'maxTemperature', title: 'maxTemperature' },
+            { id: 'minTemperature', title: 'minTemperature' },
+            { id: 'maxHumidity', title: 'maxHumidity' },
+            { id: 'minHumidity', title: 'minHumidity' },
+        ];
+        await this.exportCSV(header, list_record, filename);
+        return filename;
+    };
 
     getEnvironmentalDataReport = async (
         hid: number,
         generation: string,
     ): Promise<string> => {
+        let dateInAndDateOut = await this.getDateInAndDateOutByHidAndGeneration(
+            hid,
+            generation,
+        );
         let tmp_generation = generation.replace('/', '_');
         let filename = `EnvironmentalDataReport_Hid${hid}_Generation${tmp_generation}.csv`;
         let list_record = await this.dbPoolQuery(
             `SELECT "C"."hid", "C"."generation", "E"."timestamp","S"."sid", "E"."windspeed", "E"."ammonia", "E"."temperature", "E"."humidity"
             FROM "Environment" "E"
-            JOIN "Sensor" "S" ON "S"."sid" = "E"."sid"
+            JOIN "Sensor" "S" ON "S"."sid" = "E"."sid" AND "E"."timestamp"
+            BETWEEN TO_DATE('${dateInAndDateOut.dateIn}', 'DD-MM-YYYY') AND TO_DATE('${dateInAndDateOut.dateOut}', 'DD-MM-YYYY')
             JOIN "Chicken" "C" ON "C"."hid" = "S"."hid"
             WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
         );
@@ -216,12 +284,17 @@ export class DbService {
         hid: number,
         generation: string,
     ): Promise<string> => {
+        let dateInAndDateOut = await this.getDateInAndDateOutByHidAndGeneration(
+            hid,
+            generation,
+        );
         let tmp_generation = generation.replace('/', '_');
         let filename = `FoodConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
         let list_record = await this.dbPoolQuery(
             `SELECT "C"."hid", "C"."generation", "F"."timestamp", "F"."foodSilo", "F"."foodIn", "F"."foodRemain", "F"."foodConsumed"
             FROM "FoodRecord" "F"
-            JOIN "Chicken" "C" ON "C"."hid" = "F"."hid"
+            JOIN "Chicken" "C" ON "C"."hid" = "F"."hid" AND "F"."date"
+            BETWEEN TO_DATE('${dateInAndDateOut.dateIn}', 'DD-MM-YYYY') AND TO_DATE('${dateInAndDateOut.dateOut}', 'DD-MM-YYYY')
             WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
         list_record = list_record.rows;
@@ -242,12 +315,17 @@ export class DbService {
         hid: number,
         generation: string,
     ): Promise<string> => {
+        let dateInAndDateOut = await this.getDateInAndDateOutByHidAndGeneration(
+            hid,
+            generation,
+        );
         let tmp_generation = generation.replace('/', '_');
         let filename = `WaterConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
         let list_record = await this.dbPoolQuery(
             `SELECT "C"."hid", "C"."generation", "W"."timestamp", "W"."waterMeter1", "W"."waterMeter2", "W"."waterConsumed"
             FROM "WaterRecord" "W"
-            JOIN "Chicken" "C" ON "C"."hid" = "W"."hid"
+            JOIN "Chicken" "C" ON "C"."hid" = "W"."hid" AND "W"."date"
+            BETWEEN TO_DATE('${dateInAndDateOut.dateIn}', 'DD-MM-YYYY') AND TO_DATE('${dateInAndDateOut.dateOut}', 'DD-MM-YYYY')
             WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
         list_record = list_record.rows;
@@ -267,12 +345,17 @@ export class DbService {
         hid: number,
         generation: string,
     ): Promise<string> => {
+        let dateInAndDateOut = await this.getDateInAndDateOutByHidAndGeneration(
+            hid,
+            generation,
+        );
         let tmp_generation = generation.replace('/', '_');
         let filename = `MedicineConsumptionReport_Hid${hid}_Generation${tmp_generation}.csv`;
         let list_record = await this.dbPoolQuery(
             `SELECT "C"."hid", "C"."generation", "M"."timestamp", "M"."medicineType", "M"."medicineConc"
             FROM "MedicineRecord" "M"
-            JOIN "Chicken" "C" ON "C"."hid" = "M"."hid"
+            JOIN "Chicken" "C" ON "C"."hid" = "M"."hid" AND "M"."date"
+            BETWEEN TO_DATE('${dateInAndDateOut.dateIn}', 'DD-MM-YYYY') AND TO_DATE('${dateInAndDateOut.dateOut}', 'DD-MM-YYYY')
             WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
         list_record = list_record.rows;
@@ -291,6 +374,10 @@ export class DbService {
         hid: number,
         generation: string,
     ): Promise<string> => {
+        let dateInAndDateOut = await this.getDateInAndDateOutByHidAndGeneration(
+            hid,
+            generation,
+        );
         let tmp_generation = generation.replace('/', '_');
         let filename = `DeadChickenReport_Hid${hid}_Generation${tmp_generation}.csv`;
         let list_record = await this.dbPoolQuery(
@@ -302,6 +389,7 @@ export class DbService {
             FROM "ChickenRecord"
             GROUP BY "hid", "date", "period") "M" 
             ON "R"."hid" = "M"."hid" AND "R"."date" = "M"."date" AND "R"."chicTime" = "M"."recentChicTime"
+            AND "R"."date" BETWEEN TO_DATE('${dateInAndDateOut.dateIn}', 'DD-MM-YYYY') AND TO_DATE('${dateInAndDateOut.dateOut}', 'DD-MM-YYYY')
             JOIN "Chicken" "C" ON "C"."hid" = "R"."hid" AND "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
         list_record = list_record.rows;
@@ -518,6 +606,21 @@ export class DbService {
             WHERE "hid" = '${hid}' AND "generation" = '${generation}';`,
         );
     };
+    updateChickenFlockByHidAndGeneration = async (
+        hid,
+        generation,
+        chickenFlock: ChickenFlockUpdate,
+    ) => {
+        await this.dbPoolQuery(
+            `UPDATE "Chicken" 
+            SET "dateIn" = TO_DATE('${chickenFlock.dateIn}','DD_MM_YYYY'),
+            "dateOut" = TO_DATE('${chickenFlock.dateOut}','DD_MM_YYYY'),
+            "type" = '${chickenFlock.type}',
+            "amountIn" = '${chickenFlock.amountIn}',
+            "gender" = '${chickenFlock.gender}'
+            WHERE "hid" = '${hid}' AND "generation" = '${generation}';`,
+        );
+    };
     deleteChickenFlockByHidAndGeneration = async (hid, generation) => {
         await this.dbPoolQuery(
             `DELETE FROM "Chicken" 
@@ -638,6 +741,59 @@ export class DbService {
         );
         return queryArr.rows;
     };
+    // ****does not use
+    // getMaxAndMinEnvironmentBetweenDateBySid = async (
+    //     sid: string,
+    //     dateStart: string,
+    //     dateEnd: string,
+    // ) => {
+    //     const queryArr = await this.dbPoolQuery(
+    //         `SELECT "date", "maxWindspeed", "minWinspeed", "maxAmmonia", "minAmmonia",
+    //         "maxTemperature", "minTemperature","maxHumidity","minHumidity" FROM (
+    //         SELECT "sid", DATE("timestamp") "date",
+    //         MAX("windspeed") as "maxWindspeed", MIN("windspeed") AS "minWinspeed",
+    //         MAX("ammonia") as "maxAmmonia", MIN("ammonia") AS "minAmmonia",
+    //         MAX("temperature") as "maxTemperature", MIN("temperature") AS "minTemperature",
+    //         MAX("humidity") as "maxHumidity", MIN("humidity") AS "minHumidity"
+    //         FROM "Environment"
+    //         GROUP BY "sid", DATE("timestamp")
+    //         ) AS "tmp" WHERE "tmp"."sid" = '${sid}' AND "date" BETWEEN
+    //         TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
+    //     );
+    //     return queryArr.rows;
+    // };
+    // getMaxAndMinEnvironmentBetweenDateByHidandGeneration = async (
+    //     hid,
+    //     generation,
+    // ) => {
+    //     let chickenFlockInfo = await this.getChickenFlockInfoByHidAndGeneration(
+    //         hid,
+    //         generation,
+    //     );
+    //     let allSidInHid = await this.getAllSensorInfoByHid(hid);
+    //     let sensorList = allSidInHid.map(each => each.sid);
+    //     let dateIn = chickenFlockInfo.dateIn.toLocaleString();
+    //     let splitDateIn = dateIn.split('/');
+    //     let rearrangeDateIn = `${splitDateIn[1]}-${splitDateIn[0]}-${splitDateIn[2]}`;
+    //     let dateOut = chickenFlockInfo.dateOut.toLocaleDateString();
+    //     let splitDateOut = dateOut.split('/');
+    //     let rearrangeDateOut = `${splitDateOut[1]}-${splitDateOut[0]}-${splitDateOut[2]}`;
+
+    //     let maxAndMinEnvironmentListinHid = [];
+    //     console.log(sensorList);
+    //     for (let i in sensorList) {
+    //         let tmp = await this.getMaxAndMinEnvironmentBetweenDateBySid(
+    //             String(sensorList[i]),
+    //             rearrangeDateIn,
+    //             rearrangeDateOut,
+    //         );
+    //         maxAndMinEnvironmentListinHid.push({
+    //             sid: sensorList[i],
+    //             data: tmp,
+    //         });
+    //     }
+    //     return maxAndMinEnvironmentListinHid;
+    // };
 
     //////////////////////////////////////////////////////////////////////////////
     //table Camera
@@ -819,6 +975,7 @@ export class DbService {
         );
         return queryArr.rows[0];
     };
+
     //////////////////////////////////////////////////////////////////////////////
     //Temperature
 

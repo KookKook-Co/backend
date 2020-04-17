@@ -51,6 +51,14 @@ export interface CreateChickenFlockInput {
     hid: number;
 }
 
+export interface ChickenFlockUpdate {
+    dateIn: string;
+    dateOut: string;
+    type: string;
+    amountIn: number;
+    gender: string;
+}
+
 export interface CreateCameraInput {
     cid: string;
     cno: number;
