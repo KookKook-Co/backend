@@ -27,8 +27,18 @@ export class UsersController {
     @Get()
     async fetchAllAccounts(@Query('hno') hno, @Res() res) {
         const hid = await this.dbService.getHidByHno(hno);
-        // const {hashedPwd} = await this.dbService.getAllUsersInfoByHid(hid);
-        res.send({});
+        const uids = await this.dbService.getAllUsersIDByHid(hid);
+        const result = await Promise.all(
+            uids.map(async each => {
+                const {
+                    hashedPwd,
+                    isCurrentUser,
+                    ...remains
+                } = await this.dbService.getUserByUid(each);
+                return { ...remains, hno: remains.hid };
+            }),
+        );
+        res.send(result);
     }
 
     @UseGuards(AuthGuard())

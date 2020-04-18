@@ -31,9 +31,11 @@ export class AuthService {
     async login(user: User) {
         try {
             const { uid } = user;
-            const { hno, role } = await this.dbService.getLoginUserInfoByUid(
-                uid,
-            );
+            const {
+                imageUrl,
+                hno,
+                role,
+            } = await this.dbService.getLoginUserInfoByUid(uid);
             const payload: UserPayload = {
                 uid,
                 hno,
@@ -41,9 +43,21 @@ export class AuthService {
             };
             const access_token = this.jwtService.sign(payload);
 
-            return {
-                access_token,
-            };
+            if (role === Role.OWNER || role === Role.ADMIN) {
+                return {
+                    access_token,
+                    imageUrl,
+                    hno: await this.dbService.getAllHno(),
+                    role,
+                };
+            } else {
+                return {
+                    access_token,
+                    imageUrl,
+                    hno,
+                    role,
+                };
+            }
         } catch (err) {
             console.log(err);
         }
