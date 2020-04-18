@@ -8,6 +8,7 @@ import {
     Query,
     Put,
     Delete,
+    Req,
 } from '@nestjs/common';
 import { CreateUserDTO } from './users.interfaces';
 import { Response } from 'express';
@@ -28,6 +29,18 @@ export class UsersController {
         const hid = await this.dbService.getHidByHno(hno);
         // const {hashedPwd} = await this.dbService.getAllUsersInfoByHid(hid);
         res.send({});
+    }
+
+    @UseGuards(AuthGuard())
+    @Get('currentuser')
+    async getUserInfo(@Req() req, @Res() res) {
+        const { uid } = req.user;
+        const {
+            isCurrentUser,
+            hashedPwd,
+            ...remains
+        } = await this.dbService.getUserByUid(uid);
+        res.send({ ...remains, hno: remains.hid });
     }
 
     @UseGuards(AuthGuard(), RolesGuard)

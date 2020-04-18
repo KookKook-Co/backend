@@ -391,6 +391,7 @@ Temporary Items
 /db
 .env
 dist
+csv
 
 # Production
 /build

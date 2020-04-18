@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 import { Role, User, UserPayload } from '../users/users.interfaces';
 
@@ -24,18 +24,16 @@ export class AuthService {
             return null;
         } else {
             const { hashedPwd, ...result } = user;
-            return (await bcrypt.compare(password, hashedPwd)) ? result : null;
+            return bcrypt.compareSync(password, hashedPwd) ? result : null;
         }
     }
 
     async login(user: User) {
         try {
             const { uid } = user;
-            const {
-                imageUrl,
-                hno,
-                role,
-            } = await this.dbService.getLoginUserInfoByUid(uid);
+            const { hno, role } = await this.dbService.getLoginUserInfoByUid(
+                uid,
+            );
             const payload: UserPayload = {
                 uid,
                 hno,
@@ -43,21 +41,9 @@ export class AuthService {
             };
             const access_token = this.jwtService.sign(payload);
 
-            if (role === Role.OWNER || role === Role.ADMIN) {
-                return {
-                    access_token,
-                    imageUrl,
-                    hno: await this.dbService.getAllHno(),
-                    role,
-                };
-            } else {
-                return {
-                    access_token,
-                    imageUrl,
-                    hno,
-                    role,
-                };
-            }
+            return {
+                access_token,
+            };
         } catch (err) {
             console.log(err);
         }

@@ -18,14 +18,14 @@ export class CheckerService {
     private readonly windspeed = [0.3, 1.5];
     private readonly ammonia = 20;
 
-    private checkIrrTemperature = (ageIndex, temperature) =>
+    isIrrTemperature = (ageIndex, temperature) =>
         temperature < this.normalMinTemperature[ageIndex] ||
         temperature > this.normalMaxTemperature[ageIndex];
 
-    private checkIrrHumidity = (ageIndex, humidity) =>
+    isIrrHumidity = (ageIndex, humidity) =>
         humidity < this.normalHumidity[0] || humidity > this.normalHumidity[1];
 
-    private checkIrrWindspeed = (ageIndex, windspeed) => {
+    isIrrWindspeed = (ageIndex, windspeed) => {
         if (ageIndex < 3) {
             return (
                 windspeed < this.windspeed[0] - 0.05 ||
@@ -39,16 +39,16 @@ export class CheckerService {
         }
     };
 
-    private checkIrrAmmonia = (ageIndex, ammonia) => ammonia > this.ammonia;
+    isIrrAmmonia = (ageIndex, ammonia) => ammonia > this.ammonia;
 
     private readonly checkList = {
-        [EnvType.temperature]: this.checkIrrTemperature,
-        [EnvType.humidity]: this.checkIrrHumidity,
-        [EnvType.windspeed]: this.checkIrrWindspeed,
-        [EnvType.ammonia]: this.checkIrrAmmonia,
+        [EnvType.temperature]: this.isIrrTemperature,
+        [EnvType.humidity]: this.isIrrHumidity,
+        [EnvType.windspeed]: this.isIrrWindspeed,
+        [EnvType.ammonia]: this.isIrrAmmonia,
     };
 
-    private getAgeIndex = (age: number) => {
+    getAgeIndex = (age: number) => {
         let ageIndex = 0;
         for (ageIndex = 0; ageIndex < this.ageRange.length; ageIndex++) {
             if (age < this.ageRange[ageIndex]) {

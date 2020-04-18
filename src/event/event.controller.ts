@@ -22,7 +22,7 @@ import {
 import { Response } from 'express';
 import { RolesGuard, HousesGuard } from '../guard';
 import { DbService } from '../db/db.service';
-import { CheckerService } from './checker.services';
+import { CheckerService } from './checker.service';
 import * as moment from 'moment';
 import { DailyInfo } from '../event/event.interfaces';
 

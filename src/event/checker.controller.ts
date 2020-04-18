@@ -7,7 +7,7 @@ import {
     Payload,
 } from '@nestjs/microservices';
 import { NotiService } from './notification.service';
-import { CheckerService } from './checker.services';
+import { CheckerService } from './checker.service';
 import { DbService } from '../db/db.service';
 import moment = require('moment');
 import { EnvType } from './event.interfaces';
