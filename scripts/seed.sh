@@ -14,4 +14,4 @@ if [ ! "$(docker ps -q -f name=${POSTGRES_CONTAINER_NAME})" ]; then
     echo "# Wating for database"
     sleep 10
 fi
-npm run seed
+docker exec -it kookkook-backend-dev npm run seed

@@ -3,6 +3,8 @@ version: '3.2'
 services:
   backend:
     image: node:12
+    depends_on:
+      - db
     container_name: kookkook-backend-dev
     volumes:
       - ./src:/app/src
@@ -20,7 +22,15 @@ services:
     command: ['npm', 'run', 'start:dev']
 
   db:
-    container_name: kookkook-postgres-dev
+    image: postgres:latest
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+    ports:
+      - 5432:5432
+
+volumes:
+  postgres:

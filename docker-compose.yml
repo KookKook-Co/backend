@@ -2,11 +2,10 @@ version: '3.2'
 
 services:
   backend:
-    build: .
     image: patsk135/kookkook-backend
-    depends_on:
-      - db
     restart: always
+    volumes:
+      - /app/csv
     environment:
       DB_URI:
       QUERY_DB_URI:
@@ -21,17 +20,6 @@ services:
     ports:
       - 4000:4000
 
-  db:
-    image: postgres:latest
-    restart: always
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER:
-      POSTGRES_PASSWORD:
-    ports:
-      - 5432:5432
-
   adminer:
     image: adminer
     restart: always
@@ -45,6 +33,3 @@ services:
       - ./mosquitto:/mosquitto
     ports:
       - 1883:1883
-
-volumes:
-  postgres:
