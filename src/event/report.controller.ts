@@ -10,7 +10,7 @@ export class ReportController {
     constructor(private readonly dbService: DbService) {}
 
     private checkList = {
-        [Report.ENVIRONMENT]: this.dbService.getEnvironmentalDataReport,
+        [Report.ENVIRONMENT]: this.dbService.getMaxMinEnvironmentalDataReport,
         [Report.FOOD]: this.dbService.getFoodConsumptionReport,
         [Report.WATER]: this.dbService.getWaterConsumptionReport,
         [Report.MEDICINE]: this.dbService.getMedicineConsumptionReport,

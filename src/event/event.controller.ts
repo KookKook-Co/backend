@@ -254,30 +254,46 @@ export class EventController {
         @Body() body: CreateChickenFlockDTO,
         @Res() res: Response,
     ) {
-        const hid = await this.dbService.getHidByHno(body.hno);
+        try {
+            const { generation, ...remains } = body.chickenFlockInfo;
 
-        const chickenflock = await this.dbService.getChickenFlockInfoByHidAndGeneration(
-            hid,
-            body.chickenFlockInfo.generation,
-        );
+            const hid = await this.dbService.getHidByHno(body.hno);
 
-        if (!chickenflock) {
-            await this.dbService.createChickenFlock({
-                ...body.chickenFlockInfo,
-                dateIn: moment(body.chickenFlockInfo.dateIn).format(
-                    'DD-MM-YYYY',
-                ),
-                dateOut: moment(body.chickenFlockInfo.dateOut).format(
-                    'DD-MM-YYYY',
-                ),
+            const chickenflock = await this.dbService.getChickenFlockInfoByHidAndGeneration(
                 hid,
-            });
-        } else {
-            // Fuck DB update
-            console.log('Wait for Update function.');
-        }
+                generation,
+            );
 
-        res.status(200).send('Success');
+            if (!chickenflock) {
+                await this.dbService.createChickenFlock({
+                    ...body.chickenFlockInfo,
+                    dateIn: moment(body.chickenFlockInfo.dateIn).format(
+                        'DD-MM-YYYY',
+                    ),
+                    dateOut: moment(body.chickenFlockInfo.dateOut).format(
+                        'DD-MM-YYYY',
+                    ),
+                    hid,
+                });
+            } else {
+                await this.dbService.updateChickenFlockByHidAndGeneration(
+                    hid,
+                    generation,
+                    {
+                        ...remains,
+                        dateIn: moment(body.chickenFlockInfo.dateIn).format(
+                            'DD-MM-YYYY',
+                        ),
+                        dateOut: moment(body.chickenFlockInfo.dateOut).format(
+                            'DD-MM-YYYY',
+                        ),
+                    },
+                );
+            }
+            res.status(200).send('Success');
+        } catch (err) {
+            res.status(400).send(err);
+        }
     }
 
     @UseGuards(AuthGuard(), RolesGuard)
