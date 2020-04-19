@@ -54,5 +54,11 @@ export const addMultiConstraint = (
     return `ALTER TABLE "${table_name}" \
     ADD CONSTRAINT "${constraint_name}" FOREIGN KEY (${own_column}) REFERENCES "${parent_table}" (${parent_table_column} ${option});`;
 };
+export const addIndexBtree = (indexName, tableName, colName) => {
+    return `CREATE INDEX IF NOT EXISTS "${indexName}" ON "${tableName}" USING btree (${colName});`;
+};
+export const addUniqueIndexBtree = (indexName, tableName, colName) => {
+    return `CREATE UNIQUE INDEX IF NOT EXISTS  "${indexName}" ON "${tableName}" USING btree (${colName});`;
+};
 
 export const deleteDatabase = (db_name: string) => `DROP DATABASE ${db_name};`;

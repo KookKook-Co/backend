@@ -10,6 +10,7 @@ async function bootstrap() {
     // await seeder.seedNewDatabase();
     // await seeder.seedNewDatabaseUser();
     await seeder.seedTableConstraint();
+    await seeder.seedIndexTable();
     await seeder.seedSampleDataSet2();
     app.close();
 }

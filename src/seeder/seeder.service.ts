@@ -13,7 +13,9 @@ import {
 } from '../db/db.interfaces';
 import {
     addConstraint,
+    addIndexBtree,
     addMultiConstraint,
+    addUniqueIndexBtree,
     createTable,
     dropTable,
 } from './utils';
@@ -333,6 +335,68 @@ export class SeederService {
                 'sid_constraint',
             ),
         );
+        await poolQuery(this.pool, query_list.join(''));
+    };
+
+    seedIndexTable = async () => {
+        let query_list = [];
+        query_list.push(addUniqueIndexBtree('HouseIndex', 'House', 'hid'));
+        query_list.push(addUniqueIndexBtree('UserIndex', 'User', 'uid'));
+        query_list.push(
+            addIndexBtree('DailyRecordIndex', 'DailyRecord', 'hid, date'),
+        );
+        query_list.push(
+            addIndexBtree(
+                'DailyDataRecordIndex',
+                'DailyDataRecord',
+                'date, timestamp',
+            ),
+        );
+        query_list.push(
+            addIndexBtree('ChickenIndex', 'Chicken', 'hid, generation'),
+        );
+        query_list.push(addUniqueIndexBtree('SensorIndex', 'Sensor', 'sid'));
+        query_list.push(addUniqueIndexBtree('CameraIndex', 'Camera', 'cid'));
+        query_list.push(
+            addIndexBtree(
+                'WaterRecordIndex',
+                'WaterRecord',
+                'hid, date, timestamp',
+            ),
+        );
+        query_list.push(
+            addIndexBtree(
+                'MedicineRecordIndex',
+                'MedicineRecord',
+                'hid, date, timestamp',
+            ),
+        );
+        query_list.push(addIndexBtree('ImageIndex', 'Image', 'cid, timestamp'));
+        query_list.push(
+            addIndexBtree(
+                'CollectedDeadChickenTimeIndex',
+                'CollectedDeadChickenTime',
+                'cid, timestamp',
+            ),
+        );
+        query_list.push(
+            addIndexBtree(
+                'FoodRecordIndex',
+                'FoodRecord',
+                'hid, "foodSilo", date, timestamp',
+            ),
+        );
+        query_list.push(
+            addIndexBtree('EnvironmentIndex', 'Environment', 'sid, timestamp'),
+        );
+        query_list.push(
+            addIndexBtree(
+                'ChickenRecordIndex',
+                'ChickenRecord',
+                'hid, date, "chicTime"',
+            ),
+        );
+
         await poolQuery(this.pool, query_list.join(''));
     };
 
