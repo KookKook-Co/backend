@@ -39,10 +39,13 @@ export class CheckerController {
 
         console.log(`ChickenAge: ${chickenAge}`);
 
+        console.log(
+            this.checkerService.isIrrEnv(chickenAge, info[2] as EnvType, value),
+        );
         if (
             this.checkerService.isIrrEnv(chickenAge, info[2] as EnvType, value)
         ) {
-            this.notiService.sendLineMsg(hid, info[2], value);
+            this.notiService.sendLineMsg(hid, info[2] as EnvType, value);
         }
     }
 }

@@ -14,6 +14,7 @@ services:
       MQTT_PORT:
       JWT_SECRET:
       LINE_USERID:
+      LINE_GROUPID:
       LINE_BOT_TOKEN:
       EMAIL_USER:
       EMAIL_PASSWORD:

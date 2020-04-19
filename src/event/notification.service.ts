@@ -1,13 +1,21 @@
 import * as request from 'request';
 
 import { ConfigService } from '@nestjs/config';
+import { EnvType } from './event.interfaces';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class NotiService {
     constructor(private readonly configService: ConfigService) {}
 
-    sendLineMsg(hno, type, value) {
+    private units = {
+        [EnvType.temperature]: '°C',
+        [EnvType.ammonia]: 'ppm',
+        [EnvType.humidity]: '%RH',
+        [EnvType.windspeed]: 'm/s',
+    };
+
+    sendLineMsg(hno, type: EnvType, value) {
         const headers = {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.configService.get<string>(
@@ -20,7 +28,7 @@ export class NotiService {
             messages: [
                 {
                     type: 'text',
-                    text: `Warning !!! House ${hno} has irregular ${type} condition. \nCurrent ${type} is ${value}.`,
+                    text: `Warning !!! House ${hno} has irregular ${type} condition. \nCurrent ${type} is ${value} ${this.units[type]}.`,
                 },
             ],
         });
