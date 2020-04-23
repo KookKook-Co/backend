@@ -22,29 +22,14 @@ import {
 import { Response } from 'express';
 import { RolesGuard, HousesGuard } from '../guard';
 import { DbService } from '../db/db.service';
-import { CheckerService } from './checker.service';
 import * as moment from 'moment';
 import { DailyInfo } from '../event/event.interfaces';
 
 @Controller('event')
 export class EventController {
-    constructor(
-        private readonly checkIrrEnvService: CheckerService,
-        private readonly dbService: DbService,
-    ) {}
+    constructor(private readonly dbService: DbService) {}
 
     private logger: Logger = new Logger();
-
-    @Get('test')
-    async test() {
-        const data = {
-            temperature: 23.3,
-            humidity: 81,
-            windspeed: 1.55,
-            ammonia: 20.1,
-        };
-        console.log(this.checkIrrEnvService.getIrrEnv(28, data));
-    }
 
     @UseGuards(AuthGuard(), HousesGuard)
     @Get('sensors')

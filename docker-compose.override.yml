@@ -7,12 +7,7 @@ services:
       - db
     container_name: kookkook-backend-dev
     volumes:
-      - ./src:/app/src
-      - ./node_modules:/app/node_modules
-      - ./package.json:/app/package.json
-      - ./tsconfig.json:/app/tsconfig.json
-      - ./tsconfig.build.json:/app/tsconfig.build.json
-      - ./csv:/app/csv
+      - .:/app
     environment:
       DB_URI: postgres://postgres:password@db/postgres
       QUERY_DB_URI: postgres://user1:password@db/chicken_farm

@@ -1,4 +1,4 @@
-import { EnvType, EnvironmentalData } from './event.interfaces';
+import { EnvType, EnvironmentalData } from '../event.interfaces';
 
 import { Injectable } from '@nestjs/common';
 

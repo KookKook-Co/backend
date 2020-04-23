@@ -9,6 +9,8 @@ import {
     Put,
     Delete,
     Req,
+    UseInterceptors,
+    UploadedFile,
 } from '@nestjs/common';
 import { CreateUserDTO } from './users.interfaces';
 import { Response } from 'express';
@@ -16,12 +18,18 @@ import { RolesGuard } from '../guard/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { DbService } from '../db/db.service';
 import { CreateUserInput } from '../db/db.interfaces';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { v4 as uuidv4 } from 'uuid';
 
 import * as bcrypt from 'bcrypt';
+import { FileService } from './files.service';
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly dbService: DbService) {}
+    constructor(
+        private readonly dbService: DbService,
+        private readonly fileService: FileService,
+    ) {}
 
     @UseGuards(AuthGuard(), RolesGuard)
     @Get()
@@ -54,18 +62,26 @@ export class UsersController {
     }
 
     @UseGuards(AuthGuard(), RolesGuard)
+    @UseInterceptors(FileInterceptor('image'))
     @Post()
     async createAccount(
+        @UploadedFile() img,
         @Body() createUserDTO: CreateUserDTO,
         @Res() res: Response,
     ) {
         try {
+            const imageUrl = await this.fileService.uploadFile(
+                img.buffer,
+                uuidv4(),
+            );
+
             const { user, hno } = createUserDTO;
             const { password, ...userInfo } = user;
             const hid = await this.dbService.getHidByHno(hno);
             const createUserInput: CreateUserInput = {
                 ...userInfo,
                 hashedPwd: bcrypt.hashSync(password, 1),
+                imageUrl,
                 isCurrentUser: true,
                 hid,
             };

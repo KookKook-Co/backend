@@ -9,12 +9,8 @@ export class AppController {
         private readonly appService: AppService,
         private readonly seederService: SeederService,
     ) {}
-    @Get()
-    getHello() {
-        return this.appService.getHello();
-    }
 
-    @Get('/dropdb')
+    @Get('dropdb')
     async deleteDb() {
         // await this.seederService.dropDatabaseUser();
         await this.seederService.dropDatabase();

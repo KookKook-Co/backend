@@ -1,8 +1,8 @@
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { AuthModule } from '../auth/auth.module';
-import { CheckerController } from './checker.controller';
-import { CheckerService } from './checker.service';
+import { CheckerController } from './checker/checker.controller';
+import { CheckerService } from './checker/checker.service';
 import { ConfigModule } from '@nestjs/config';
 import { EventController } from './event.controller';
 import { EventGateway } from './event.gateway';

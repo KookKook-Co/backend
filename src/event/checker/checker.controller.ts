@@ -6,16 +6,16 @@ import {
     MqttContext,
     Payload,
 } from '@nestjs/microservices';
-import { NotiService } from './notification.service';
+import { NotiService } from '../notification.service';
 import { CheckerService } from './checker.service';
-import { DbService } from '../db/db.service';
+import { DbService } from '../../db/db.service';
 import moment = require('moment');
-import { EnvType } from './event.interfaces';
+import { EnvType } from '../event.interfaces';
 
 @Controller()
 export class CheckerController {
     constructor(
-        @Inject('MQTT_SERVICE') private client: ClientProxy,
+        // @Inject('MQTT_SERVICE') private client: ClientProxy,
         private readonly checkerService: CheckerService,
         private readonly notiService: NotiService,
         private readonly dbService: DbService,

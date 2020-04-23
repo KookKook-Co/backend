@@ -11,7 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-import { CheckerService } from './checker.service';
+import { CheckerService } from './checker/checker.service';
 import { DbService } from '../db/db.service';
 import { Logger } from '@nestjs/common';
 

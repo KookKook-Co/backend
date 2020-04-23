@@ -389,9 +389,14 @@ Temporary Items
 # Local
 # docker-compose.yml
 /db
-.env
 dist
 csv
+client
+
+# Credentials
+.env
+credentials.json
+oauth2.keys.json
 
 # Production
 /build
