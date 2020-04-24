@@ -22,11 +22,7 @@ export enum Role {
 }
 
 export interface CreateUserDTO {
-    user: UserDTO;
-    hno: number;
-}
-
-interface UserDTO {
+    hno: any;
     username: string;
     password: string;
     firstName: string;

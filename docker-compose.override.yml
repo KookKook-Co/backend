@@ -12,7 +12,6 @@ services:
       DB_URI: postgres://postgres:password@db/postgres
       QUERY_DB_URI: postgres://user1:password@db/chicken_farm
       NODE_ENV: development
-      HOST_IP: mqtt
     working_dir: /app
     command: ['npm', 'run', 'start:dev']
 

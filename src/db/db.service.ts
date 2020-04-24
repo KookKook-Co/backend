@@ -66,7 +66,7 @@ export class DbService {
             .dbPoolQuery(`INSERT INTO "User" ("username", "hashedPwd", "isCurrentUser", "firstName", "lastName", "lineID", "role", "imageUrl", "hid") 
                 VALUES ('${createUserInput.username}', '${createUserInput.hashedPwd}', '${createUserInput.isCurrentUser}',
                 '${createUserInput.firstName}', '${createUserInput.lastName}', '${createUserInput.lineID}', '${createUserInput.role}',
-                 '${createUserInput.imageUrl}', '${createUserInput.hid}');`);
+                 '${createUserInput.imageUrl}', ${createUserInput.hid});`);
 
     createHouse = (hno: number, length: number, width: number, scale: number) =>
         this.dbPoolQuery(`INSERT INTO "House" 

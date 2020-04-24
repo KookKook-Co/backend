@@ -8,7 +8,7 @@ async function bootstrap() {
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.MQTT,
         options: {
-            hostname: process.env.HOST_IP,
+            hostname: process.env.MQTT_BROKER,
             port: parseInt(process.env.MQTT_PORT),
         },
     });

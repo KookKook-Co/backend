@@ -9,7 +9,7 @@ export interface CreateUserInput {
     lineID: string;
     role: Role;
     imageUrl: string;
-    hid: number;
+    hid: any;
 }
 export interface UserInput {
     username: string;

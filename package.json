@@ -34,7 +34,6 @@
     "@nestjs/websockets": "^7.0.3",
     "aws-sdk": "^2.661.0",
     "axios": "^0.19.2",
-    "bcrypt": "^4.0.1",
     "bcryptjs": "^2.4.3",
     "csv-writer": "^1.6.0",
     "moment": "^2.24.0",

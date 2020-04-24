@@ -1,7 +1,7 @@
 import * as AWS from 'aws-sdk';
 
 export interface IFileService {
-    uploadFile(file: any, name: string): Promise<string>;
+    uploadFile(file: any, name: string): any;
     getFile(name: string): string;
 }
 
@@ -21,21 +21,20 @@ export class FileService implements IFileService {
         });
     }
 
-    uploadFile(file: any, name: string): Promise<string> {
+    uploadFile(file: any, name: string): Promise<any> {
         const params = {
             Bucket: this.BUCKET_NAME,
             Key: name,
             Body: file,
             ACL: 'public-read-write',
         };
+
         return new Promise((resolve, reject) => {
             this.s3.upload(params, function(err: any, data: any) {
                 if (err) {
-                    return reject(err);
+                    reject(false);
                 }
-                return resolve(
-                    'https://' + this.BUCKET_NAME + '.s3.amazonaws.com/' + name,
-                );
+                resolve(true);
             });
         });
     }

@@ -11,6 +11,7 @@ import {
     Req,
     UseInterceptors,
     UploadedFile,
+    Logger,
 } from '@nestjs/common';
 import { CreateUserDTO } from './users.interfaces';
 import { Response } from 'express';
@@ -21,7 +22,7 @@ import { CreateUserInput } from '../db/db.interfaces';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { v4 as uuidv4 } from 'uuid';
 
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { FileService } from './files.service';
 
 @Controller('users')
@@ -70,24 +71,30 @@ export class UsersController {
         @Res() res: Response,
     ) {
         try {
-            const imageUrl = await this.fileService.uploadFile(
-                img.buffer,
-                uuidv4(),
-            );
+            console.log(img);
 
-            const { user, hno } = createUserDTO;
-            const { password, ...userInfo } = user;
-            const hid = await this.dbService.getHidByHno(hno);
+            const uuid = uuidv4();
+            await this.fileService.uploadFile(img.buffer, uuid);
+            const imageUrl = this.fileService.getFile(uuid);
+            console.log(imageUrl);
+            console.log(createUserDTO);
+
+            const { password, hno, ...userInfo } = createUserDTO;
+
             const createUserInput: CreateUserInput = {
                 ...userInfo,
                 hashedPwd: bcrypt.hashSync(password, 1),
                 imageUrl,
                 isCurrentUser: true,
-                hid,
+                hid: hno,
             };
+
+            console.log(createUserInput);
+
             await this.dbService.createUser(createUserInput);
-            res.status(200).send('Success');
+            res.status(200).send(imageUrl);
         } catch (err) {
+            console.log(err);
             res.status(400).send(err);
         }
     }
