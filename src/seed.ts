@@ -11,7 +11,7 @@ async function bootstrap() {
     // await seeder.seedNewDatabaseUser();
     await seeder.seedTableConstraint();
     await seeder.seedIndexTable();
-    await seeder.seedSampleDataSet2();
+    await seeder.seedSampleDataSet3();
     app.close();
 }
 
