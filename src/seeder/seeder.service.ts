@@ -937,7 +937,7 @@ export class SeederService {
             lineID: `lineowner`,
             role: Role.OWNER,
             imageUrl: `https://i.imgur.com/M9CxSGh.jpg`,
-            hid: 1,
+            hid: null,
         };
         await this.dbService.createUser(ownerDataInput);
 
