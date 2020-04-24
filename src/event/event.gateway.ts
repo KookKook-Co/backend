@@ -105,7 +105,7 @@ export class EventGateway
         //     client.emit('pipeRealTimeData', houseEnv);
         // }, 5000);
 
-        setInterval(() => {
+        const send = () => {
             const houseRealTimeData: RealTimeData[] = [];
 
             for (let i = 1; i <= 6; i++) {
@@ -118,7 +118,13 @@ export class EventGateway
             }
             // console.log(houseRealTimeData);
             client.emit('pipeRealTimeData', houseRealTimeData);
-        }, 5000);
+        };
+
+        send();
+
+        setInterval(() => {
+            send();
+        }, 3000);
     }
 
     @SubscribeMessage('sendEnvironmentalData')
