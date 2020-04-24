@@ -1656,12 +1656,22 @@ export class SeederService {
                 for (let i = 1; i <= 14; i++) {
                     for (let j = 1; j <= 24; j++) {
                         let amountDead = 0;
-                        if (i == 3 && j == 4) amountDead = 2;
-                        if (i == 9 && j == 15) amountDead = 4;
-                        if (i == 12 && j == 21) amountDead = 3;
+                        let url = `https://i.imgur.com/0jQOC0U.jpg`;
+                        if (i == 3 && j == 4) {
+                            amountDead = 1;
+                            url = `https://drive.google.com/file/d/10IyOGobVx4VKEsskE3XVLYrYehCDH4JD/view?usp=sharing`;
+                        }
+                        if (i == 9 && j == 15) {
+                            amountDead = 4;
+                            url = `https://drive.google.com/file/d/1YdLa8RxcA_jasi43pMUtlML3CTz9JzGL/view?usp=sharing`;
+                        }
+                        if (i == 12 && j == 21) {
+                            amountDead = 2;
+                            url = `https://drive.google.com/file/d/1oPScW9cJNfUJEPmbi5wwIsxb_PqTfiZw/view?usp=sharing`;
+                        }
                         let imageInput: CreateCamImgInput = {
                             timestamp: `${ts}`,
-                            url: `https://i.imgur.com/0jQOC0U.jpg`,
+                            url: url,
                             amountDead: amountDead,
                             cid: `${uniqueID}`,
                         };
