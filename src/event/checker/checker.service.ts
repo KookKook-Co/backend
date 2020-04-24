@@ -6,14 +6,14 @@ import { Injectable } from '@nestjs/common';
 export class CheckerService {
     private readonly ageRange = [4, 8, 15, 22, 29];
     private readonly normalMinTemperature = [
-        23.3,
-        24.4,
-        25.6,
-        26.7,
-        27.8,
         28.9,
+        27.8,
+        26.7,
+        25.6,
+        24.4,
+        23.3,
     ];
-    private readonly normalMaxTemperature = [29.4, 30.6, 31.7, 32.8, 33.9, 35];
+    private readonly normalMaxTemperature = [35, 33.9, 32.8, 31.7, 30.6, 29.4];
     private readonly normalHumidity = [50, 80];
     private readonly windspeed = [0.3, 1.5];
     private readonly ammonia = 20;
