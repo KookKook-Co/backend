@@ -1374,7 +1374,7 @@ export class SeederService {
             }
         }
 
-        let randomGender = ['MALE', 'FEMEALE'];
+        let randomGender = ['MALE', 'FEMALE'];
         for (let i = 1; i <= 5; i++) {
             let randomPostionInlist = Math.floor(
                 Math.random() * randomGender.length,
