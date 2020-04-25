@@ -82,7 +82,7 @@ export class SeederService {
             createTable(
                 'User',
                 '"uid" SERIAL, \
-                "username" VARCHAR(50), \
+                "username" VARCHAR(50) UNIQUE, \
                 "hashedPwd" VARCHAR, \
                 "isCurrentUser" BOOLEAN, \
                 "firstName" VARCHAR(50), \
@@ -1409,12 +1409,12 @@ export class SeederService {
             }
         }
         //CREATE ChickenRecord SAMPLE
-        let tsMorning1 = 1587351000;
-        let tsMorning2 = 1587358200;
-        let tsEvening1 = 1587384600;
-        let tsEvening2 = 1587391800;
+        let tsMorning1 = 1587351000 + 60 * 60 * 6;
+        let tsMorning2 = 1587358200 + 60 * 60 * 8;
+        let tsEvening1 = 1587384600 + 60 * 60 * 4;
+        let tsEvening2 = 1587391800 + 60 * 60 * 6;
         let randomweight = { 0: 0.8, 1: 0.05, 2: 0.05, 3: 0.05, 4: 0.05 };
-        for (let day = 1; day <= 8; day++) {
+        for (let day = 1; day <= 9; day++) {
             let amountDead1 = await this.weightedRandom(randomweight);
             let amountZleg1 = await this.weightedRandom(randomweight);
             let amountDwaft1 = await this.weightedRandom(randomweight);
@@ -1539,7 +1539,7 @@ export class SeederService {
         }
         ////////////////////////////////////////////////////////
         let ts = 1587352200;
-        for (let t = 1; t <= 96; t++) {
+        for (let t = 1; t <= 114; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -1562,8 +1562,8 @@ export class SeederService {
         }
 
         //create Food Record Input one times per day
-        ts = 1587352200;
-        for (let t = 1; t <= 8; t++) {
+        ts = 1587352200 + 60 * 60 * 6;
+        for (let t = 1; t <= 10; t++) {
             for (let house = 1; house <= 5; house++) {
                 for (let silo = 1; silo <= 2; silo++) {
                     let getDate = new Date(0);
@@ -1615,7 +1615,7 @@ export class SeederService {
         let meter1 = 2508392;
         let meter2 = 2530116;
         let waterconsume = 663;
-        for (let t = 1; t <= 8; t++) {
+        for (let t = 1; t <= 9; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -1657,7 +1657,7 @@ export class SeederService {
         }
         //create Environment Data
         ts = 1587352200;
-        for (let t = 1; t <= 30; t++) {
+        for (let t = 1; t <= 38; t++) {
             uniqueID = 1;
             for (let house = 1; house <= 5; house++) {
                 for (let no = 1; no <= 2 * 3; no++) {
