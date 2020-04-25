@@ -13,7 +13,7 @@ import {
     UploadedFile,
     Logger,
 } from '@nestjs/common';
-import { CreateUserDTO } from './users.interfaces';
+import { CreateUserDTO, UpdateUserDTO } from './users.interfaces';
 import { Response } from 'express';
 import { RolesGuard } from '../guard/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
@@ -31,6 +31,8 @@ export class UsersController {
         private readonly dbService: DbService,
         private readonly fileService: FileService,
     ) {}
+
+    private logger: Logger = new Logger('UserController');
 
     @UseGuards(AuthGuard(), RolesGuard)
     @Get()
@@ -71,8 +73,15 @@ export class UsersController {
         @Res() res: Response,
     ) {
         try {
-            console.log(img);
+            const user = await this.dbService.getUserByUsername(
+                createUserDTO.username,
+            );
 
+            if (user === undefined || user === null) {
+                res.status(409).send('Duplicated Username');
+            }
+
+            console.log(img);
             const uuid = uuidv4();
             await this.fileService.uploadFile(img.buffer, uuid);
             const imageUrl = this.fileService.getFile(uuid);
@@ -101,9 +110,30 @@ export class UsersController {
 
     @UseGuards(AuthGuard(), RolesGuard)
     @Put()
-    async updateUser(@Body() body) {
-        // Wait Frontend & DB
-        return true;
+    async updateUser(@Body() body: UpdateUserDTO, @Res() res) {
+        try {
+            // console.log(body);
+            const { uid, ...user } = body;
+            await this.dbService.updateUserInfo(uid, user);
+            res.status(200).send('Success');
+        } catch (err) {
+            console.log(err);
+            res.status(400).send(err);
+        }
+    }
+
+    @UseGuards(AuthGuard(), RolesGuard)
+    @Put('password')
+    async resetPassword(@Body() body, @Res() res) {
+        try {
+            this.logger.log(body, '/PUT password');
+            const { uid, password } = body;
+            const hashedPwd = bcrypt.hashSync(password, Math.random());
+            await this.dbService.resetUserPassword(uid, hashedPwd);
+            res.status(200).send('Success');
+        } catch (err) {
+            res.status(400).send(err);
+        }
     }
 
     @UseGuards(AuthGuard(), RolesGuard)

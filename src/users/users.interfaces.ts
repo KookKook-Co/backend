@@ -30,3 +30,12 @@ export interface CreateUserDTO {
     role: Role;
     lineID: string;
 }
+
+export interface UpdateUserDTO {
+    uid: number;
+    username: string;
+    firstName: string;
+    lastName: string;
+    role: Role;
+    lineID: string;
+}

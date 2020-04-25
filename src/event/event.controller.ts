@@ -29,7 +29,7 @@ import { DailyInfo } from '../event/event.interfaces';
 export class EventController {
     constructor(private readonly dbService: DbService) {}
 
-    private logger: Logger = new Logger();
+    private logger: Logger = new Logger('EventController');
 
     @UseGuards(AuthGuard(), HousesGuard)
     @Get('sensors')
@@ -55,6 +55,7 @@ export class EventController {
         @Query() query: GetWeeklyDailyDataQuery,
         @Res() res: Response,
     ) {
+        console.log(query);
         const { sid, type, dateStart, dateEnd } = query;
 
         // const dateStart = moment().format('DD-MM-YYYY');
@@ -82,13 +83,10 @@ export class EventController {
 
     @UseGuards(AuthGuard(), HousesGuard)
     @Get('dailydata')
-    async getDailyDataInfo(
-        @Request() req,
-        @Query() query,
-        @Res() res: Response,
-    ) {
+    async getDailyDataInfo(@Query() query, @Res() res: Response) {
+        this.logger.log(query, '/GET dailydata');
+
         const formatedDate = moment(query.date).format('DD-MM-YYYY');
-        // const formatedDate = '12-03-2020'; // mock
 
         const hid = await this.dbService.getHidByHno(query.hno);
 
@@ -174,6 +172,8 @@ export class EventController {
         @Query() query: GetUnqualifiedChickenInfo,
         @Res() res: Response,
     ) {
+        this.logger.log(query, '/GET unqualifiedchicken');
+
         const formatedDate = moment(query.date).format('DD-MM-YYYY');
         const h_id = await this.dbService.getHidByHno(query.hno);
 
@@ -229,6 +229,7 @@ export class EventController {
     @UseGuards(AuthGuard(), RolesGuard)
     @Get('chickenflocks')
     async getChickenFlock(@Query('hno') hno, @Res() res: Response) {
+        this.logger.log(hno, '/GET chickenflocks');
         const hid = await this.dbService.getHidByHno(hno);
         res.send(await this.dbService.getChickenFlockInfoByHid(hid));
     }

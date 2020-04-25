@@ -13,14 +13,10 @@ export interface CreateUserInput {
 }
 export interface UserInput {
     username: string;
-    hashedPwd: string;
-    isCurrentUser: boolean;
     firstName: string;
     lastName: string;
     lineID: string;
     role: Role;
-    imageUrl: string;
-    hid: number;
 }
 
 export interface UserDataOutput {

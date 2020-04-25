@@ -1,9 +1,10 @@
 import { EnvType, EnvironmentalData } from '../event.interfaces';
-
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export class CheckerService {
+    private logger: Logger = new Logger('IrrEnvChecker Service');
+
     private readonly ageRange = [4, 8, 15, 22, 29];
     private readonly normalMinTemperature = [
         28.9,
@@ -27,14 +28,14 @@ export class CheckerService {
 
     isIrrWindspeed = (ageIndex, windspeed) => {
         if (ageIndex < 3) {
-            return (
-                windspeed < this.windspeed[0] - 0.05 ||
-                windspeed > this.windspeed[0] + 0.05
+            return !(
+                windspeed >= this.windspeed[0] - 0.05 &&
+                windspeed <= this.windspeed[0] + 0.05
             );
         } else {
-            return (
-                windspeed < this.windspeed[1] - 0.05 ||
-                windspeed > this.windspeed[1] + 0.05
+            return !(
+                windspeed >= this.windspeed[1] - 0.05 &&
+                windspeed <= this.windspeed[1] + 0.05
             );
         }
     };
@@ -79,6 +80,8 @@ export class CheckerService {
     }
 
     isIrrEnv(age: number, type: EnvType, value: number) {
-        return this.checkList[type](this.getAgeIndex(age), value);
+        const result = this.checkList[type](this.getAgeIndex(age), value);
+        this.logger.log(`Irregular ${type}? false`);
+        return result;
     }
 }

@@ -29,10 +29,9 @@ interface Block {
 
 export interface GetWeeklyDailyDataQuery {
     sid: string;
-    hno: number;
     type: EnvType;
-    dateStart: Date;
-    dateEnd: Date;
+    dateStart: string;
+    dateEnd: string;
 }
 
 export interface PostDailyInfo {

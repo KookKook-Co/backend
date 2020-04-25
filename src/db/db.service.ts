@@ -458,14 +458,18 @@ export class DbService {
             `UPDATE "User" 
             SET 
             "username" = '${updateUserInfo.username}',
-            "hashedPwd"= '${updateUserInfo.hashedPwd}',
-            "isCurrentUser"= '${updateUserInfo.isCurrentUser}',
             "firstName"= '${updateUserInfo.firstName}',
             "lastName"= '${updateUserInfo.lastName}',
             "lineID"= '${updateUserInfo.lineID}',
-            "role"= '${updateUserInfo.role}',
-            "imageUrl"= '${updateUserInfo.imageUrl}',
-            "hid"= '${updateUserInfo.hid}'
+            "role"= '${updateUserInfo.role}'
+            WHERE "uid" = '${uid}';`,
+        );
+    };
+    resetUserPassword = async (uid: number, password: string) => {
+        await this.dbPoolQuery(
+            `UPDATE "User" 
+            SET 
+            "hashedPwd" = '${password}'
             WHERE "uid" = '${uid}';`,
         );
     };
