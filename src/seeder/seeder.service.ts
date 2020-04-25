@@ -1297,29 +1297,55 @@ export class SeederService {
             hashedPwd:
                 '$2b$04$vpJ4H0yfvyN68IsbAS4e2eQ3A/wPJvK2bWqpq6CDhhHX9Y63IhHyG',
             isCurrentUser: true,
-            firstName: `ownerfirstname`,
-            lastName: `ownerlastname`,
+            firstName: `Nakornthip`,
+            lastName: `Prompoon`,
             lineID: `lineowner`,
             role: Role.OWNER,
-            imageUrl: `https://i.imgur.com/M9CxSGh.jpg`,
+            imageUrl: `https://kookkook.s3-ap-southeast-1.amazonaws.com/profile/0.jpg`,
             hid: null,
         };
         await this.dbService.createUser(ownerDataInput);
 
-        let userDataInput: CreateUserInput = {
-            username: `worker`,
-            hashedPwd:
-                '$2b$04$C4GP5tj3zJCpgOHOBHmbfe1ahTVhvhfch6uwJ1Gv7vSUE3nJfJuyS',
-            isCurrentUser: true,
-            firstName: `firstname`,
-            lastName: `lastname`,
-            lineID: `lineid`,
-            role: Role.WORKER,
-            imageUrl: `https://i.imgur.com/asFo8tE.jpg`,
-            hid: 1,
-        };
-        await this.dbService.createUser(userDataInput);
-
+        // let userDataInput: CreateUserInput = {
+        //     username: `worker`,
+        //     hashedPwd:
+        //         '$2b$04$C4GP5tj3zJCpgOHOBHmbfe1ahTVhvhfch6uwJ1Gv7vSUE3nJfJuyS',
+        //     isCurrentUser: true,
+        //     firstName: `firstname`,
+        //     lastName: `lastname`,
+        //     lineID: `lineid`,
+        //     role: Role.WORKER,
+        //     imageUrl: `https://i.imgur.com/asFo8tE.jpg`,
+        //     hid: 1,
+        // };
+        // await this.dbService.createUser(userDataInput);
+        let firstname = [
+            '',
+            'Napatee',
+            'Anapat',
+            'Theerat',
+            'Natakorn Ammy',
+            'Panas',
+            'Pachara',
+            'Puvit',
+            'Onninan',
+            'Prin',
+            'Ranchida',
+        ];
+        let lastname = [
+            '',
+            'Yaibuates',
+            'Jiamwijitkul',
+            'Tassanai',
+            'Kam',
+            'Rattanasuwan',
+            'Pattarabodee',
+            'Pracharktam',
+            'Lewthanawinit',
+            'Siripattanakul',
+            'Nanagara',
+        ];
+        let userCount = 1;
         for (let i = 1; i <= 5; i++) {
             for (let j = 1; j <= 2; j++) {
                 let userDataInput: CreateUserInput = {
@@ -1327,14 +1353,15 @@ export class SeederService {
                     hashedPwd:
                         '$2b$04$C4GP5tj3zJCpgOHOBHmbfe1ahTVhvhfch6uwJ1Gv7vSUE3nJfJuyS',
                     isCurrentUser: true,
-                    firstName: `firstname${i}${j}`,
-                    lastName: `lastname${i}${j}`,
+                    firstName: firstname[userCount],
+                    lastName: lastname[userCount],
                     lineID: `lineid${i}${j}`,
                     role: Role.WORKER,
-                    imageUrl: `https://i.imgur.com/asFo8tE.jpg`,
+                    imageUrl: `https://kookkook.s3-ap-southeast-1.amazonaws.com/profile/${userCount}.png`,
                     hid: i,
                 };
                 await this.dbService.createUser(userDataInput);
+                userCount++;
             }
         }
 
@@ -1386,7 +1413,7 @@ export class SeederService {
         let tsMorning2 = 1587358200;
         let tsEvening1 = 1587384600;
         let tsEvening2 = 1587391800;
-        let randomweight = { 0: 0.96, 1: 0.01, 2: 0.01, 3: 0.01, 4: 0.01 };
+        let randomweight = { 0: 0.8, 1: 0.05, 2: 0.05, 3: 0.05, 4: 0.05 };
         for (let day = 1; day <= 8; day++) {
             let amountDead1 = await this.weightedRandom(randomweight);
             let amountZleg1 = await this.weightedRandom(randomweight);
@@ -1659,15 +1686,15 @@ export class SeederService {
                         let url = `https://i.imgur.com/0jQOC0U.jpg`;
                         if (i == 3 && j == 4) {
                             amountDead = 1;
-                            url = `https://drive.google.com/file/d/10IyOGobVx4VKEsskE3XVLYrYehCDH4JD/view?usp=sharing`;
+                            url = `https://kookkook.s3-ap-southeast-1.amazonaws.com/chicken_img/46.png`;
                         }
                         if (i == 9 && j == 15) {
                             amountDead = 4;
-                            url = `https://drive.google.com/file/d/1YdLa8RxcA_jasi43pMUtlML3CTz9JzGL/view?usp=sharing`;
+                            url = `https://kookkook.s3-ap-southeast-1.amazonaws.com/chicken_img/49.png`;
                         }
                         if (i == 12 && j == 21) {
                             amountDead = 2;
-                            url = `https://drive.google.com/file/d/1oPScW9cJNfUJEPmbi5wwIsxb_PqTfiZw/view?usp=sharing`;
+                            url = `https://kookkook.s3-ap-southeast-1.amazonaws.com/chicken_img/18.png`;
                         }
                         let imageInput: CreateCamImgInput = {
                             timestamp: `${ts}`,
