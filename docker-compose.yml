@@ -19,6 +19,9 @@ services:
       LINE_BOT_TOKEN:
       EMAIL_USER:
       EMAIL_PASSWORD:
+      BUCKET_ID:
+      BUCKET_SECRET:
+      BUCKET_NAME:
     ports:
       - 4000:4000
 

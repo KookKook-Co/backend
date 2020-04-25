@@ -13,7 +13,7 @@ export class AppController {
     @Get('dropdb')
     async deleteDb() {
         // await this.seederService.dropDatabaseUser();
-        await this.seederService.dropDatabase();
+        // await this.seederService.dropDatabase();
         await this.seederService.dropAllTable();
     }
 }

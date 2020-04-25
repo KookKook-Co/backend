@@ -32,6 +32,7 @@ export class FileService implements IFileService {
         return new Promise((resolve, reject) => {
             this.s3.upload(params, function(err: any, data: any) {
                 if (err) {
+                    console.log(err);
                     reject(false);
                 }
                 resolve(true);
