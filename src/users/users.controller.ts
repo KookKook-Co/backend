@@ -78,30 +78,30 @@ export class UsersController {
             );
 
             if (user === undefined || user === null) {
+                console.log(img);
+                const uuid = uuidv4();
+                await this.fileService.uploadFile(img.buffer, uuid);
+                const imageUrl = this.fileService.getFile(uuid);
+                console.log(imageUrl);
+                console.log(createUserDTO);
+
+                const { password, hno, ...userInfo } = createUserDTO;
+
+                const createUserInput: CreateUserInput = {
+                    ...userInfo,
+                    hashedPwd: bcrypt.hashSync(password, 1),
+                    imageUrl,
+                    isCurrentUser: true,
+                    hid: hno,
+                };
+
+                console.log(createUserInput);
+
+                await this.dbService.createUser(createUserInput);
+                res.status(200).send(imageUrl);
+            } else {
                 res.status(409).send('Duplicated Username');
             }
-
-            console.log(img);
-            const uuid = uuidv4();
-            await this.fileService.uploadFile(img.buffer, uuid);
-            const imageUrl = this.fileService.getFile(uuid);
-            console.log(imageUrl);
-            console.log(createUserDTO);
-
-            const { password, hno, ...userInfo } = createUserDTO;
-
-            const createUserInput: CreateUserInput = {
-                ...userInfo,
-                hashedPwd: bcrypt.hashSync(password, 1),
-                imageUrl,
-                isCurrentUser: true,
-                hid: hno,
-            };
-
-            console.log(createUserInput);
-
-            await this.dbService.createUser(createUserInput);
-            res.status(200).send(imageUrl);
         } catch (err) {
             console.log(err);
             res.status(400).send(err);
