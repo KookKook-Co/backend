@@ -1236,10 +1236,10 @@ export class SeederService {
                 for (let no = 1; no <= 2 * 3; no++) {
                     let environmentInput: CreateEnvDataInput = {
                         timestamp: `${ts}`,
-                        windspeed: Math.floor(Math.random() * 15 + 110),
-                        ammonia: Math.floor(Math.random() * 5 + 20),
-                        temperature: Math.floor(Math.random() * 10 + 25),
-                        humidity: Math.floor(Math.random() * 20 + 40),
+                        windspeed: this.weightedCenterRandom(1.6, 1.4, 5),
+                        ammonia: this.weightedCenterRandom(30, 0, 3),
+                        temperature: this.weightedCenterRandom(35, 20, 5),
+                        humidity: this.weightedCenterRandom(80, 50, 2),
                         sid: `${uniqueID}`,
                     };
                     await this.dbService.createEnvData(environmentInput);
@@ -1663,10 +1663,10 @@ export class SeederService {
                 for (let no = 1; no <= 2 * 3; no++) {
                     let environmentInput: CreateEnvDataInput = {
                         timestamp: `${ts}`,
-                        windspeed: Math.floor(Math.random() * 15 + 110),
-                        ammonia: Math.floor(Math.random() * 5 + 20),
-                        temperature: Math.floor(Math.random() * 10 + 25),
-                        humidity: Math.floor(Math.random() * 20 + 40),
+                        windspeed: this.weightedCenterRandom(1.6, 1.4, 5),
+                        ammonia: this.weightedCenterRandom(30, 0, 3),
+                        temperature: this.weightedCenterRandom(35, 20, 5),
+                        humidity: this.weightedCenterRandom(80, 50, 2),
                         sid: `${uniqueID}`,
                     };
                     await this.dbService.createEnvData(environmentInput);
@@ -1745,5 +1745,12 @@ export class SeederService {
             sum += prob[i];
             if (r <= sum) return i;
         }
+    };
+    weightedCenterRandom = (max, min, numDice) => {
+        var num = min;
+        for (var i = 0; i < numDice; i++) {
+            num += Math.random() * ((max - min) / numDice);
+        }
+        return num.toFixed(2);
     };
 }
