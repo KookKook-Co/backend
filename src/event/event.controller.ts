@@ -22,7 +22,7 @@ import {
 import { Response } from 'express';
 import { RolesGuard, HousesGuard } from '../guard';
 import { DbService } from '../db/db.service';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { DailyInfo } from '../event/event.interfaces';
 
 @Controller('event')
@@ -67,8 +67,12 @@ export class EventController {
             await this.dbService.getMaxAndMinBetweenDateBySidandEnvType(
                 type,
                 sid,
-                moment(dateStart).format('DD-MM-YYYY'),
-                moment(dateEnd).format('DD-MM-YYYY'),
+                moment(dateStart)
+                    .tz('Asia/Bangkok')
+                    .format('DD-MM-YYYY'),
+                moment(dateEnd)
+                    .tz('Asia/Bangkok')
+                    .format('DD-MM-YYYY'),
             ),
         );
     }
@@ -86,7 +90,9 @@ export class EventController {
     async getDailyDataInfo(@Query() query, @Res() res: Response) {
         this.logger.log(query, '/GET dailydata');
 
-        const formatedDate = moment(query.date).format('DD-MM-YYYY');
+        const formatedDate = moment(query.date)
+            .tz('Asia/Bangkok')
+            .format('DD-MM-YYYY');
 
         const hid = await this.dbService.getHidByHno(query.hno);
 
@@ -110,7 +116,9 @@ export class EventController {
     ) {
         try {
             const hid = await this.dbService.getHidByHno(body.hno);
-            const date = moment(body.date).format('DD-MM-YYYY');
+            const date = moment(body.date)
+                .tz('Asia/Bangkok')
+                .format('DD-MM-YYYY');
             const dateBefore = moment(body.date)
                 .subtract(1, 'days')
                 .format('DD-MM-YYYY');
@@ -174,7 +182,9 @@ export class EventController {
     ) {
         this.logger.log(query, '/GET unqualifiedchicken');
         try {
-            const formatedDate = moment(query.date).format('DD-MM-YYYY');
+            const formatedDate = moment(query.date)
+                .tz('Asia/Bangkok')
+                .format('DD-MM-YYYY');
             this.logger.log(formatedDate);
             const h_id = await this.dbService.getHidByHno(query.hno);
 
@@ -209,7 +219,9 @@ export class EventController {
             const { date, period, unqualifiedChickenInfo } = body;
 
             const hid = await this.dbService.getHidByHno(body.hno);
-            const formatedDate = moment(date).format('DD-MM-YYYY');
+            const formatedDate = moment(date)
+                .tz('Asia/Bangkok')
+                .format('DD-MM-YYYY');
 
             if (
                 !(await this.dbService.isDailyRecordTupleExist(
@@ -260,12 +272,12 @@ export class EventController {
             if (!chickenflock) {
                 await this.dbService.createChickenFlock({
                     ...body.chickenFlockInfo,
-                    dateIn: moment(body.chickenFlockInfo.dateIn).format(
-                        'DD-MM-YYYY',
-                    ),
-                    dateOut: moment(body.chickenFlockInfo.dateOut).format(
-                        'DD-MM-YYYY',
-                    ),
+                    dateIn: moment(body.chickenFlockInfo.dateIn)
+                        .tz('Asia/Bangkok')
+                        .format('DD-MM-YYYY'),
+                    dateOut: moment(body.chickenFlockInfo.dateOut)
+                        .tz('Asia/Bangkok')
+                        .format('DD-MM-YYYY'),
                     hid,
                 });
             } else {
@@ -274,12 +286,12 @@ export class EventController {
                     generation,
                     {
                         ...remains,
-                        dateIn: moment(body.chickenFlockInfo.dateIn).format(
-                            'DD-MM-YYYY',
-                        ),
-                        dateOut: moment(body.chickenFlockInfo.dateOut).format(
-                            'DD-MM-YYYY',
-                        ),
+                        dateIn: moment(body.chickenFlockInfo.dateIn)
+                            .tz('Asia/Bangkok')
+                            .format('DD-MM-YYYY'),
+                        dateOut: moment(body.chickenFlockInfo.dateOut)
+                            .tz('Asia/Bangkok')
+                            .format('DD-MM-YYYY'),
                     },
                 );
             }

@@ -8,7 +8,7 @@ import {
 import { NotiService } from '../notification.service';
 import { CheckerService } from './checker.service';
 import { DbService } from '../../db/db.service';
-import moment = require('moment');
+import moment = require('moment-timezone');
 import { EnvType } from '../event.interfaces';
 
 @Controller()

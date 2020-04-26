@@ -37,6 +37,7 @@
     "bcryptjs": "^2.4.3",
     "csv-writer": "^1.6.0",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.28",
     "mqtt": "^3.0.0",
     "nodemailer": "^6.4.6",
     "passport": "^0.4.1",
