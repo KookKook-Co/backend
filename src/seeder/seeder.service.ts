@@ -1381,8 +1381,8 @@ export class SeederService {
             );
             let chickenInput: CreateChickenFlockInput = {
                 generation: '2020/1',
-                dateIn: '20-04-2020',
-                dateOut: '20-05-2020',
+                dateIn: '10-04-2020',
+                dateOut: '15-05-2020',
                 type: 'Sally',
                 amountIn: 40000,
                 gender: randomGender[randomPostionInlist],
