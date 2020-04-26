@@ -8,6 +8,13 @@ import { Injectable } from '@nestjs/common';
 export class NotiService {
     constructor(private readonly configService: ConfigService) {}
 
+    private topics = {
+        [EnvType.temperature]: 'TEMPERATURE',
+        [EnvType.ammonia]: 'AMMONIA CONCENTRATION',
+        [EnvType.humidity]: 'HUMIDITY',
+        [EnvType.windspeed]: 'WINDSPEED',
+    };
+
     private units = {
         [EnvType.temperature]: '°C',
         [EnvType.ammonia]: 'ppm',
@@ -68,18 +75,18 @@ export class NotiService {
             messages: [
                 {
                     type: 'template',
-                    altText: 'this is a buttons template',
+                    altText: `WARNING! [HOUSE ${hno}] IRR ENV`,
                     template: {
                         type: 'buttons',
                         actions: [
                             {
                                 type: 'uri',
                                 label: 'View Dashboard',
-                                uri: 'http://kookkook.live',
+                                uri: 'http://128.199.211.41',
                             },
                         ],
                         thumbnailImageUrl: `${this.images[type]}`,
-                        title: 'WARNING!!!\nTEMPERATURE',
+                        title: `WARNING!\nIRREGULAR ${this.topics[type]}`,
                         text: `House ${hno} ${type} is ${value} ${this.units[type]}.`,
                     },
                 },
@@ -96,7 +103,7 @@ export class NotiService {
                 if (err) {
                     console.log('error: ' + err);
                 } else {
-                    console.log('body: ' + body);
+                    // console.log('body: ' + body);
                 }
             },
         );

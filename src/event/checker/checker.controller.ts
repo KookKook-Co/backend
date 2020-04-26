@@ -36,6 +36,7 @@ export class CheckerController {
 
         const now = moment(new Date());
         const chickenAge = moment.duration(now.diff(moment(dateIn))).asDays();
+        this.logger.log(`Chicken Age: ${chickenAge}`);
 
         if (
             this.checkerService.isIrrEnv(chickenAge, info[2] as EnvType, value)

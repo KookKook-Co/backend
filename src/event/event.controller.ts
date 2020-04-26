@@ -173,22 +173,26 @@ export class EventController {
         @Res() res: Response,
     ) {
         this.logger.log(query, '/GET unqualifiedchicken');
+        try {
+            const formatedDate = moment(query.date).format('DD-MM-YYYY');
+            const h_id = await this.dbService.getHidByHno(query.hno);
 
-        const formatedDate = moment(query.date).format('DD-MM-YYYY');
-        const h_id = await this.dbService.getHidByHno(query.hno);
+            const result = await this.dbService.getLatestChickenRecordByHidAndDateAndPeriod(
+                h_id,
+                formatedDate,
+                query.period,
+            );
 
-        const {
-            chicTime,
-            period,
-            date,
-            hid,
-            ...remains
-        } = await this.dbService.getLatestChickenRecordByHidAndDateAndPeriod(
-            h_id,
-            formatedDate,
-            query.period,
-        );
-        res.send(remains);
+            if (result === null || result === undefined) {
+                res.send(null);
+            } else {
+                const { chicTime, period, date, hid, ...remains } = result;
+                res.send(remains);
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(400).send(err);
+        }
     }
 
     @UseGuards(AuthGuard(), HousesGuard)
