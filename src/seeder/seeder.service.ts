@@ -1591,7 +1591,7 @@ export class SeederService {
 
         //create Medicine Record Only one times
         ts = 1587352200 + 60 * 60 * 6;
-        for (let t = 1; t <= 1; t++) {
+        for (let t = 1; t <= 9; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -1609,6 +1609,7 @@ export class SeederService {
                 };
                 await this.dbService.createMedicineRecord(medicineRecordInput);
             }
+            ts += 60 * 60 * 24;
         }
         // create Water Record one times per day
         ts = 1587352200 + 60 * 60 * 8;

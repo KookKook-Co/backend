@@ -238,14 +238,14 @@ export class DbService {
             { id: 'generation', title: 'Generation' },
             { id: 'sid', title: 'Sensor ID' },
             { id: 'date', title: 'Date' },
-            { id: 'maxWindspeed', title: 'MaxWindspeed' },
-            { id: 'minWindspeed', title: 'MinWindspeed' },
-            { id: 'maxAmmonia', title: 'MaxAmmonia' },
-            { id: 'minAmmonia', title: 'MinAmmonia' },
-            { id: 'maxTemperature', title: 'MaxTemperature' },
-            { id: 'minTemperature', title: 'MinTemperature' },
-            { id: 'maxHumidity', title: 'MaxHumidity' },
-            { id: 'minHumidity', title: 'MinHumidity' },
+            { id: 'maxWindspeed', title: 'Max Windspeed' },
+            { id: 'minWindspeed', title: 'Min Windspeed' },
+            { id: 'maxAmmonia', title: 'Max Ammonia' },
+            { id: 'minAmmonia', title: 'Min Ammonia' },
+            { id: 'maxTemperature', title: 'Max Temperature' },
+            { id: 'minTemperature', title: 'Min Temperature' },
+            { id: 'maxHumidity', title: 'Max Humidity' },
+            { id: 'minHumidity', title: 'Min Humidity' },
         ];
         await this.exportCSV(header, list_record, filename);
         return filename;
@@ -379,7 +379,7 @@ export class DbService {
             { id: 'hid', title: 'House ID' },
             { id: 'generation', title: 'Generation' },
             { id: 'timestamp', title: 'Timestamp' },
-            { id: 'medicineType', title: 'MedicineType' },
+            { id: 'medicineType', title: 'Medicine Type' },
             { id: 'medicineConc', title: 'Medicine Dose' },
         ];
         await this.exportCSV(header, list_record, filename);
@@ -417,12 +417,12 @@ export class DbService {
             { id: 'hid', title: 'House ID' },
             { id: 'generation', title: 'Generation' },
             { id: 'date', title: 'Date' },
-            { id: 'chicTime', title: 'ChicTime' },
+            { id: 'chicTime', title: 'Timestamp' },
             { id: 'period', title: 'Period' },
-            { id: 'amountDead', title: 'AmountDead' },
-            { id: 'amountZleg', title: 'AmountZleg' },
-            { id: 'amountDwaft', title: 'AmountDwarf' },
-            { id: 'amountSick', title: 'AmountSick' },
+            { id: 'amountDead', title: 'Amount Dead' },
+            { id: 'amountZleg', title: 'Amount Zleg' },
+            { id: 'amountDwaft', title: 'Amount Dwarf' },
+            { id: 'amountSick', title: 'Amount Sick' },
         ];
         await this.exportCSV(header, list_record, filename);
         return filename;
