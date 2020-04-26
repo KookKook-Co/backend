@@ -122,13 +122,14 @@ export class EventGateway
                             environmentalData: env,
                         };
                     });
-                    console.log(houseEnv[0]);
+                    this.logger.log(`Age: ${chickenAge}`);
+                    this.logger.log(houseEnv[0]);
                     houseRealTimeData.push(houseEnv[0]);
                 } else {
                     const currData = currentData();
                     houseRealTimeData.push({
                         sid: i.toString(),
-                        irregularEnv: this.checkIrrEnv.getIrrEnv(10, currData),
+                        irregularEnv: this.checkIrrEnv.getIrrEnv(20, currData),
                         environmentalData: currData,
                     });
                 }
