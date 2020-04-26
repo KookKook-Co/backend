@@ -115,15 +115,19 @@ export class EventController {
         @Res() res: Response,
     ) {
         try {
+            this.logger.log('Start', '/POST dailydata');
             const hid = await this.dbService.getHidByHno(body.hno);
             const date = moment(body.date)
                 .tz('Asia/Bangkok')
                 .format('DD-MM-YYYY');
             const dateBefore = moment(body.date)
+                .tz('Asia/Bangkok')
                 .subtract(1, 'days')
                 .format('DD-MM-YYYY');
 
-            // console.log(body);
+            console.log(date);
+            console.log(dateBefore);
+            console.log(body);
 
             if (!(await this.dbService.isDailyRecordTupleExist(date, hid))) {
                 await this.dbService.createDailyRecord(date, hid);
@@ -216,12 +220,15 @@ export class EventController {
         @Res() res: Response,
     ) {
         try {
+            console.log(body);
             const { date, period, unqualifiedChickenInfo } = body;
 
             const hid = await this.dbService.getHidByHno(body.hno);
             const formatedDate = moment(date)
                 .tz('Asia/Bangkok')
                 .format('DD-MM-YYYY');
+
+            console.log(formatedDate);
 
             if (
                 !(await this.dbService.isDailyRecordTupleExist(
