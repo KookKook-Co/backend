@@ -12,7 +12,7 @@ RUN npm run build
 
 FROM node:12-alpine
 
-RUN sudo echo "America/New_York" > /etc/timezone
+RUN sudo echo "Asia/Bangkok" > /etc/timezone
 RUN sudo dpkg-reconfigure -f noninteractive tzdata
 
 WORKDIR /app
