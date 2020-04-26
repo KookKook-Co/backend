@@ -269,6 +269,13 @@ export interface MaxAndMin {
     max: number;
     min: number;
 }
+export interface MaxAndMinWithTimestamp {
+    date: Date;
+    maxTS: Date;
+    max: number;
+    minTS: Date;
+    min: number;
+}
 
 export interface MaxAndMinTemperature {
     date: Date;
