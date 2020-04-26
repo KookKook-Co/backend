@@ -28,6 +28,7 @@ import {
     MaxAndMinHumidity,
     MaxAndMinTemperature,
     MaxAndMinWindSpeed,
+    MaxAndMinWithTimestamp,
     SensorOutput,
     TemperatureTimestamp,
     UserDataOutput,
@@ -212,11 +213,11 @@ export class DbService {
         let tmp_generation = generation.replace('/', '_');
         let filename = `MaxAndMinEnvironmentalDataReport_Hid${hid}_Generation${tmp_generation}.csv`;
         let list_record = await this.dbPoolQuery(
-            `SELECT "C"."hid", "C"."generation","S"."sid", "date", "tmp"."maxWindspeed", "tmp"."minWinspeed", "tmp"."maxAmmonia", "tmp"."minAmmonia",
+            `SELECT "C"."hid", "C"."generation","S"."sid", "date", "tmp"."maxWindspeed", "tmp"."minWindspeed", "tmp"."maxAmmonia", "tmp"."minAmmonia",
             "tmp"."maxTemperature", "tmp"."minTemperature","tmp"."maxHumidity","tmp"."minHumidity"
             FROM(
             SELECT "sid", DATE("timestamp") "date",
-            MAX("windspeed") as "maxWindspeed", MIN("windspeed") AS "minWinspeed",
+            MAX("windspeed") as "maxWindspeed", MIN("windspeed") AS "minWindspeed",
             MAX("ammonia") as "maxAmmonia", MIN("ammonia") AS "minAmmonia",
             MAX("temperature") as "maxTemperature", MIN("temperature") AS "minTemperature",
             MAX("humidity") as "maxHumidity", MIN("humidity") AS "minHumidity"
@@ -229,19 +230,22 @@ export class DbService {
             ORDER BY "date", "S"."sid"`,
         );
         list_record = list_record.rows;
+        list_record.forEach(element => {
+            element['date'] = element['date'].toDateString();
+        });
         let header = [
-            { id: 'hid', title: 'hid' },
-            { id: 'generation', title: 'generation' },
-            { id: 'sid', title: 'sid' },
-            { id: 'date', title: 'date' },
-            { id: 'maxWindspeed', title: 'maxWindspeed' },
-            { id: 'minWindspeed', title: 'minWindspeed' },
-            { id: 'maxAmmonia', title: 'maxAmmonia' },
-            { id: 'minAmmonia', title: 'minAmmonia' },
-            { id: 'maxTemperature', title: 'maxTemperature' },
-            { id: 'minTemperature', title: 'minTemperature' },
-            { id: 'maxHumidity', title: 'maxHumidity' },
-            { id: 'minHumidity', title: 'minHumidity' },
+            { id: 'hid', title: 'House ID' },
+            { id: 'generation', title: 'Generation' },
+            { id: 'sid', title: 'Sensor ID' },
+            { id: 'date', title: 'Date' },
+            { id: 'maxWindspeed', title: 'MaxWindspeed' },
+            { id: 'minWindspeed', title: 'MinWindspeed' },
+            { id: 'maxAmmonia', title: 'MaxAmmonia' },
+            { id: 'minAmmonia', title: 'MinAmmonia' },
+            { id: 'maxTemperature', title: 'MaxTemperature' },
+            { id: 'minTemperature', title: 'MinTemperature' },
+            { id: 'maxHumidity', title: 'MaxHumidity' },
+            { id: 'minHumidity', title: 'MinHumidity' },
         ];
         await this.exportCSV(header, list_record, filename);
         return filename;
@@ -266,15 +270,18 @@ export class DbService {
             WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}'`,
         );
         list_record = list_record.rows;
+        list_record.forEach(element => {
+            element['timestamp'] = element['timestamp'].toUTCString();
+        });
         let header = [
-            { id: 'hid', title: 'hid' },
-            { id: 'generation', title: 'generation' },
-            { id: 'timestamp', title: 'timestamp' },
-            { id: 'sid', title: 'sid' },
-            { id: 'windspeed', title: 'windspeed' },
-            { id: 'ammonia', title: 'ammonia' },
-            { id: 'temperature', title: 'temperature' },
-            { id: 'humidity', title: 'humidity' },
+            { id: 'hid', title: 'House ID' },
+            { id: 'generation', title: 'Generation' },
+            { id: 'timestamp', title: 'Timestamp' },
+            { id: 'sid', title: 'Sensor ID' },
+            { id: 'windspeed', title: 'Windspeed' },
+            { id: 'ammonia', title: 'Ammonia' },
+            { id: 'temperature', title: 'Temperature' },
+            { id: 'humidity', title: 'Humidity' },
         ];
         await this.exportCSV(header, list_record, filename);
         return filename;
@@ -298,14 +305,17 @@ export class DbService {
             WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
         list_record = list_record.rows;
+        list_record.forEach(element => {
+            element['timestamp'] = element['timestamp'].toUTCString();
+        });
         let header = [
-            { id: 'hid', title: 'hid' },
-            { id: 'generation', title: 'generation' },
-            { id: 'timestamp', title: 'timestamp' },
-            { id: 'foodSilo', title: 'foodSilo' },
-            { id: 'foodIn', title: 'foodIn' },
-            { id: 'foodRemain', title: 'foodRemain' },
-            { id: 'foodConsumed', title: 'foodConsumed' },
+            { id: 'hid', title: 'House ID' },
+            { id: 'generation', title: 'Generation' },
+            { id: 'timestamp', title: 'Timestamp' },
+            { id: 'foodSilo', title: 'FoodSilo' },
+            { id: 'foodIn', title: 'FoodIn' },
+            { id: 'foodRemain', title: 'FoodRemain' },
+            { id: 'foodConsumed', title: 'FoodConsumed' },
         ];
         await this.exportCSV(header, list_record, filename);
         return filename;
@@ -329,13 +339,16 @@ export class DbService {
             WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
         list_record = list_record.rows;
+        list_record.forEach(element => {
+            element['timestamp'] = element['timestamp'].toUTCString();
+        });
         let header = [
-            { id: 'hid', title: 'hid' },
-            { id: 'generation', title: 'generation' },
-            { id: 'timestamp', title: 'timestamp' },
-            { id: 'waterMeter1', title: 'waterMeter1' },
-            { id: 'waterMeter2', title: 'waterMeter2' },
-            { id: 'waterConsumed', title: 'waterConsumed' },
+            { id: 'hid', title: 'House ID' },
+            { id: 'generation', title: 'Generation' },
+            { id: 'timestamp', title: 'Timestamp' },
+            { id: 'waterMeter1', title: 'WaterMeter1' },
+            { id: 'waterMeter2', title: 'WaterMeter2' },
+            { id: 'waterConsumed', title: 'WaterConsumed' },
         ];
         await this.exportCSV(header, list_record, filename);
         return filename;
@@ -359,12 +372,15 @@ export class DbService {
             WHERE "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
         list_record = list_record.rows;
+        list_record.forEach(element => {
+            element['timestamp'] = element['timestamp'].toUTCString();
+        });
         let header = [
-            { id: 'hid', title: 'hid' },
-            { id: 'generation', title: 'generation' },
-            { id: 'timestamp', title: 'timestamp' },
-            { id: 'medicineType', title: 'medicineType' },
-            { id: 'medicineConc', title: 'medicineConc' },
+            { id: 'hid', title: 'House ID' },
+            { id: 'generation', title: 'Generation' },
+            { id: 'timestamp', title: 'Timestamp' },
+            { id: 'medicineType', title: 'MedicineType' },
+            { id: 'medicineConc', title: 'Medicine Dose' },
         ];
         await this.exportCSV(header, list_record, filename);
         return filename;
@@ -393,16 +409,20 @@ export class DbService {
             JOIN "Chicken" "C" ON "C"."hid" = "R"."hid" AND "C"."hid" = '${hid}' AND "C"."generation" = '${generation}';`,
         );
         list_record = list_record.rows;
+        list_record.forEach(element => {
+            element['date'] = element['date'].toDateString();
+            element['chicTime'] = element['chicTime'].toUTCString();
+        });
         let header = [
-            { id: 'hid', title: 'hid' },
-            { id: 'generation', title: 'generation' },
-            { id: 'date', title: 'date' },
-            { id: 'chicTime', title: 'chicTime' },
-            { id: 'period', title: 'period' },
-            { id: 'amountDead', title: 'amountDead' },
-            { id: 'amountZleg', title: 'amountZleg' },
-            { id: 'amountDwarf', title: 'amountDwarf' },
-            { id: 'amountSick', title: 'amountSick' },
+            { id: 'hid', title: 'House ID' },
+            { id: 'generation', title: 'Generation' },
+            { id: 'date', title: 'Date' },
+            { id: 'chicTime', title: 'ChicTime' },
+            { id: 'period', title: 'Period' },
+            { id: 'amountDead', title: 'AmountDead' },
+            { id: 'amountZleg', title: 'AmountZleg' },
+            { id: 'amountDwaft', title: 'AmountDwarf' },
+            { id: 'amountSick', title: 'AmountSick' },
         ];
         await this.exportCSV(header, list_record, filename);
         return filename;
@@ -473,6 +493,14 @@ export class DbService {
             WHERE "uid" = '${uid}';`,
         );
     };
+    updateHashedPwdByUid = async (uid: number, newHashedPwd: string) => {
+        await this.dbPoolQuery(
+            `UPDATE "User" 
+            SET "hashedPwd" = '${newHashedPwd}' 
+            WHERE "uid" = '${uid}';`,
+        );
+    };
+
     getAllUsersIDByHid = async (hid: number): Promise<number[]> => {
         const queryArr = await this.dbPoolQuery(
             `SELECT "uid"
@@ -1066,6 +1094,35 @@ export class DbService {
         GROUP BY "sid", DATE("timestamp")
         ) AS "tmp" WHERE "tmp"."sid" = '${sid}' AND "date" BETWEEN
         TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY');`,
+        );
+        return queryArr.rows;
+    };
+
+    getMaxAndMinAndTSBetweenDateBySidandEnvType = async (
+        envType: EnvType,
+        sid: string,
+        dateStart: string,
+        dateEnd: string,
+    ): Promise<MaxAndMinWithTimestamp[]> => {
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "date", "maxTS", "max", "minTS", "min" 
+            FROM (
+                SELECT DATE("timestamp") AS "date", MAX("${envType}") AS "max", MIN("${envType}") AS "min"
+                FROM "Environment"
+                WHERE "sid" = '${sid}'
+             AND DATE("timestamp") BETWEEN TO_DATE('${dateStart}', 'DD-MM-YYYY') AND TO_DATE('${dateEnd}', 'DD-MM-YYYY')
+                GROUP BY DATE("timestamp")
+            ) AS "A"
+            NATURAL JOIN (
+             SELECT "timestamp" AS "maxTS", DATE("timestamp") AS "date", "${envType}" AS "max"
+            FROM "Environment"
+             WHERE "sid" = '${sid}'
+            ) AS "B"
+            NATURAL JOIN (
+             SELECT "timestamp" AS "minTS", DATE("timestamp") AS "date", "${envType}" AS "min"
+            FROM "Environment"
+             WHERE "sid" = '${sid}'
+            ) AS "C";`,
         );
         return queryArr.rows;
     };
