@@ -22,6 +22,7 @@ services:
       BUCKET_ID:
       BUCKET_SECRET:
       BUCKET_NAME:
+      TZ: 'Asia/Bangkok'
     ports:
       - 4000:4000
 
