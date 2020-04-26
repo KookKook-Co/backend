@@ -25,6 +25,14 @@ export class EventGateway
         private readonly checkIrrEnv: CheckerService,
     ) {}
 
+    private weightedCenterRandom = (max, min, numDice, fixed) => {
+        var num: number = min;
+        for (var i = 0; i < numDice; i++) {
+            num += Math.random() * ((max - min) / numDice);
+        }
+        return num.toFixed(fixed);
+    };
+
     @WebSocketServer()
     server: Server;
 
@@ -51,14 +59,18 @@ export class EventGateway
     @SubscribeMessage('getRealTimeData')
     async pipeData(client: Socket, payload: any) {
         // random
-        const rand = () => parseFloat((Math.random() * 100).toFixed(1));
+        // const rand = () => parseFloat((Math.random() * 100).toFixed(1));
 
         const currentData = (): EnvironmentalData => {
             return {
-                temperature: rand(),
-                humidity: rand(),
-                windspeed: rand(),
-                ammonia: rand(),
+                temperature: parseFloat(
+                    this.weightedCenterRandom(35, 20, 5, 1),
+                ),
+                humidity: parseFloat(this.weightedCenterRandom(80, 50, 2, 1)),
+                windspeed: parseFloat(
+                    this.weightedCenterRandom(1.6, 1.4, 5, 2),
+                ),
+                ammonia: parseFloat(this.weightedCenterRandom(25, 0, 3, 1)),
             };
         };
 
@@ -78,43 +90,48 @@ export class EventGateway
 
         // random
 
-        // const { hno } = payload;
-
-        // const hid = await this.dbService.getHidByHno(hno);
-        // const { dateIn } = await this.dbService.getLatestChickenFlockInfoByHid(
-        //     hid,
-        // );
-
-        // const now = moment(new Date());
-        // const chickenAge = moment.duration(now.diff(moment(dateIn))).asDays();
-
-        // setInterval(async () => {
-        //     const houseEnvInfo = await this.dbService.getLatestEnivonmentForEachSensorInHid(
-        //         hid,
-        //     );
-
-        //     const houseEnv = houseEnvInfo.map(each => {
-        //         const { sid, timestamp, ...env } = each;
-        //         return {
-        //             sid,
-        //             irregularEnv: this.checkIrrEnv.getIrrEnv(chickenAge, env),
-        //             environmentalData: env,
-        //         };
-        //     });
-
-        //     client.emit('pipeRealTimeData', houseEnv);
-        // }, 5000);
-
-        const send = () => {
+        const send = async () => {
             const houseRealTimeData: RealTimeData[] = [];
 
             for (let i = 1; i <= 6; i++) {
-                const currData = currentData();
-                houseRealTimeData.push({
-                    sid: i.toString(),
-                    irregularEnv: this.checkIrrEnv.getIrrEnv(10, currData),
-                    environmentalData: currData,
-                });
+                if (i === 1) {
+                    // const { hno } = payload;
+
+                    const hid = await this.dbService.getHidByHno(1);
+                    const {
+                        dateIn,
+                    } = await this.dbService.getLatestChickenFlockInfoByHid(1);
+
+                    const now = moment(new Date());
+                    const chickenAge = moment
+                        .duration(now.diff(moment(dateIn)))
+                        .asDays();
+
+                    const houseEnvInfo = await this.dbService.getLatestEnivonmentForEachSensorInHid(
+                        1,
+                    );
+
+                    const houseEnv = houseEnvInfo.map(each => {
+                        const { sid, timestamp, ...env } = each;
+                        return {
+                            sid,
+                            irregularEnv: this.checkIrrEnv.getIrrEnv(
+                                chickenAge,
+                                env,
+                            ),
+                            environmentalData: env,
+                        };
+                    });
+                    console.log(houseEnv[0]);
+                    houseRealTimeData.push(houseEnv[0]);
+                } else {
+                    const currData = currentData();
+                    houseRealTimeData.push({
+                        sid: i.toString(),
+                        irregularEnv: this.checkIrrEnv.getIrrEnv(10, currData),
+                        environmentalData: currData,
+                    });
+                }
             }
             // console.log(houseRealTimeData);
             client.emit('pipeRealTimeData', houseRealTimeData);
