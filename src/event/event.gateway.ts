@@ -122,8 +122,8 @@ export class EventGateway
                             environmentalData: env,
                         };
                     });
-                    this.logger.log(`Age: ${chickenAge}`);
-                    this.logger.log(houseEnv[0]);
+                    // this.logger.log(`Age: ${chickenAge}`);
+                    // this.logger.log(houseEnv[0]);
                     houseRealTimeData.push(houseEnv[0]);
                 } else {
                     const currData = currentData();

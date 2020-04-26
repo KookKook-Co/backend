@@ -175,6 +175,7 @@ export class EventController {
         this.logger.log(query, '/GET unqualifiedchicken');
         try {
             const formatedDate = moment(query.date).format('DD-MM-YYYY');
+            this.logger.log(formatedDate);
             const h_id = await this.dbService.getHidByHno(query.hno);
 
             const result = await this.dbService.getLatestChickenRecordByHidAndDateAndPeriod(
@@ -182,6 +183,8 @@ export class EventController {
                 formatedDate,
                 query.period,
             );
+
+            console.log(result);
 
             if (result === null || result === undefined) {
                 res.send(null);
