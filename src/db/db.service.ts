@@ -505,7 +505,8 @@ export class DbService {
         const queryArr = await this.dbPoolQuery(
             `SELECT "uid"
             FROM "User" 
-            WHERE "hid" = ${hid}`,
+            WHERE "hid" = ${hid}
+            ORDER BY "uid" ASC`,
         );
         return queryArr.rows.map(each => each.uid);
     };
@@ -554,7 +555,9 @@ export class DbService {
     };
 
     getAllHno = async (): Promise<number[]> => {
-        const queryArr = await this.dbPoolQuery(`SELECT "hno" FROM "House";`);
+        const queryArr = await this.dbPoolQuery(
+            `SELECT "hno" FROM "House" ORDER BY "hno" ASC;`,
+        );
         return queryArr.rows.map(each => each.hno);
     };
 
@@ -680,7 +683,8 @@ export class DbService {
         const queryArr = await this.dbPoolQuery(
             `SELECT "sid", "xPosSen", "yPosSen" 
             FROM "Sensor" 
-            WHERE "hid" = '${hid}';`,
+            WHERE "hid" = '${hid}'
+            ORDER BY "sid" ASC;`,
         );
         return queryArr.rows;
     };
