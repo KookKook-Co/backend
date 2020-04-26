@@ -11,6 +11,10 @@ RUN npm run build
 
 
 FROM node:12-alpine
+
+RUN sudo echo "America/New_York" > /etc/timezone
+RUN sudo dpkg-reconfigure -f noninteractive tzdata
+
 WORKDIR /app
 
 COPY --from=builder /app/package.json /app/package-lock.json ./
