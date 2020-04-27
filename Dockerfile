@@ -6,6 +6,7 @@ COPY ./package.json ./package-lock.json ./
 RUN npm install
 
 # Build
+COPY ./client ./client
 COPY ./mosquitto ./mosquitto
 COPY ./tsconfig.json ./
 COPY ./src ./src
