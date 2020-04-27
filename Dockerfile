@@ -6,14 +6,14 @@ COPY ./package.json ./package-lock.json ./
 RUN npm install
 
 # Build
-COPY . .
+COPY ./mosquitto ./mosquitto
+COPY ./tsconfig.json ./
+COPY ./src ./src
+COPY ./scripts ./scripts
 RUN npm run build
 
 
 FROM node:12-alpine
-
-RUN sudo echo "Asia/Bangkok" > /etc/timezone
-RUN sudo dpkg-reconfigure -f noninteractive tzdata
 
 WORKDIR /app
 
