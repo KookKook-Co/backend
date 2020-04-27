@@ -55,7 +55,7 @@ export class EventController {
         @Query() query: GetWeeklyDailyDataQuery,
         @Res() res: Response,
     ) {
-        console.log(query);
+        // console.log(query);
         const { sid, type, dateStart, dateEnd } = query;
 
         // const dateStart = moment().format('DD-MM-YYYY');
@@ -63,17 +63,24 @@ export class EventController {
         //     .subtract(6, 'days')
         //     .format('DD-MM-YYYY');
 
+        const result = await this.dbService.getMaxAndMinAndTSBetweenDateBySidandEnvType(
+            type,
+            sid,
+            dateStart,
+            dateEnd,
+        );
+
+        // console.log(result);
+
         res.send(
-            await this.dbService.getMaxAndMinBetweenDateBySidandEnvType(
-                type,
-                sid,
-                moment(dateStart)
-                    .tz('Asia/Bangkok')
-                    .format('DD-MM-YYYY'),
-                moment(dateEnd)
-                    .tz('Asia/Bangkok')
-                    .format('DD-MM-YYYY'),
-            ),
+            result.map(each => {
+                return {
+                    ...each,
+                    date: moment(each.date)
+                        .tz('Asia/Bangkok')
+                        .format(),
+                };
+            }),
         );
     }
 
@@ -90,16 +97,16 @@ export class EventController {
     async getDailyDataInfo(@Query() query, @Res() res: Response) {
         this.logger.log(query, '/GET dailydata');
 
-        const formatedDate = moment(query.date)
-            .tz('Asia/Bangkok')
-            .format('DD-MM-YYYY');
+        // const formatedDate = moment(query.date)
+        //     .tz('Asia/Bangkok')
+        //     .format('DD-MM-YYYY');
 
         const hid = await this.dbService.getHidByHno(query.hno);
 
-        if (await this.dbService.isDailyRecordTupleExist(formatedDate, hid)) {
+        if (await this.dbService.isDailyRecordTupleExist(query.date, hid)) {
             const dailyInfo: DailyInfo = await this.dbService.getAllDataRecordByHidAndDate(
                 hid,
-                formatedDate,
+                query.date,
             );
             res.send(dailyInfo);
         } else {
@@ -116,17 +123,19 @@ export class EventController {
     ) {
         try {
             this.logger.log('Start', '/POST dailydata');
-            const hid = await this.dbService.getHidByHno(body.hno);
-            const date = moment(body.date)
-                .tz('Asia/Bangkok')
-                .format('DD-MM-YYYY');
-            const dateBefore = moment(body.date)
-                .tz('Asia/Bangkok')
-                .subtract(1, 'days')
-                .format('DD-MM-YYYY');
 
-            console.log(date);
-            console.log(dateBefore);
+            const { date, dateBefore } = body;
+            const hid = await this.dbService.getHidByHno(body.hno);
+            // const date = moment(body.date)
+            //     .tz('Asia/Bangkok')
+            //     .format('DD-MM-YYYY');
+            // const dateBefore = moment(body.date)
+            //     .tz('Asia/Bangkok')
+            //     .subtract(1, 'days')
+            //     .format('DD-MM-YYYY');
+
+            // console.log(date);
+            // console.log(dateBefore);
             console.log(body);
 
             if (!(await this.dbService.isDailyRecordTupleExist(date, hid))) {
@@ -173,6 +182,7 @@ export class EventController {
 
             res.status(200).send('Success');
         } catch (err) {
+            console.log(err);
             res.status(400).send(err);
         }
     }
@@ -186,15 +196,18 @@ export class EventController {
     ) {
         this.logger.log(query, '/GET unqualifiedchicken');
         try {
-            const formatedDate = moment(query.date)
-                .tz('Asia/Bangkok')
-                .format('DD-MM-YYYY');
-            this.logger.log(formatedDate);
+            // const formatedDate = moment(query.date)
+            //     .tz('Asia/Bangkok')
+            //     .format('DD-MM-YYYY');
+            // this.logger.log(formatedDate);
+
+            console.log(query.date);
+
             const h_id = await this.dbService.getHidByHno(query.hno);
 
             const result = await this.dbService.getLatestChickenRecordByHidAndDateAndPeriod(
                 h_id,
-                formatedDate,
+                query.date,
                 query.period,
             );
 
@@ -219,27 +232,23 @@ export class EventController {
         @Body() body: SubmitUnqualifiedChickenDTO,
         @Res() res: Response,
     ) {
+        this.logger.log('body', '/POST unqualifiedchicken');
         try {
             console.log(body);
             const { date, period, unqualifiedChickenInfo } = body;
 
             const hid = await this.dbService.getHidByHno(body.hno);
-            const formatedDate = moment(date)
-                .tz('Asia/Bangkok')
-                .format('DD-MM-YYYY');
+            // const formatedDate = moment(date)
+            //     .tz('Asia/Bangkok')
+            //     .format('DD-MM-YYYY');
 
-            console.log(formatedDate);
+            console.log(date);
 
-            if (
-                !(await this.dbService.isDailyRecordTupleExist(
-                    formatedDate,
-                    hid,
-                ))
-            ) {
-                await this.dbService.createDailyRecord(formatedDate, hid);
+            if (!(await this.dbService.isDailyRecordTupleExist(date, hid))) {
+                await this.dbService.createDailyRecord(date, hid);
             }
             await this.dbService.createChickenRecord({
-                date: formatedDate,
+                date,
                 chicTime: (new Date().valueOf() / 1000).toString(),
                 hid,
                 period,
@@ -248,6 +257,7 @@ export class EventController {
 
             res.status(200).send('Success');
         } catch (err) {
+            console.log(err);
             res.status(400).send(err);
         }
     }
@@ -304,6 +314,7 @@ export class EventController {
             }
             res.status(200).send('Success');
         } catch (err) {
+            console.log(err);
             res.status(400).send(err);
         }
     }
@@ -319,6 +330,7 @@ export class EventController {
             );
             res.send('Success');
         } catch (err) {
+            console.log(err);
             res.status(400).send(err);
         }
     }

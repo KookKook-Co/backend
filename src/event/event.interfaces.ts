@@ -37,6 +37,7 @@ export interface GetWeeklyDailyDataQuery {
 export interface PostDailyInfo {
     hno: number;
     date: string;
+    dateBefore: string;
     dailyInfo: DailyInfo;
 }
 

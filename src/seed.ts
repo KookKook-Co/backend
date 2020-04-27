@@ -7,7 +7,7 @@ async function bootstrap() {
     console.log('Please run this file in development environment only');
     const app = await NestFactory.create(SeederModule);
     const seeder = app.get(SeederService);
-    await seeder.seedNewDatabase();
+    // await seeder.seedNewDatabase();
     // await seeder.seedNewDatabaseUser();
     await seeder.seedTableConstraint();
     await seeder.seedIndexTable();
