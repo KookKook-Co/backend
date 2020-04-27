@@ -1991,7 +1991,7 @@ export class SeederService {
         }
         ////////////////////////////////////////////////////////
         let ts = 1586488200;
-        for (let t = 1; t <= 200; t++) {
+        for (let t = 1; t <= 212; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2015,7 +2015,7 @@ export class SeederService {
 
         //create Food Record Input one times per day
         ts = 1586488200 + 60 * 60 * 6;
-        for (let t = 1; t <= 14; t++) {
+        for (let t = 1; t <= 18; t++) {
             for (let house = 1; house <= 5; house++) {
                 for (let silo = 1; silo <= 2; silo++) {
                     let getDate = new Date(0);
@@ -2043,7 +2043,7 @@ export class SeederService {
 
         //create Medicine Record Only one times
         ts = 1586488200 + 60 * 60 * 6;
-        for (let t = 1; t <= 14; t++) {
+        for (let t = 1; t <= 18; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2068,7 +2068,7 @@ export class SeederService {
         let meter1 = 2508392;
         let meter2 = 2530116;
         let waterconsume = 663;
-        for (let t = 1; t <= 14; t++) {
+        for (let t = 1; t <= 18; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2109,8 +2109,8 @@ export class SeederService {
             }
         }
         //create Environment Data
-        ts = 1586488200;
-        for (let t = 1; t <= 70; t++) {
+        ts = 1586488200 + 60 * 60 * 24 * 2;
+        for (let t = 1; t <= 62; t++) {
             uniqueID = 1;
             for (let house = 1; house <= 5; house++) {
                 for (let no = 1; no <= 2 * 3; no++) {
