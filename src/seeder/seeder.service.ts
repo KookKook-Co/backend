@@ -1815,6 +1815,14 @@ export class SeederService {
                 );
             }
         }
+        for (let num = 0; num <= 9; num++) {
+            for (let house = 1; house <= 5; house++) {
+                await this.dbService.createDailyRecord(
+                    `2${num}-04-2020`,
+                    house,
+                );
+            }
+        }
 
         let randomGender = ['MALE', 'FEMALE'];
         for (let i = 1; i <= 5; i++) {
@@ -1851,6 +1859,7 @@ export class SeederService {
             }
         }
         //CREATE ChickenRecord SAMPLE
+        let count = 0;
         let tsMorning1 = 1586487000 + 60 * 60 * 6;
         let tsMorning2 = 1586494200 + 60 * 60 * 8;
         let tsEvening1 = 1586520600 + 60 * 60 * 4;
@@ -1879,7 +1888,7 @@ export class SeederService {
                     amountZleg: amountZleg1,
                     amountDwaft: amountDwaft1,
                     amountSick: amountSick1,
-                    date: inputDateMorning1,
+                    date: `2${count}-04-2020`,
                     hid: house,
                 };
                 await this.dbService.createChickenRecord(
@@ -1908,7 +1917,7 @@ export class SeederService {
                     amountSick:
                         Number(amountSick1) +
                         Number(await this.weightedRandom(randomweight)),
-                    date: `${inputDateMorning2}`,
+                    date: `2${count}-04-2020`,
                     hid: house,
                 };
                 await this.dbService.createChickenRecord(
@@ -1937,7 +1946,7 @@ export class SeederService {
                     amountZleg: amountZleg2,
                     amountDwaft: amountDwaft2,
                     amountSick: amountSick2,
-                    date: `${inputDateEvening1}`,
+                    date: `2${count}-04-2020`,
                     hid: house,
                 };
                 await this.dbService.createChickenRecord(
@@ -1967,13 +1976,14 @@ export class SeederService {
                     amountSick:
                         Number(amountSick2) +
                         Number(await this.weightedRandom(randomweight)),
-                    date: `${inputDateEvening2}`,
+                    date: `2${count}-04-2020`,
                     hid: house,
                 };
                 await this.dbService.createChickenRecord(
                     chickenRecordInputEvening2,
                 );
             }
+            count++;
             tsMorning1 = tsMorning1 + 60 * 60 * 24;
             tsMorning2 = tsMorning2 + 60 * 60 * 24;
             tsEvening1 = tsEvening1 + 60 * 60 * 24;
@@ -1981,7 +1991,7 @@ export class SeederService {
         }
         ////////////////////////////////////////////////////////
         let ts = 1586488200;
-        for (let t = 1; t <= 114; t++) {
+        for (let t = 1; t <= 200; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2005,7 +2015,7 @@ export class SeederService {
 
         //create Food Record Input one times per day
         ts = 1586488200 + 60 * 60 * 6;
-        for (let t = 1; t <= 8; t++) {
+        for (let t = 1; t <= 14; t++) {
             for (let house = 1; house <= 5; house++) {
                 for (let silo = 1; silo <= 2; silo++) {
                     let getDate = new Date(0);
@@ -2033,7 +2043,7 @@ export class SeederService {
 
         //create Medicine Record Only one times
         ts = 1586488200 + 60 * 60 * 6;
-        for (let t = 1; t <= 9; t++) {
+        for (let t = 1; t <= 14; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2058,7 +2068,7 @@ export class SeederService {
         let meter1 = 2508392;
         let meter2 = 2530116;
         let waterconsume = 663;
-        for (let t = 1; t <= 9; t++) {
+        for (let t = 1; t <= 14; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2100,7 +2110,7 @@ export class SeederService {
         }
         //create Environment Data
         ts = 1586488200;
-        for (let t = 1; t <= 38; t++) {
+        for (let t = 1; t <= 70; t++) {
             uniqueID = 1;
             for (let house = 1; house <= 5; house++) {
                 for (let no = 1; no <= 2 * 3; no++) {
