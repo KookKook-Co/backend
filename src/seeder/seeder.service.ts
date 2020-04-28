@@ -1991,7 +1991,7 @@ export class SeederService {
         }
         ////////////////////////////////////////////////////////
         let ts = 1586488200;
-        for (let t = 1; t <= 236; t++) {
+        for (let t = 1; t <= 233; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2043,7 +2043,7 @@ export class SeederService {
 
         //create Medicine Record Only one times
         ts = 1586488200 + 60 * 60 * 6;
-        for (let t = 1; t <= 20; t++) {
+        for (let t = 1; t <= 19; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2068,7 +2068,7 @@ export class SeederService {
         let meter1 = 2508392;
         let meter2 = 2530116;
         let waterconsume = 663;
-        for (let t = 1; t <= 20; t++) {
+        for (let t = 1; t <= 19; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
