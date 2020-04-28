@@ -103,7 +103,7 @@ export class NotiService {
                 if (err) {
                     console.log('error: ' + err);
                 } else {
-                    // console.log('body: ' + body);
+                    console.log('body: ' + body);
                 }
             },
         );

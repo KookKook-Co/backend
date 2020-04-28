@@ -66,11 +66,11 @@ export class EventGateway
                 temperature: parseFloat(
                     this.weightedCenterRandom(35, 20, 5, 1),
                 ),
-                humidity: parseFloat(this.weightedCenterRandom(80, 50, 2, 1)),
+                humidity: parseFloat(this.weightedCenterRandom(81, 49, 2, 1)),
                 windspeed: parseFloat(
-                    this.weightedCenterRandom(1.6, 1.4, 5, 2),
+                    this.weightedCenterRandom(1.55, 1.45, 5, 2),
                 ),
-                ammonia: parseFloat(this.weightedCenterRandom(25, 0, 3, 1)),
+                ammonia: parseFloat(this.weightedCenterRandom(20, 0, 3, 1)),
             };
         };
 

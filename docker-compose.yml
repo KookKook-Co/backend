@@ -6,7 +6,7 @@ services:
     restart: always
     volumes:
       - /app/csv
-      - /app/client
+      - ./client:/app/client
     environment:
       DB_URI:
       QUERY_DB_URI:

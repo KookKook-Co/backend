@@ -81,7 +81,7 @@ export class CheckerService {
 
     isIrrEnv(age: number, type: EnvType, value: number) {
         const result = this.checkList[type](this.getAgeIndex(age), value);
-        this.logger.log(`Irregular ${type}? false`);
+        this.logger.log(`Irregular ${type}? ${result}`);
         return result;
     }
 }

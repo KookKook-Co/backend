@@ -602,7 +602,7 @@ export class DbService {
             `SELECT "dateIn", "dateOut", "generation", "type", "amountIn", "gender" 
             FROM "Chicken" 
             WHERE "hid" = '${hid}'
-            ORDER BY "dateIn"`,
+            ORDER BY "dateIn" DESC`,
         );
         return queryArr.rows;
     };

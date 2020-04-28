@@ -23,6 +23,8 @@ export class ReportController {
         try {
             const { hno, generation, email, reports } = body;
             const hid = await this.dbService.getHidByHno(hno);
+            console.log(body);
+
             const result = await Promise.all(
                 reports.map(report => this.checkList[report](hid, generation)),
             );
