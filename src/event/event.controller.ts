@@ -72,8 +72,34 @@ export class EventController {
 
         // console.log(result);
 
+        const temp = [];
+
+        result.map((each, index, arr) => {
+            if (
+                index !== 0 &&
+                moment(each.date)
+                    .tz('Asia/Bangkok')
+                    .format('DD-MM-YYYY') ===
+                    moment(arr[index - 1].date)
+                        .tz('Asia/Bangkok')
+                        .format('DD-MM-YYYY')
+            ) {
+                // console.log('here');
+                temp.push(index);
+            }
+        });
+
+        // console.log(temp);
+
+        temp.map(each => {
+            result.splice(each, 1);
+        });
+
+        // console.log('after');
+        // console.log(result);
+
         res.send(
-            result.map(each => {
+            result.map((each, index, arr) => {
                 return {
                     ...each,
                     date: moment(each.date)
