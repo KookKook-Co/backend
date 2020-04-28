@@ -1991,7 +1991,7 @@ export class SeederService {
         }
         ////////////////////////////////////////////////////////
         let ts = 1586488200;
-        for (let t = 1; t <= 212; t++) {
+        for (let t = 1; t <= 236; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2015,7 +2015,7 @@ export class SeederService {
 
         //create Food Record Input one times per day
         ts = 1586488200 + 60 * 60 * 6;
-        for (let t = 1; t <= 18; t++) {
+        for (let t = 1; t <= 20; t++) {
             for (let house = 1; house <= 5; house++) {
                 for (let silo = 1; silo <= 2; silo++) {
                     let getDate = new Date(0);
@@ -2043,7 +2043,7 @@ export class SeederService {
 
         //create Medicine Record Only one times
         ts = 1586488200 + 60 * 60 * 6;
-        for (let t = 1; t <= 18; t++) {
+        for (let t = 1; t <= 20; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2068,7 +2068,7 @@ export class SeederService {
         let meter1 = 2508392;
         let meter2 = 2530116;
         let waterconsume = 663;
-        for (let t = 1; t <= 18; t++) {
+        for (let t = 1; t <= 20; t++) {
             for (let house = 1; house <= 5; house++) {
                 let getDate = new Date(0);
                 getDate.setSeconds(ts);
@@ -2110,7 +2110,7 @@ export class SeederService {
         }
         //create Environment Data
         ts = 1586488200 + 60 * 60 * 24 * 2;
-        for (let t = 1; t <= 62; t++) {
+        for (let t = 1; t <= 70; t++) {
             uniqueID = 1;
             for (let house = 1; house <= 5; house++) {
                 for (let no = 1; no <= 2 * 3; no++) {
@@ -2130,13 +2130,14 @@ export class SeederService {
         }
         //create Image
         ts = 1586488200;
+        let countURL = 0;
         for (let t = 1; t <= 20; t++) {
             uniqueID = 1;
             for (let house = 1; house <= 2; house++) {
                 for (let i = 1; i <= 14; i++) {
                     for (let j = 1; j <= 24; j++) {
                         let amountDead = 0;
-                        let url = `https://i.imgur.com/0jQOC0U.jpg`;
+                        let url = `https://kookkook.s3-ap-southeast-1.amazonaws.com/chicken_img/${countURL}.png`;
                         if (i == 3 && j == 4) {
                             amountDead = 1;
                             url = `https://kookkook.s3-ap-southeast-1.amazonaws.com/chicken_img/46.png`;
@@ -2157,6 +2158,8 @@ export class SeederService {
                         };
                         await this.dbService.createImage(imageInput);
                         uniqueID++;
+                        countURL++;
+                        if (countURL >= 15) countURL = 0;
                     }
                 }
             }
